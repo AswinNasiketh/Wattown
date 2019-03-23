@@ -4,6 +4,7 @@ import board
 import adafruit_mcp3xxx.mcp3008 as MCP
 import time
 import pigpio
+import neopixel
 
 spi = busio.SPI(clock=board.SCK_1, MISO=board.MISO_1, MOSI=board.MOSI_1) #ADCs use second SPI port of RPi
 cs = digitalio.DigitalInOut(board.D16)
@@ -23,6 +24,15 @@ pi.set_mode(windmillDriverPlus, pigpio.OUTPUT)
 pi.set_mode(windmillDriverMinus, pigpio.OUTPUT)
 wid = 0
 drivingWindmills = False
+
+num_neopixels = 97
+reservoir_range_lower = 0
+reservoir_range_upper = 7
+city_range_lower = 8
+city_range_upper = 94
+fuel_cell_range_lower = 95
+fuel_cell_range_upper = 96
+pixels = neopixel.NeoPixel(board.D12, num_neopixels, auto_write = False)
 
 def driveWindmills(frequency):
     global wid
@@ -70,8 +80,35 @@ def getWindmillVoltages():
     global adcChannel4
     global adcChannel5
 
-    return [adcChannel1.voltage,
-    adcChannel2.voltage,
-    adcChannel3.voltage,
-    adcChannel4.voltage,
-    adcChannel5.voltage]
+    return [adcChannel1.voltage, adcChannel2.voltage, adcChannel3.voltage, adcChannel4.voltage, adcChannel5.voltage]
+
+#LED control code, colour must be inputted as list of three integers between 0 and 255 (i.e. setCityLEDs([255,255,0]))
+def setCityLEDs(colour):
+        global pixels
+        global city_range_lower
+        global city_range_upper
+
+        for i in range(city_range_lower, city_range_upper + 1):
+                pixels[i] = colour
+
+        pixels.show()
+
+def setReservoirLEDs(colour):
+        global pixels
+        global reservoir_range_lower
+        global reservoir_range_upper
+
+        for i in range(reservoir_range_lower, reservoir_range_upper + 1):
+                pixels[i] = colour
+        
+        pixels.show()
+
+def setFuelCellLEDs(colour):
+        global pixels
+        global fuel_cell_range_lower
+        global fuel_cell_range_upper
+
+        for i in range(fuel_cell_range_lower, fuel_cell_range_upper + 1):
+                pixels[i] = colour
+
+        pixels.show()
