@@ -28,6 +28,9 @@ class WattownBoard():
                 self.wid = 0
                 self.drivingWindmills = False
 
+                self.fuelCellPin = 8
+                self.pi.set_mode(self.fuelCellPin, pigpio.OUTPUT)
+
                 self.num_neopixels = 97
                 self.reservoir_level_0 = 0
                 self.reservoir_level_1_lower = 1
@@ -106,3 +109,9 @@ class WattownBoard():
                         self.pixels[i] = colour
 
                 self.pixels.show()
+
+        def turnOnFuelCell(self):
+               self.pi.write(self.fuelCellPin, 1)
+
+        def turnOffFuelCell(self):
+               self.pi.write(self.fuelCellPin, 0)
