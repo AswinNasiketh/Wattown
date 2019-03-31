@@ -26,8 +26,13 @@ wid = 0
 drivingWindmills = False
 
 num_neopixels = 97
-reservoir_range_lower = 0
-reservoir_range_upper = 7
+reservoir_level_0 = 0
+reservoir_level_1_lower = 1
+reservoir_level_1_upper = 2
+reservoir_level_2_lower = 3
+reservoir_level_2_upper = 4
+reservoir_level_3_lower = 5
+reservoir_level_3_upper = 7
 city_range_lower = 8
 city_range_upper = 94
 fuel_cell_range_lower = 95
@@ -93,13 +98,26 @@ def setCityLEDs(colour):
 
         pixels.show()
 
-def setReservoirLEDs(colour):
+def setReservoirLEDs(level0Colour, level1Colour, level2Colour, level3Colour):
         global pixels
-        global reservoir_range_lower
-        global reservoir_range_upper
+        global reservoir_level_0
+        global reservoir_level_1_lower
+        global reservoir_level_1_upper
+        global reservoir_level_2_lower
+        global reservoir_level_2_upper
+        global reservoir_level_3_lower
+        global reservoir_level_3_upper
 
-        for i in range(reservoir_range_lower, reservoir_range_upper + 1):
-                pixels[i] = colour
+        pixels[reservoir_level_0] = level0Colour
+
+        for i in range(reservoir_level_1_lower, reservoir_level_1_upper + 1):
+                pixels[i] = level1Colour
+
+        for i in range(reservoir_level_2_lower, reservoir_level_2_upper + 1):
+                pixels[i] = level2Colour
+
+        for i in range(reservoir_level_3_lower, reservoir_level_3_upper + 1):
+                pixels[i] = level3Colour      
         
         pixels.show()
 
