@@ -6,127 +6,103 @@ import time
 import pigpio
 import neopixel
 
-spi = busio.SPI(clock=board.SCK_1, MISO=board.MISO_1, MOSI=board.MOSI_1) #ADCs use second SPI port of RPi
-cs = digitalio.DigitalInOut(board.D16)
-mcp = MCP.MCP3008(spi, cs)
+class WattownBoard():
+        def __init__(self):
+                spi = busio.SPI(clock=board.SCK_1, MISO=board.MISO_1, MOSI=board.MOSI_1) #ADCs use second SPI port of RPi
+                cs = digitalio.DigitalInOut(board.D16)
+                mcp = MCP.MCP3008(spi, cs)
 
-adcChannel1 = AnalogIn(mcp, MCP.P1) # channels 1 to 5 are measuring windmill voltages
-adcChannel2 = AnalogIn(mcp, MCP.P2)
-adcChannel3 = AnalogIn(mcp, MCP.P3)
-adcChannel4 = AnalogIn(mcp, MCP.P4)
-adcChannel5 = AnalogIn(mcp, MCP.P5)
-adcChannel7 = AnalogIn(mcp, MCP.P7) #channel 7 is measuring solar panel voltage
+                self.adcChannel1 = AnalogIn(mcp, MCP.P1) # channels 1 to 5 are measuring windmill voltages
+                self.adcChannel2 = AnalogIn(mcp, MCP.P2)
+                self.adcChannel3 = AnalogIn(mcp, MCP.P3)
+                self.adcChannel4 = AnalogIn(mcp, MCP.P4)
+                self.adcChannel5 = AnalogIn(mcp, MCP.P5)
+                self.adcChannel7 = AnalogIn(mcp, MCP.P7) #channel 7 is measuring solar panel voltage
 
-windmillDriverPlus = 1 #pins connected to BJT H bridges driving windmills
-windmillDriverMinus = 7
-pi = pigpio.pi()
-pi.set_mode(windmillDriverPlus, pigpio.OUTPUT)
-pi.set_mode(windmillDriverMinus, pigpio.OUTPUT)
-wid = 0
-drivingWindmills = False
+                self.windmillDriverPlus = 1 #pins connected to BJT H bridges driving windmills
+                self.windmillDriverMinus = 7
 
-num_neopixels = 97
-reservoir_level_0 = 0
-reservoir_level_1_lower = 1
-reservoir_level_1_upper = 2
-reservoir_level_2_lower = 3
-reservoir_level_2_upper = 4
-reservoir_level_3_lower = 5
-reservoir_level_3_upper = 7
-city_range_lower = 8
-city_range_upper = 94
-fuel_cell_range_lower = 95
-fuel_cell_range_upper = 96
-pixels = neopixel.NeoPixel(board.D12, num_neopixels, auto_write = False)
+                self.pi = pigpio.pi()
+                self.pi.set_mode(self.windmillDriverPlus, pigpio.OUTPUT)
+                self.pi.set_mode(self.windmillDriverMinus, pigpio.OUTPUT)
+                self.wid = 0
+                self.drivingWindmills = False
 
-def driveWindmills(frequency):
-    global wid
-    global drivingWindmills
-    global windmillDriverPlus
-    global windmillDriverMinus
-    global pi
+                self.num_neopixels = 97
+                self.reservoir_level_0 = 0
+                self.reservoir_level_1_lower = 1
+                self.reservoir_level_1_upper = 2
+                self.reservoir_level_2_lower = 3
+                self.reservoir_level_2_upper = 4
+                self.reservoir_level_3_lower = 5
+                self.reservoir_level_3_upper = 7
+                self.city_range_lower = 8
+                self.city_range_upper = 94
+                self.fuel_cell_range_lower = 95
+                self.fuel_cell_range_upper = 96
+                
+                self.pixels = neopixel.NeoPixel(board.D12, self.num_neopixels, auto_write = False)
 
-    halfCyclePeriod = 1/(2 * frequency)
-    halfCyclePeriod = halfCyclePeriod  * (10**6) #convert to microseconds
-    square = []
 
-    #                          ON       OFF    MICROS
-    square.append(pigpio.pulse(1<<windmillDriverPlus, 1<<windmillDriverMinus, halfCyclePeriod))
-    square.append(pigpio.pulse(1<<windmillDriverMinus,1<<windmillDriverPlus, halfCyclePeriod))
-    pi.wave_add_generic(square)
-    wid = pi.wave_create()
+        def driveWindmills(self, frequency):
+                if self.drivingWindmills:
+                        self.stopWindmills()
 
-    if wid >= 0:
-        pi.wave_send_repeat(wid)
-        drivingWindmills = True
+                halfCyclePeriod = 1/(2 * frequency)
+                halfCyclePeriod = halfCyclePeriod  * (10**6) #convert to microseconds
+                square = []
 
-def stopWindmills():
-    global drivingWindmills
-    global wid
-    global pi
+                #                          ON       OFF    MICROS
+                square.append(pigpio.pulse(1<<self.windmillDriverPlus, 1<<self.windmillDriverMinus, halfCyclePeriod))
+                square.append(pigpio.pulse(1<<self.windmillDriverMinus,1<<self.windmillDriverPlus, halfCyclePeriod))
+                self.pi.wave_add_generic(square)
+                wid = self.pi.wave_create()
 
-    if drivingWindmills:
-        pi.wave_tx_stop()
-        pi.wave_delete(wid)
-        drivingWindmills = False
+                if wid >= 0:
+                        self.pi.wave_send_repeat(wid)
+                        self.drivingWindmills = True
 
-def releaseResources():
-    global pi
-    pi.stop()
+        def stopWindmills(self):       
 
-def getSolarPanelVoltage():
-    global adcChannel7
-    return adcChannel7.voltage
+                if self.drivingWindmills:
+                        self.pi.wave_tx_stop()
+                        self.pi.wave_delete(self.wid)
+                        self.drivingWindmills = False
 
-def getWindmillVoltages():
-    global adcChannel1
-    global adcChannel2
-    global adcChannel3
-    global adcChannel4
-    global adcChannel5
+        def releaseResources(self):
+                self.pi.stop()
 
-    return [adcChannel1.voltage, adcChannel2.voltage, adcChannel3.voltage, adcChannel4.voltage, adcChannel5.voltage]
+        def getSolarPanelVoltage(self):    
+                return self.adcChannel7.voltage
 
-#LED control code, colour must be inputted as list of three integers between 0 and 255 (i.e. setCityLEDs([255,255,0]))
-def setCityLEDs(colour):
-        global pixels
-        global city_range_lower
-        global city_range_upper
+        def getWindmillVoltages(self):
+                return [self.adcChannel1.voltage, self.adcChannel2.voltage, self.adcChannel3.voltage, self.adcChannel4.voltage, self.adcChannel5.voltage]
 
-        for i in range(city_range_lower, city_range_upper + 1):
-                pixels[i] = colour
+        #LED control code, colour must be inputted as list of three integers between 0 and 255 (i.e. setCityLEDs([255,255,0]))
+        def setCityLEDs(self, colour):
+                for i in range(self.city_range_lower, self.city_range_upper + 1):
+                        self.pixels[i] = colour
 
-        pixels.show()
+                self.pixels.show()
 
-def setReservoirLEDs(level0Colour, level1Colour, level2Colour, level3Colour):
-        global pixels
-        global reservoir_level_0
-        global reservoir_level_1_lower
-        global reservoir_level_1_upper
-        global reservoir_level_2_lower
-        global reservoir_level_2_upper
-        global reservoir_level_3_lower
-        global reservoir_level_3_upper
+        def setReservoirLEDs(self, level0Colour, level1Colour, level2Colour, level3Colour):
 
-        pixels[reservoir_level_0] = level0Colour
+                self.pixels[self.reservoir_level_0] = level0Colour
 
-        for i in range(reservoir_level_1_lower, reservoir_level_1_upper + 1):
-                pixels[i] = level1Colour
+                for i in range(self.reservoir_level_1_lower, self.reservoir_level_1_upper + 1):
+                        self.pixels[i] = level1Colour
 
-        for i in range(reservoir_level_2_lower, reservoir_level_2_upper + 1):
-                pixels[i] = level2Colour
+                for i in range(self.reservoir_level_2_lower, self.reservoir_level_2_upper + 1):
+                        self.pixels[i] = level2Colour
 
-        for i in range(reservoir_level_3_lower, reservoir_level_3_upper + 1):
-                pixels[i] = level3Colour      
-        
-        pixels.show()
+                for i in range(self.reservoir_level_3_lower, self.reservoir_level_3_upper + 1):
+                        self.pixels[i] = level3Colour      
+                
+                self.pixels.show()
 
-def setFuelCellLEDs(colour):
-        global pixels
-        global fuel_cell_range_lower
-        global fuel_cell_range_upper
+        def setFuelCellLEDs(self, colour):
 
-        for i in range(fuel_cell_range_lower, fuel_cell_range_upper + 1):
-                pixels[i] = colour
+                for i in range(self.fuel_cell_range_lower, self.fuel_cell_range_upper + 1):
+                        self.pixels[i] = colour
 
-        pixels.show()
+                self.pixels.show()

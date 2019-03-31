@@ -1,8 +1,28 @@
 from tkinter import *
 from ui import *
+import time
+import threading
+
+taskRunning = True
+
+root = Tk()
+
+app = Window(root)
 
 def interactiveMode():
-    print("Starting interactive mode")
+    t = threading.Thread(target=interactiveModeLoop)
+    t.daemon = True
+    t.start()
+
+def interactiveModeLoop():
+        print("Starting interactive mode")
+        global taskRunning
+        taskRunning = True
+        app.setTaskRunning(taskRunning)
+        while taskRunning:
+                print("interactive mode running")
+                taskRunning = app.getTaskRunning()
+                time.sleep(1)
 
 def dailyCycleMode():
     print("Starting daily cycle mode")
@@ -10,12 +30,9 @@ def dailyCycleMode():
 def gameMode():
     print("Starting game mode")
 
-
-
-root = Tk()
-# root.geometry("400x300")
-
-app = Window(interactiveMode, dailyCycleMode, gameMode, root)
+app.setInteractiveBtnCommand(interactiveMode)
+app.setDailyCylceBtnCommand(dailyCycleMode)
+app.setGameBtnCommand(gameMode)
 
 root.mainloop()
 
