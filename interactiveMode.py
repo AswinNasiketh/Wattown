@@ -23,6 +23,9 @@ class InteractiveMode():
         self.LED_WATER_BLUE = (94,155,255)
 
     def interactiveModeLoop(self):
+        self.currentBatteryLevel = 0
+        self.previousBatteryLevel = 0
+
         while self.window.getTaskRunning():
             self.previousBatteryLevel = self.currentBatteryLevel
 
@@ -46,6 +49,8 @@ class InteractiveMode():
             self.animateReservoir()
 
             time.sleep(1)
+        
+        self.board.resetBoard()
         
     
     def areSolarPanelsOn(self):

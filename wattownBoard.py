@@ -25,6 +25,8 @@ class WattownBoard():
                 self.pi = pigpio.pi()
                 self.pi.set_mode(self.windmillDriverPlus, pigpio.OUTPUT)
                 self.pi.set_mode(self.windmillDriverMinus, pigpio.OUTPUT)
+                self.pi.write(self.windmillDriverPlus, 0)
+                self.pi.write(self.windmillDriverMinus, 0)
                 self.wid = 0
                 self.drivingWindmills = False
 
@@ -65,12 +67,14 @@ class WattownBoard():
                         self.pi.wave_send_repeat(wid)
                         self.drivingWindmills = True
 
-        def stopWindmills(self):       
+        def stopWindmills(self):     
 
                 if self.drivingWindmills:
                         self.pi.wave_tx_stop()
                         self.pi.wave_delete(self.wid)
                         self.drivingWindmills = False
+                        self.pi.write(self.windmillDriverPlus, 0)
+                        self.pi.write(self.windmillDriverMinus, 0)
 
         def releaseResources(self):
                 self.pi.stop()
@@ -115,3 +119,8 @@ class WattownBoard():
 
         def turnOffFuelCell(self):
                self.pi.write(self.fuelCellPin, 0)
+
+        def resetBoard(self):
+                self.pixels.fill((0,0,0))
+                self.stopWindmills()
+                self.turnOffFuelCell()
