@@ -23,6 +23,8 @@ class InteractiveMode():
         self.LED_WATER_BLUE = (94,155,255)
 
     def interactiveModeLoop(self):
+        print("Starting interactive mode loop")
+        self.board.stopWindmills()
         self.currentBatteryLevel = 0
         self.previousBatteryLevel = 0
 
@@ -47,7 +49,7 @@ class InteractiveMode():
 
             self.animateBattery()
             self.animateReservoir()
-
+            print("Battery level: " + self.currentBatteryLevel)
             time.sleep(1)
         
         self.board.resetBoard()
@@ -57,8 +59,10 @@ class InteractiveMode():
         solarPanelVoltage = self.board.getSolarPanelVoltage()
 
         if solarPanelVoltage >= self.PV_THRESHOLD:
+            print("Solar panels on")
             return True
         else:
+            print("Solar panels off")
             return False
 
     def getWindmillsBlown(self):
@@ -67,7 +71,10 @@ class InteractiveMode():
 
         for i in range(len(windmillVoltages)):
             if windmillVoltages[i] >= self.WINDMILL_THRESHOLD:
+                print("Windmill " + i + "Running")
                 windmillsBlown += 1
+            else:
+                print("Windmill " + i + "stopped")
 
         return windmillsBlown
 

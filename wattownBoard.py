@@ -32,6 +32,7 @@ class WattownBoard():
 
                 self.fuelCellPin = 8
                 self.pi.set_mode(self.fuelCellPin, pigpio.OUTPUT)
+                self.pi.write(self.fuelCellPin, 0)
 
                 self.num_neopixels = 97
                 self.reservoir_level_0 = 0
@@ -68,7 +69,6 @@ class WattownBoard():
                         self.drivingWindmills = True
 
         def stopWindmills(self):     
-
                 if self.drivingWindmills:
                         self.pi.wave_tx_stop()
                         self.pi.wave_delete(self.wid)
@@ -85,7 +85,7 @@ class WattownBoard():
         def getWindmillVoltages(self):
                 return [self.adcChannel1.voltage, self.adcChannel2.voltage, self.adcChannel3.voltage, self.adcChannel4.voltage, self.adcChannel5.voltage]
 
-        #LED control code, colour must be inputted as list of three integers between 0 and 255 (i.e. setCityLEDs([255,255,0]))
+        #LED control code, colour must be inputted as tuple of three integers between 0 and 255 (i.e. setCityLEDs((255,255,0))
         def setCityLEDs(self, colour):
                 for i in range(self.city_range_lower, self.city_range_upper + 1):
                         self.pixels[i] = colour
