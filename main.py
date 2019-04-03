@@ -18,17 +18,17 @@ def interactiveModeLoop():
         print("Starting interactive mode")
         global taskRunning
         taskRunning = True
-        app.setTaskRunning(taskRunning)
+        app.setTaskRunning(taskRunning, "Interactive Mode")
         while taskRunning:
                 print("interactive mode running")
                 taskRunning = app.getTaskRunning()
                 time.sleep(1)
 
 def dailyCycleMode():
-    print("Starting daily cycle mode")
+    print("daily cycle mode not implemented")
 
 def gameMode():
-    print("Starting game mode")
+    print("game mode not implemented")
 
 app.setInteractiveBtnCommand(interactiveMode)
 app.setDailyCylceBtnCommand(dailyCycleMode)

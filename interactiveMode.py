@@ -21,6 +21,7 @@ class InteractiveMode():
         self.LED_BLUE_MAX = (94, 193, 255)
         self.LED_GREEN_BRIGHT = (97, 255, 94)
         self.LED_WATER_BLUE = (94,155,255)
+        self.LED_CITY_LIGHTS_YELLOW = (244, 217, 66)
 
     def interactiveModeLoop(self):
         print("Starting interactive mode loop")
@@ -49,7 +50,8 @@ class InteractiveMode():
 
             self.animateBattery()
             self.animateReservoir()
-            print("Battery level: " + self.currentBatteryLevel)
+            self.animateCityLights()
+            print("Battery level: " + str(self.currentBatteryLevel))
             time.sleep(1)
         
         self.board.resetBoard()
@@ -71,10 +73,10 @@ class InteractiveMode():
 
         for i in range(len(windmillVoltages)):
             if windmillVoltages[i] >= self.WINDMILL_THRESHOLD:
-                print("Windmill " + i + "Running")
+                print("Windmill " + str(i) + " Running")
                 windmillsBlown += 1
             else:
-                print("Windmill " + i + "stopped")
+                print("Windmill " + str(i) + " stopped")
 
         return windmillsBlown
 
@@ -133,6 +135,12 @@ class InteractiveMode():
             level3Colour = self.LED_WATER_BLUE
 
         self.board.setReservoirLEDs(level0Colour,level1Colour,level2Colour,level3Colour)
+
+    def animateCityLights(self):
+        if(self.currentBatteryLevel > 0):
+            self.board.setCityLEDs(self.LED_CITY_LIGHTS_YELLOW)
+        else:
+            self.board.setCityLEDs((0,0,0))
 
 
 
