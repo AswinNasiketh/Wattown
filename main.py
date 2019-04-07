@@ -3,36 +3,39 @@ from ui import *
 import time
 import threading
 
-taskRunning = True
+# taskRunning = True
 
 root = Tk()
 
-app = Window(root)
+simulation = 5
 
-def interactiveMode():
-    t = threading.Thread(target=interactiveModeLoop)
-    t.daemon = True
-    t.start()
+app = CycleModeControlsWindow(root, 5)
 
-def interactiveModeLoop():
-        print("Starting interactive mode")
-        global taskRunning
-        taskRunning = True
-        app.setTaskRunning(taskRunning, "Interactive Mode")
-        while taskRunning:
-                print("interactive mode running")
-                taskRunning = app.getTaskRunning()
-                time.sleep(1)
 
-def dailyCycleMode():
-    print("daily cycle mode not implemented")
+# def interactiveMode():
+#     t = threading.Thread(target=interactiveModeLoop)
+#     t.daemon = True
+#     t.start()
 
-def gameMode():
-    print("game mode not implemented")
+# def interactiveModeLoop():
+#         print("Starting interactive mode")
+#         global taskRunning
+#         taskRunning = True
+#         app.setTaskRunning(taskRunning, "Interactive Mode")
+#         while taskRunning:
+#                 print("interactive mode running")
+#                 taskRunning = app.getTaskRunning()
+#                 time.sleep(1)
 
-app.setInteractiveBtnCommand(interactiveMode)
-app.setDailyCylceBtnCommand(dailyCycleMode)
-app.setGameBtnCommand(gameMode)
+# def dailyCycleMode():
+#     print("daily cycle mode not implemented")
+
+# def gameMode():
+#     print("game mode not implemented")
+
+# app.setInteractiveBtnCommand(interactiveMode)
+# app.setDailyCylceBtnCommand(dailyCycleMode)
+# app.setGameBtnCommand(gameMode)
 
 root.mainloop()
 

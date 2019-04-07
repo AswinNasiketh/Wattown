@@ -6,7 +6,7 @@ import time
 import threading
 
 root = Tk()
-app = Window(root)
+app = MainWindow(root)
 board = WattownBoard()
 
 interactiveModeObj = InteractiveMode(app, board)
