@@ -3,8 +3,9 @@ import threading
 
 class CycleSim():
 
-    def __init__(self, board):
+    def __init__(self, board, mainWindow):
         self.board = board
+        self.mainWindow = mainWindow
 
         #1GW = 0.1 units
         self.SUNNY_DAY_SOLAR_GENERATION = 1.28 #UK solar power capacity = 12.8GW
@@ -97,6 +98,9 @@ class CycleSim():
             print("Battery Charging: ", str(self.batteryCharging))
             time.sleep(2.5)
 
+        self.board.resetBoard()
+        self.mainWindow.setTaskRunning(False)
+
 
     def animateCityLights(self, consumption, maxConsumption, minConsumption):
         maxConsumptionDelta = maxConsumption - minConsumption
@@ -165,7 +169,8 @@ class CycleSim():
                 self.board.stopWindmills()
                 windmillsOn = False
                 time.sleep(windmillTime)
-
+        self.board.stopWindmills()
+        self.board.turnOffFuelCell()
             
 
     def pulseFuelCell(self):
@@ -229,6 +234,8 @@ class CycleSim():
             time.sleep(0.5)
             self.board.setFuelCellLEDs(batteryColour)
             time.sleep(0.5)
+
+        self.board.setFuelCellLEDs((0,0,0))
     
     def addToBattery(self, unitsToAdd):
         if (self.batteryRemaining + unitsToAdd) > 100:

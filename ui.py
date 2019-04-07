@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter.ttk import *
+import threading
 
 class MainWindow(Frame):
     
@@ -57,10 +58,11 @@ class MainWindow(Frame):
      
 class CycleModeControlsWindow(Frame):
 
-    def __init__(self, master, simulation):
+    def __init__(self, master, simulation, mainWindow):
         Frame.__init__(self, master)
         self.master = master
         self.simulation = simulation
+        self.mainWindow = mainWindow
         self.initWindow()
         
     def initWindow(self):
@@ -193,5 +195,9 @@ class CycleModeControlsWindow(Frame):
         windAmplitude = int(windAmplitude)
 
         if validated:
+            self.mainWindow.setTaskRunning(True, "Cycle mode")
             self.simulation.configure(typeOfDay, daylightHours, windPresent, windmillTime, windAmplitude)
+            cycleSimulationThread = threading.Thread(target=self.simulation.cycleModeLoop)
+            cycleSimulationThread.daemon = True
+            cycleSimulationThread.run()
             self.destroy()

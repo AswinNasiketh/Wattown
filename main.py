@@ -10,7 +10,8 @@ root = Tk()
 simulation = 5
 
 app = CycleModeControlsWindow(root, 5)
-
+newWin = Toplevel(root)
+anotherWindow = MainWindow(newWin)
 
 # def interactiveMode():
 #     t = threading.Thread(target=interactiveModeLoop)
