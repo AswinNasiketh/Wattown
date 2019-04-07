@@ -95,7 +95,7 @@ class CycleModeControlsWindow(Frame):
 
         daylightHoursContainer = Frame(solarControlContainer)
 
-        daylightHoursLabel = Label(daylightHoursContainer, text = "Daylight hours (<24)")
+        daylightHoursLabel = Label(daylightHoursContainer, text = "Daylight hours (<23)")
         daylightHoursLabel.pack(side = LEFT)
 
         self.daylightHoursVar = StringVar()
@@ -124,18 +124,18 @@ class CycleModeControlsWindow(Frame):
 
         windPresentContainer.pack(pady = 4)
 
-        windFrequencyContainer = Frame(windControlsContainer)
+        windmillTimeContainer = Frame(windControlsContainer)
 
-        windFrequencyLabel = Label(windFrequencyContainer, text="Wind Frequency (Hz) :")
-        windFrequencyLabel.pack(side = LEFT)
+        windmillTimeLabel = Label(windmillTimeContainer, text="Time windmills are on per cycle (s):")
+        windmillTimeLabel.pack(side = LEFT)
 
-        self.windFrequency = DoubleVar()
-        windFrequencyScale = Scale(windFrequencyContainer, orient= HORIZONTAL, from_=0.033, to=0.25, variable=self.windFrequency, command= self.updateWindFrequencyLabel)
-        windFrequencyScale.pack(side = LEFT)
-        self.currentWindFrequencyLabel = Label(windFrequencyContainer, text = str(0.033) + " Hz")
-        self.currentWindFrequencyLabel.pack(side = LEFT)        
+        self.windmillTime = DoubleVar()
+        windmillTimeScale = Scale(windmillTimeContainer, orient= HORIZONTAL, from_=2, to=15, variable=self.windmillTime, command= self.updateWindFrequencyLabel)
+        windmillTimeScale.pack(side = LEFT)
+        self.currentWindmillTimeLabel = Label(windmillTimeContainer, text = "2 s")
+        self.currentWindmillTimeLabel.pack(side = LEFT)        
 
-        windFrequencyContainer.pack(pady=4)
+        windmillTimeContainer.pack(pady=4)
         
 
         windAmplitudeContainer = Frame(windControlsContainer)
@@ -155,7 +155,7 @@ class CycleModeControlsWindow(Frame):
 
     def updateWindFrequencyLabel(self, currentVal):
         roundedVal = round(float(currentVal), 3)
-        self.currentWindFrequencyLabel.configure(text= str(roundedVal) + " Hz")
+        self.currentWindmillTimeLabel.configure(text= str(roundedVal) + " s")
 
     def updateWindAmplitudeLabel(self, currentVal):
         roundedVal = round(float(currentVal), 2)      
@@ -167,7 +167,7 @@ class CycleModeControlsWindow(Frame):
         daylightHours = self.daylightHoursVar.get() #string
 
         windPresent = self.windPresentCheck.get() #integer representing boolean
-        windFrequency = self.windFrequency.get() #double
+        windmillTime = self.windmillTime.get() #double
         windAmplitude = self.windAmplitude.get() #int
 
         #TODO: perform validation
@@ -175,7 +175,23 @@ class CycleModeControlsWindow(Frame):
         print("Type of day:", typeOfDay)
         print("Daylight Hours:", daylightHours)
         print("Wind Present:", str(windPresent))
-        print("Wind Frequency:", str(windFrequency))
+        print("Windmill Time:", str(windmillTime))
         print("Wind Amplitude:", str(windAmplitude))
 
-        #TODO: apply these retrieved values to simulation object
+        validated = True
+
+        daylightHours = int(daylightHours)
+        if daylightHours < 0 or daylightHours > 22:
+            print ("Invalid daylight hours")
+            validated = False
+        if typeOfDay != "Sunny" and typeOfDay != "Cloudy":
+            print("Invalid type of day")
+            validated = False
+
+        windPresent = bool(windPresent)
+        windmillTime = int(windmillTime)
+        windAmplitude = int(windAmplitude)
+
+        if validated:
+            self.simulation.configure(typeOfDay, daylightHours, windPresent, windmillTime, windAmplitude)
+            self.destroy()
