@@ -72,6 +72,17 @@ class CycleModeControlsWindow(Frame):
 
         self.addWindControls()
         self.addSolarControls()
+        
+        numLoopsEntryContainer = Frame(self)
+        
+        numLoopsLabel = Label(numLoopsEntryContainer, text="Number of times to loop: ")
+        numLoopsLabel.pack(side = LEFT)
+        
+        self.numLoops = StringVar()        
+        numLoopsEntry = Entry(numLoopsEntryContainer, textvariable = self.numLoops)
+        numLoopsEntry.pack(side = LEFT)
+        
+        numLoopsEntryContainer.pack(padx = 8, pady = 8)
 
         startBtn = Button(self, text = "Start Simulation", command = self.startSimBtnCallback)
         startBtn.pack(padx= 8, pady = 8)
@@ -171,33 +182,41 @@ class CycleModeControlsWindow(Frame):
         windPresent = self.windPresentCheck.get() #integer representing boolean
         windmillTime = self.windmillTime.get() #double
         windAmplitude = self.windAmplitude.get() #int
-
-        #TODO: perform validation
+        numLoops = self.numLoops.get()
+        
+        windPresent = bool(windPresent)
+        windmillTime = int(windmillTime)
+        windAmplitude = int(windAmplitude)
+        daylightHours = int(daylightHours)
+        numLoops = int(numLoops)
 
         print("Type of day:", typeOfDay)
         print("Daylight Hours:", daylightHours)
         print("Wind Present:", str(windPresent))
         print("Windmill Time:", str(windmillTime))
         print("Wind Amplitude:", str(windAmplitude))
-
+        print("Number of loops:", numLoops)
         validated = True
 
-        daylightHours = int(daylightHours)
+        
         if daylightHours < 0 or daylightHours > 22:
             print ("Invalid daylight hours")
             validated = False
+            
         if typeOfDay != "Sunny" and typeOfDay != "Cloudy":
             print("Invalid type of day")
             validated = False
-
-        windPresent = bool(windPresent)
-        windmillTime = int(windmillTime)
-        windAmplitude = int(windAmplitude)
+            
+        if numLoops <=0 :
+                print("Invalid number of loops")
+                validated = False        
 
         if validated:
             self.mainWindow.setTaskRunning(True, "Cycle mode")
-            self.simulation.configure(typeOfDay, daylightHours, windPresent, windmillTime, windAmplitude)
+            self.simulation.configure(typeOfDay, daylightHours, windPresent, windmillTime, windAmplitude, numLoops)
             cycleSimulationThread = threading.Thread(target=self.simulation.cycleModeLoop)
             cycleSimulationThread.daemon = True
-            cycleSimulationThread.run()
-            self.destroy()
+            cycleSimulationThread.start()
+            
+            self.master.destroy()
+            

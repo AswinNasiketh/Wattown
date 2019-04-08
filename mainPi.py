@@ -30,4 +30,5 @@ mainWindow.setInteractiveBtnCommand(interactiveMode)
 mainWindow.setDailyCylceBtnCommand(cycleMode)
 mainWindow.setGameBtnCommand(gameMode)
 
+    
 root.mainloop()

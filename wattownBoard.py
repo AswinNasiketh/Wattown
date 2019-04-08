@@ -56,7 +56,7 @@ class WattownBoard():
                         self.stopWindmills()
 
                 halfCyclePeriod = 1/(2 * frequency)
-                halfCyclePeriod = halfCyclePeriod  * (10**6) #convert to microseconds
+                halfCyclePeriod = int(halfCyclePeriod  * (10**6)) #convert to microseconds
                 square = []
 
                 #                          ON       OFF    MICROS

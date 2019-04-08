@@ -37,6 +37,7 @@ class CycleSim():
     def cycleModeLoop(self):
         print("Starting cycle mode loop")
 
+
         self.setupConsumptionValues(self.MAX_CONSUMPTION, self.MIN_CONSUMPTION, self.SIM_WAKEUP_TIME, self.SIM_SLEEP_TIME)
         self.setupSolarGenerationValues(self.typeOfDay, self.daylightHours)
 
@@ -62,41 +63,47 @@ class CycleSim():
         batteryAnimatorThread = threading.Thread(target=self.animateBattery)
         batteryAnimatorThread.daemon = True
         batteryAnimatorThread.start()
+        
+        for j in range(0, self.numLoops):
+            print("New day")            
 
-        for i in range(0, 24):           
+            for i in range(0, 24):
 
-            self.addToBattery(self.solarGenerationValues[i])
-            self.addToBattery(windPowerGenerationUnits)
+                if not self.mainWindow.getTaskRunning():
+                    break           
 
-            #only animate the city lights if we have enough capacity in the reservoir
-            if self.subtractFromReservoir(self.consumptionValues[i]):
-                self.animateCityLights(self.consumptionValues[i], self.MAX_CONSUMPTION, self.MIN_CONSUMPTION)
-            else:
-                self.board.setCityLEDs((0,0,0))      
+                self.addToBattery(self.solarGenerationValues[i])
+                self.addToBattery(windPowerGenerationUnits)
 
-                                
-            #when we have minimum consumption use battery to pump reservoir
-            if self.consumptionValues[i] == self.MIN_CONSUMPTION:
-                self.batteryCharging = False
+                #only animate the city lights if we have enough capacity in the reservoir
+                if self.subtractFromReservoir(self.consumptionValues[i]):
+                    self.animateCityLights(self.consumptionValues[i], self.MAX_CONSUMPTION, self.MIN_CONSUMPTION)
+                else:
+                    self.board.setCityLEDs((0,0,0))      
 
-                #only transfer energy to reservoir if we have enough in the battery
-                if self.subtractFromBattery(self.RESERVOIR_RECHARGE_RATE):
-                     self.addToReservoir(self.RESERVOIR_RECHARGE_RATE)     
+                                    
+                #when we have minimum consumption use battery to pump reservoir
+                if self.consumptionValues[i] == self.MIN_CONSUMPTION:
+                    self.batteryCharging = False
 
-            #otherwise only charge battery   
-            else:
-                self.batteryCharging = True       
-               
-            self.animateReservoir(self.reservoirLevel)
+                    #only transfer energy to reservoir if we have enough in the battery
+                    if self.subtractFromBattery(self.RESERVOIR_RECHARGE_RATE):
+                         self.addToReservoir(self.RESERVOIR_RECHARGE_RATE)     
 
-            print("Hour", str(i))
-            print("City consumption: ", str(self.consumptionValues[i]))
-            print("Solar Panel Generation: ", str(self.solarGenerationValues[i]))
-            print("Wind Generation: ", str(windPowerGenerationUnits))
-            print("Battery Level: ", str(self.batteryRemaining))
-            print("Reservoir Level: ", str(self.reservoirLevel))
-            print("Battery Charging: ", str(self.batteryCharging))
-            time.sleep(2.5)
+                #otherwise only charge battery   
+                else:
+                    self.batteryCharging = True       
+                   
+                self.animateReservoir(self.reservoirLevel)
+
+                print("Hour", str(i))
+                print("City consumption: ", str(self.consumptionValues[i]))
+                print("Solar Panel Generation: ", str(self.solarGenerationValues[i]))
+                print("Wind Generation: ", str(windPowerGenerationUnits))
+                print("Battery Level: ", str(self.batteryRemaining))
+                print("Reservoir Level: ", str(self.reservoirLevel))
+                print("Battery Charging: ", str(self.batteryCharging))
+                time.sleep(2.5)
 
         self.board.resetBoard()
         self.mainWindow.setTaskRunning(False)
@@ -105,9 +112,10 @@ class CycleSim():
     def animateCityLights(self, consumption, maxConsumption, minConsumption):
         maxConsumptionDelta = maxConsumption - minConsumption
 
-        consumptionAboveMin = consumption -minConsumption
+        consumptionAboveMin = consumption - minConsumption
 
         cityLightsCoefficent = consumptionAboveMin/maxConsumptionDelta
+    
 
         cityLightsColour = (int(self.city_lights_yellow_delta[0] * cityLightsCoefficent) + self.LED_CITY_LIGHTS_YELLOW_MIN[0],
         int(self.city_lights_yellow_delta[1] * cityLightsCoefficent) + self.LED_CITY_LIGHTS_YELLOW_MIN[1],
@@ -139,7 +147,11 @@ class CycleSim():
     
     def setupConsumptionValues(self, maxConsumption, minConsumption, wakeupTime, sleepTime):
         self.consumptionValues = []
-        self.consumptionValues[0:wakeupTime] = minConsumption
+        
+        
+        for i in range(0, wakeupTime):
+            self.consumptionValues.append(minConsumption)
+        
 
         consumptionDelta = maxConsumption - minConsumption
 
@@ -152,14 +164,18 @@ class CycleSim():
             self.consumptionValues.append(maxConsumption)
 
         for i in range(sleepTime, 24):
-            consumption = maxConsumption - (consumptionDelta * i/(24-sleepTime))
+            consumption = maxConsumption - (consumptionDelta * (i - sleepTime + 1)/(24-sleepTime))
             self.consumptionValues.append(consumption)
+            
 
 
     def animateWindmillsAndFuelCell(self, windmillTime, windmillDrivingFrequency):       
-        self.windmillsOn = False
+        windmillsOn = False
 
         for i in range(0, 60, windmillTime):
+            if not self.mainWindow.getTaskRunning():
+                break
+
             if not windmillsOn:
                 self.board.driveWindmills(windmillDrivingFrequency)
                 windmillsOn = True
@@ -178,12 +194,13 @@ class CycleSim():
         time.sleep(1)
         self.board.turnOffFuelCell()
 
-    def configure(self, typeOfDay, daylightHours, windPresent, windmillTime, windAmplitude):
+    def configure(self, typeOfDay, daylightHours, windPresent, windmillTime, windAmplitude, numLoops):
         self.typeOfDay = typeOfDay
         self.daylightHours = daylightHours
         self.windPresent = windPresent
         self.windmillTime = windmillTime
         self.windAmplitude = windAmplitude
+        self.numLoops = numLoops
 
     def animateReservoir(self, reservoirLevel):
         if reservoirLevel == 0:
@@ -216,6 +233,9 @@ class CycleSim():
         
     def animateBattery(self):
         for i in range(0,60):
+            if self.mainWindow.getTaskRunning():
+                break
+
             if self.batteryCharging:
                 chargingColour = self.LED_BLUE
             else:
