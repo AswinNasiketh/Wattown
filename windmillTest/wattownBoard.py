@@ -52,8 +52,8 @@ class WattownBoard():
 
 
         def driveWindmills(self, frequency):
-                # print("Drive windmills called")
-                # print("currently driving windmills?:", str(self.drivingWindmills))
+                print("Drive windmills called")
+                print("currently driving windmills?:", str(self.drivingWindmills))
                 if self.drivingWindmills:
                         self.stopWindmills()
 
@@ -61,7 +61,7 @@ class WattownBoard():
                 halfCyclePeriod = int(halfCyclePeriod  * (10**6)) #convert to microseconds
                 square = []
 
-                # print("Square wave half cycle period:", str(halfCyclePeriod), "us")
+                print("Square wave half cycle period:", str(halfCyclePeriod), "us")
 
                 #                          ON       OFF    MICROS
                 square.append(pigpio.pulse(1<<self.windmillDriverPlus, 1<<self.windmillDriverMinus, halfCyclePeriod))
@@ -69,18 +69,18 @@ class WattownBoard():
                 self.pi.wave_add_generic(square)
                 self.wid = self.pi.wave_create()
                 
-                # print("Wave ID: ", str(self.wid))
+                print("Wave ID: ", str(self.wid))
 
                 if self.wid >= 0:
                         self.pi.wave_send_repeat(self.wid)
                         self.drivingWindmills = True
 
         def stopWindmills(self): 
-                # print("Stop windmills called")
-                # print("currently driving windmills?:", str(self.drivingWindmills))    
+                print("Stop windmills called")
+                print("currently driving windmills?:", str(self.drivingWindmills))    
                 
                 if self.drivingWindmills:
-                        # print("Stopping Wave ID: ", str(self.wid))
+                        print("Stopping Wave ID: ", str(self.wid))
                         self.pi.wave_tx_stop()
                         self.pi.wave_delete(self.wid)
                         self.drivingWindmills = False
