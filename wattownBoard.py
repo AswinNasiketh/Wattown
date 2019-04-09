@@ -63,10 +63,10 @@ class WattownBoard():
                 square.append(pigpio.pulse(1<<self.windmillDriverPlus, 1<<self.windmillDriverMinus, halfCyclePeriod))
                 square.append(pigpio.pulse(1<<self.windmillDriverMinus,1<<self.windmillDriverPlus, halfCyclePeriod))
                 self.pi.wave_add_generic(square)
-                wid = self.pi.wave_create()
+                self.wid = self.pi.wave_create()
 
-                if wid >= 0:
-                        self.pi.wave_send_repeat(wid)
+                if self.wid >= 0:
+                        self.pi.wave_send_repeat(self.wid)
                         self.drivingWindmills = True
 
         def stopWindmills(self):     

@@ -32,3 +32,6 @@ mainWindow.setGameBtnCommand(gameMode)
 
     
 root.mainloop()
+
+board.resetBoard()
+board.releaseResources()

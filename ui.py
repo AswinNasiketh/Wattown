@@ -75,7 +75,7 @@ class CycleModeControlsWindow(Frame):
         
         numLoopsEntryContainer = Frame(self)
         
-        numLoopsLabel = Label(numLoopsEntryContainer, text="Number of times to loop: ")
+        numLoopsLabel = Label(numLoopsEntryContainer, text="Number of days: ")
         numLoopsLabel.pack(side = LEFT)
         
         self.numLoops = StringVar()        
@@ -139,7 +139,7 @@ class CycleModeControlsWindow(Frame):
 
         windmillTimeContainer = Frame(windControlsContainer)
 
-        windmillTimeLabel = Label(windmillTimeContainer, text="Time windmills are on per cycle (s):")
+        windmillTimeLabel = Label(windmillTimeContainer, text="Time windmills are on per 'hour' (s):")
         windmillTimeLabel.pack(side = LEFT)
 
         self.windmillTime = DoubleVar()

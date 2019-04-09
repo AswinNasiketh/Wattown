@@ -13,7 +13,9 @@ square.append(pigpio.pulse(1<<GPIO_minus,1<<GPIO_plus, 125000))
 
 pi = pigpio.pi() # connect to local Pi
 
-pi.set_mode(GPIO, pigpio.OUTPUT)
+pi.set_mode(GPIO_plus, pigpio.OUTPUT)
+pi.set_mode(GPIO_minus, pigpio.OUTPUT)
+
 
 pi.wave_add_generic(square)
 
