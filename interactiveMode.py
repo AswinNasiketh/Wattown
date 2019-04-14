@@ -6,7 +6,8 @@ class InteractiveMode():
         self.window = window
         self.board = board
 
-        self.PV_THRESHOLD = 1.5
+        currentSolarPanelVoltage = board.getSolarPanelVoltage()
+        self.PV_THRESHOLD = currentSolarPanelVoltage + 0.2
         self.WINDMILL_THRESHOLD = 2.0
 
         self.PV_GENERATION_UNIT = 5
@@ -21,7 +22,7 @@ class InteractiveMode():
         self.LED_BLUE_MAX = (94, 193, 255)
         self.LED_GREEN_BRIGHT = (97, 255, 94)
         self.LED_WATER_BLUE = (94,155,255)
-        self.LED_CITY_LIGHTS_YELLOW = (244, 217, 66)
+        self.LED_CITY_LIGHTS_YELLOW = (163, 145, 44)
 
     def interactiveModeLoop(self):
         print("Starting interactive mode loop")
