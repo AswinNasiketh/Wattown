@@ -42,7 +42,7 @@ class CycleSim():
         self.setupSolarGenerationValues(self.typeOfDay, self.daylightHours)
 
         if self.windPresent:
-            windPowerGenerationUnits = self.MAX_WIND_POWER_GENERATION * self.windAmplitude/14
+            windPowerGenerationUnits = round(self.MAX_WIND_POWER_GENERATION * self.windAmplitude/14, 2)
 
             windmillDrivingFrequency = self.windAmplitude + 6
             print("Windmill Driving Frequency: ", str(windmillDrivingFrequency))
@@ -158,6 +158,7 @@ class CycleSim():
         consumption = 0
         for i in range(1, 13 - wakeupTime):
             consumption = minConsumption + (consumptionDelta * i/(13-wakeupTime))
+            consumption = round(consumption, 2)
             self.consumptionValues.append(consumption)
 
         for i in range(12 , sleepTime):
@@ -165,6 +166,7 @@ class CycleSim():
 
         for i in range(sleepTime, 24):
             consumption = maxConsumption - (consumptionDelta * (i - sleepTime + 1)/(24-sleepTime))
+            consumption = round(consumption)
             self.consumptionValues.append(consumption)
             
 
