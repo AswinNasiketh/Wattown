@@ -44,13 +44,13 @@ class CycleSim():
         if self.windPresent:
             windPowerGenerationUnits = round(self.MAX_WIND_POWER_GENERATION * self.windAmplitude/14, 2)
 
-            windmillDrivingFrequency = self.windAmplitude + 6
-            print("Windmill Driving Frequency: ", str(windmillDrivingFrequency))
+            self.windmillDrivingFrequency = self.windAmplitude + 6
+            print("Windmill Driving Frequency: ", str(self.windmillDrivingFrequency))
 
-            runWindmillsLambda = lambda: self.animateWindmillsAndFuelCell(self.windmillTime, windmillDrivingFrequency)
-            windmillDriverThread = threading.Thread(target=runWindmillsLambda)
-            windmillDriverThread.daemon = True
-            windmillDriverThread.start()
+            # runWindmillsLambda = lambda: self.animateWindmills(self.windmillSwitchingPeriod, windmillDrivingFrequency)
+            # windmillDriverThread = threading.Thread(target=runWindmillsLambda)
+            # windmillDriverThread.daemon = True
+            # windmillDriverThread.start()
         else:
             windPowerGenerationUnits = 0
         
@@ -63,6 +63,8 @@ class CycleSim():
         batteryAnimatorThread = threading.Thread(target=self.animateBattery)
         batteryAnimatorThread.daemon = True
         batteryAnimatorThread.start()
+
+        self.windStateCount = 0
         
         for j in range(0, self.numLoops):
             print("New day")            
@@ -73,7 +75,9 @@ class CycleSim():
                     break           
 
                 self.addToBattery(self.solarGenerationValues[i])
-                self.addToBattery(windPowerGenerationUnits)
+
+                if self.board.areWindmillsOn():                    
+                    self.addToBattery(windPowerGenerationUnits)
 
                 #only animate the city lights if we have enough capacity in the reservoir
                 if self.subtractFromReservoir(self.consumptionValues[i]):
@@ -95,11 +99,15 @@ class CycleSim():
                     self.batteryCharging = True       
                    
                 self.animateReservoir(self.reservoirLevel)
+                self.animateWindmills()
 
                 print("Hour", str(i))
                 print("City consumption: ", str(self.consumptionValues[i]))
                 print("Solar Panel Generation: ", str(self.solarGenerationValues[i]))
-                print("Wind Generation: ", str(windPowerGenerationUnits))
+                if self.board.areWindmillsOn():
+                    print("Wind Generation: ", str(windPowerGenerationUnits))
+                else:
+                    print("Wind Generation: 0")
                 print("Battery Level: ", str(self.batteryRemaining))
                 print("Reservoir Level: ", str(self.reservoirLevel))
                 print("Battery Charging: ", str(self.batteryCharging))
@@ -168,13 +176,24 @@ class CycleSim():
             consumption = maxConsumption - (consumptionDelta * (i - sleepTime + 1)/(24-sleepTime))
             consumption = round(consumption)
             self.consumptionValues.append(consumption)
+
+    def animateWindmills(self):
+        if self.windStateCount == self.windmillSwitchingPeriod:
+            currentWindState = self.board.areWindmillsOn()
+            self.windStateCount = 1
+            if currentWindState:
+                self.board.stopWindmills()
+            else:
+                self.board.driveWindmills(self.windmillDrivingFrequency)
+        else:
+            self.windStateCount += 1
             
 
-
-    def animateWindmillsAndFuelCell(self, windmillTime, windmillDrivingFrequency):       
+    #not being used anymore
+    def animateWindmillsAndFuelCell(self, windmillSwitchingPeriod, windmillDrivingFrequency):       
         windmillsOn = False
 
-        for i in range(0, 60, windmillTime):
+        for i in range(0, 60, windmillSwitchingPeriod):
             if not self.mainWindow.getTaskRunning():
                 break
 
@@ -182,25 +201,25 @@ class CycleSim():
                 self.board.driveWindmills(windmillDrivingFrequency)
                 windmillsOn = True
                 self.pulseFuelCell()
-                time.sleep(windmillTime - 1)
+                time.sleep(windmillSwitchingPeriod - 1)
             else:
                 self.board.stopWindmills()
                 windmillsOn = False
-                time.sleep(windmillTime)
+                time.sleep(windmillSwitchingPeriod)
         self.board.stopWindmills()
         self.board.turnOffFuelCell()
             
 
     def pulseFuelCell(self):
         self.board.turnOnFuelCell()
-        time.sleep(1)
+        time.sleep(0.5)
         self.board.turnOffFuelCell()
 
-    def configure(self, typeOfDay, daylightHours, windPresent, windmillTime, windAmplitude, numLoops):
+    def configure(self, typeOfDay, daylightHours, windPresent, windmillSwitchingPeriod, windAmplitude, numLoops):
         self.typeOfDay = typeOfDay
         self.daylightHours = daylightHours
         self.windPresent = windPresent
-        self.windmillTime = windmillTime
+        self.windmillSwitchingPeriod = windmillSwitchingPeriod
         self.windAmplitude = windAmplitude
         self.numLoops = numLoops
 
@@ -264,12 +283,14 @@ class CycleSim():
             self.batteryRemaining = 100
         else:
             self.batteryRemaining += unitsToAdd
+            threading.Thread(target=self.pulseFuelCell).start()
 
     def subtractFromBattery(self, unitsToSubtract):
         if(self.batteryRemaining - unitsToSubtract) < 0:
             return False
         else:
             self.batteryRemaining -= unitsToSubtract
+            threading.Thread(target=self.pulseFuelCell).start()
             return True
             
 

@@ -135,3 +135,6 @@ class WattownBoard():
                 self.pixels.fill((0,0,0))
                 self.stopWindmills()
                 self.turnOffFuelCell()
+
+        def areWindmillsOn(self):
+                return self.drivingWindmills

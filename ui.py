@@ -137,18 +137,21 @@ class CycleModeControlsWindow(Frame):
 
         windPresentContainer.pack(pady = 4)
 
-        windmillTimeContainer = Frame(windControlsContainer)
+        windmillSwitchingPeriodContainer = Frame(windControlsContainer)
 
-        windmillTimeLabel = Label(windmillTimeContainer, text="Time windmills are on per 'hour' (s):")
+        windmillTimeLabel = Label(windmillSwitchingPeriodContainer, text="Wind changes every: ")
         windmillTimeLabel.pack(side = LEFT)
 
-        self.windmillTime = DoubleVar()
-        windmillTimeScale = Scale(windmillTimeContainer, orient= HORIZONTAL, from_=2, to=15, variable=self.windmillTime, command= self.updateWindFrequencyLabel)
-        windmillTimeScale.pack(side = LEFT)
-        self.currentWindmillTimeLabel = Label(windmillTimeContainer, text = "2 s")
-        self.currentWindmillTimeLabel.pack(side = LEFT)        
+        self.windSwitchingPeriod = StringVar()
+        self.windSwitchingPeriod.set("1")
 
-        windmillTimeContainer.pack(pady=4)
+        windSwitchingEntry = Entry(windmillSwitchingPeriodContainer, textvariable=self.windSwitchingPeriod)
+        windSwitchingEntry.pack(side = LEFT)
+
+        windSwitchingUnitsLabel = Label(windmillSwitchingPeriodContainer, text=" Hours")
+        windSwitchingUnitsLabel.pack(side = LEFT)     
+
+        windmillSwitchingPeriodContainer.pack(pady=4)
         
 
         windAmplitudeContainer = Frame(windControlsContainer)
@@ -166,10 +169,6 @@ class CycleModeControlsWindow(Frame):
 
         windControlsContainer.pack(pady = 8, padx = 8)
 
-    def updateWindFrequencyLabel(self, currentVal):
-        roundedVal = round(float(currentVal), 3)
-        self.currentWindmillTimeLabel.configure(text= str(roundedVal) + " s")
-
     def updateWindAmplitudeLabel(self, currentVal):
         roundedVal = round(float(currentVal), 2)      
         self.currentWindAmplitudeLabel.configure(text= str(roundedVal))
@@ -180,12 +179,12 @@ class CycleModeControlsWindow(Frame):
         daylightHours = self.daylightHoursVar.get() #string
 
         windPresent = self.windPresentCheck.get() #integer representing boolean
-        windmillTime = self.windmillTime.get() #double
+        windSwitchingPeriod = self.windSwitchingPeriod.get() #string
         windAmplitude = self.windAmplitude.get() #int
         numLoops = self.numLoops.get()
         
         windPresent = bool(windPresent)
-        windmillTime = int(windmillTime)
+        windSwitchingPeriod = int(windSwitchingPeriod)
         windAmplitude = int(windAmplitude)
         daylightHours = int(daylightHours)
         numLoops = int(numLoops)
@@ -193,11 +192,14 @@ class CycleModeControlsWindow(Frame):
         print("Type of day:", typeOfDay)
         print("Daylight Hours:", daylightHours)
         print("Wind Present:", str(windPresent))
-        print("Windmill Time:", str(windmillTime))
+        print("Wind switching period: every", str(windSwitchingPeriod), "hours")
         print("Wind Amplitude:", str(windAmplitude))
         print("Number of loops:", numLoops)
         validated = True
 
+        if windSwitchingPeriod < 0 or windSwitchingPeriod > 23:
+            print("Invalid wind switching period")
+            validated = False
         
         if daylightHours < 0 or daylightHours > 22:
             print ("Invalid daylight hours")
@@ -213,7 +215,7 @@ class CycleModeControlsWindow(Frame):
 
         if validated:
             self.mainWindow.setTaskRunning(True, "Cycle mode")
-            self.simulation.configure(typeOfDay, daylightHours, windPresent, windmillTime, windAmplitude, numLoops)
+            self.simulation.configure(typeOfDay, daylightHours, windPresent, windSwitchingPeriod, windAmplitude, numLoops)
             cycleSimulationThread = threading.Thread(target=self.simulation.cycleModeLoop)
             cycleSimulationThread.daemon = True
             cycleSimulationThread.start()
