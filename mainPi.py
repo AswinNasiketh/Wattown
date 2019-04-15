@@ -24,7 +24,8 @@ def cycleMode():
     cycleModeConfigWindow = CycleModeControlsWindow(newWindow, cycleModeSim, mainWindow)
 
 def gameMode():
-    print("Game mode not implemented yet")
+    newWindow = Toplevel(root)
+    gameModeConfigWindow = GameModeParametersWindow(newWindow, board, mainWindow, root)
 
 mainWindow.setInteractiveBtnCommand(interactiveMode)
 mainWindow.setDailyCylceBtnCommand(cycleMode)
