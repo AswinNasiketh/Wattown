@@ -42,7 +42,7 @@ class CycleSim():
         self.setupSolarGenerationValues(self.typeOfDay, self.daylightHours)
 
         if self.windPresent:
-            windPowerGenerationUnits = round(self.MAX_WIND_POWER_GENERATION * self.windAmplitude/14, 2)
+            windPowerGenerationUnits = round(self.MAX_WIND_POWER_GENERATION * self.windAmplitude/10, 2)
 
             self.windmillDrivingFrequency = self.windAmplitude + 6
             print("Windmill Driving Frequency: ", str(self.windmillDrivingFrequency))
@@ -99,7 +99,8 @@ class CycleSim():
                     self.batteryCharging = True       
                    
                 self.animateReservoir(self.reservoirLevel)
-                self.animateWindmills()
+                if self.windPresent:
+                    self.animateWindmills()
 
                 print("Hour", str(i))
                 print("City consumption: ", str(self.consumptionValues[i]))
