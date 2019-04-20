@@ -47,7 +47,8 @@ class GameMode():
         self.currentHour = 0
         self.currentDay = 1
         self.windStateCount = 0
-        reservoirEnergy = 10
+        self.reservoirPower = 0
+        reservoirEnergy = 100
         previousBatteryEnergy = 20
         batteryEnergy = 20
         wastedEnergy = 0
@@ -175,8 +176,8 @@ class GameMode():
         elif batteryLevelChange < 0:
             #discharging
             batteryLEDcolour = (int(self.LED_YELLOW_MAX[0] * (currentBatteryLevel/100)),
-            (self.LED_YELLOW_MAX[1] * (currentBatteryLevel/100)),
-            (self.LED_YELLOW_MAX[2] * (currentBatteryLevel/100)))
+            int((self.LED_YELLOW_MAX[1] * (currentBatteryLevel/100))),
+            int((self.LED_YELLOW_MAX[2] * (currentBatteryLevel/100))))
 
             self.board.setFuelCellLEDs(batteryLEDcolour)
             self.pulseFuelCell()

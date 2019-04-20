@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import messagebox
 from tkinter.ttk import *
 import threading
 import time
@@ -162,6 +163,7 @@ class CycleModeControlsWindow(Frame):
         windAmplitudeLabel.pack(side = LEFT)
         
         self.windAmplitude = IntVar()
+        self.windAmplitude.set(0)
         windAmplitudeScale = Scale(windAmplitudeContainer, orient= HORIZONTAL, from_=0, to=10, variable=self.windAmplitude, command= self.updateWindAmplitudeLabel)
         windAmplitudeScale.pack(side = LEFT)
         self.currentWindAmplitudeLabel = Label(windAmplitudeContainer, text = "0")
@@ -308,6 +310,7 @@ class GameModeParametersWindow(Frame):
         windAmplitudeLabel.pack(side = LEFT)
         
         self.windAmplitude = IntVar()
+        self.windAmplitude.set(0)
         windAmplitudeScale = Scale(windAmplitudeContainer, orient= HORIZONTAL, from_=0, to=10, variable=self.windAmplitude, command= self.updateWindAmplitudeLabel)
         windAmplitudeScale.pack(side = LEFT)
         self.currentWindAmplitudeLabel = Label(windAmplitudeContainer, text = "0")
@@ -525,22 +528,59 @@ class GameWindow(Frame):
     def updateReservoirStateDisplay(self, state):
         if state == self.RESERVOIR_NO_ACTIVITY:
             self.reservoirStateValueLabel.configure(text = "No activity")
+            self.drainReservoirButton.config(state=NORMAL)
+            self.stopDrainingButton.config(state=DISABLED)
+            self.pumpReservoirButton.config(state=NORMAL)
+            self.stopPumpingButton.config(state=DISABLED)
         elif state == self.RESERVOIR_GATE_OPENING:
             self.reservoirStateValueLabel.configure(text = "Starting to Drain")
+            self.drainReservoirButton.config(state=DISABLED)
+            self.stopDrainingButton.config(state=DISABLED)
+            self.pumpReservoirButton.config(state=DISABLED)
+            self.stopPumpingButton.config(state=DISABLED)
         elif state == self.RESERVOIR_GATE_OPEN:
             self.reservoirStateValueLabel.configure(text = "Reservoir Draining")
+            self.drainReservoirButton.config(state=DISABLED)
+            self.stopDrainingButton.config(state=NORMAL)
+            self.pumpReservoirButton.config(state=DISABLED)
+            self.stopPumpingButton.config(state=DISABLED)
         elif state == self.RESRVOIR_GATE_CLOSING:
             self.reservoirStateValueLabel.configure(text = "Closing Drain")
+            self.drainReservoirButton.config(state=DISABLED)
+            self.stopDrainingButton.config(state=DISABLED)
+            self.pumpReservoirButton.config(state=DISABLED)
+            self.stopPumpingButton.config(state=DISABLED)
         elif state == self.RESERVOIR_PUMP_TURNING_ON:
             self.reservoirStateValueLabel.configure(text = "Pump turning on")
+            self.drainReservoirButton.config(state=DISABLED)
+            self.stopDrainingButton.config(state=DISABLED)
+            self.pumpReservoirButton.config(state=DISABLED)
+            self.stopPumpingButton.config(state=DISABLED)
         elif state == self.RESERVOIR_PUMP_ON:
             self.reservoirStateValueLabel.configure(text = "Pump on")
+            self.drainReservoirButton.config(state=DISABLED)
+            self.stopDrainingButton.config(state=DISABLED)
+            self.pumpReservoirButton.config(state=DISABLED)
+            self.stopPumpingButton.config(state=NORMAL)
         elif state == self.RESERVOIR_PUMP_TURNING_OFF:
             self.reservoirStateValueLabel.configure(text = "Pump turning off")
+            self.drainReservoirButton.config(state=DISABLED)
+            self.stopDrainingButton.config(state=DISABLED)
+            self.pumpReservoirButton.config(state=DISABLED)
+            self.stopPumpingButton.config(state=DISABLED)
 
     def updateEnergyDisplays(self, batteryEnergy, reservoirEnergy):
-        self.currentBatteryValueLabel.configure(text = str(batteryEnergy))
-        self.currentReservoirValueLabel.configure(text = str(reservoirEnergy))
+        self.currentBatteryValueLabel.configure(text = str(round(batteryEnergy, 2)))
+        self.currentReservoirValueLabel.configure(text = str(round(reservoirEnergy, 2)))
+
+        if reservoirEnergy == 0 :
+            self.drainReservoirButton.config(state=DISABLED)
+            self.stopDrainingButton.config(state=DISABLED)
+        
+        if batteryEnergy == 0:
+            self.pumpReservoirButton.config(state=DISABLED)
+            self.stopPumpingButton.config(state=DISABLED)
+
 
     def updatePowerDisplays(self, solarPower, windPower, reservoirPower, consumption):
         self.hydroPowerGenerationValueLabel.configure(text = str(reservoirPower))
@@ -549,18 +589,17 @@ class GameWindow(Frame):
         self.currentConsumptionValueLabel.configure(text = str(consumption))
 
     def updateSurplusShortageDisplays(self, surplus, shortage):
-        self.renewableSurplusValueLabel.configure(text = str(surplus))
-        self.renewableShortageValueLabel.configure(text = str(shortage))
+        self.renewableSurplusValueLabel.configure(text = str(round(surplus, 2)))
+        self.renewableShortageValueLabel.configure(text = str(round(shortage, 2)))
 
     def updateWastedDemandNotMetDisplay(self, wastedEnergy, demandNotMet):
-        self.wastedEnergyValueLabel.configure(text = str(wastedEnergy))
-        self.demandNotMetValueLabel.configure(text = str(demandNotMet))
+        self.wastedEnergyValueLabel.configure(text = str(round(wastedEnergy, 2)))
+        self.demandNotMetValueLabel.configure(text = str(round(demandNotMet, 2)))
 
     def onClickDrainReservoir(self):
         t = threading.Thread(target=self.drainReservoir)
         t.daemon = True
         t.start()
-
 
     def onClickStopDrainingReservoir(self):
         t = threading.Thread(target=self.stopDraining)
@@ -661,4 +700,4 @@ class GameWindow(Frame):
         self.master.destroy()
 
     def gameLost(self):
-        tkinter.messagebox.showinfo("Game Over!", "You failed to meet the demand or wasted too much energy!")
+        messagebox.showinfo("Game Over!", "You failed to meet the demand or wasted too much energy!")

@@ -22,6 +22,7 @@ class WindmillTestWindow(Frame):
         frequencyScaleContainer = Frame(self)
 
         self.frequency = DoubleVar()
+        self.frequency.set(6)
 
         frequencyScaleLabel = Label(frequencyScaleContainer, text = "Driving Frequency")
         frequencyScaleLabel.pack(side=LEFT)
@@ -29,7 +30,7 @@ class WindmillTestWindow(Frame):
         frequencyScale = Scale(frequencyScaleContainer, orient=HORIZONTAL, from_=6, to=20, variable = self.frequency, command = self.updateFrequencyDisplay)
         frequencyScale.pack(side=LEFT)
 
-        self.frequencyDisplayLabel = Label(frequencyScaleContainer, text = "4Hz")
+        self.frequencyDisplayLabel = Label(frequencyScaleContainer, text = "6Hz")
         self.frequencyDisplayLabel.pack(side=LEFT)
 
         frequencyScaleContainer.pack(padx= 8, pady = 8)
