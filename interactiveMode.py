@@ -91,7 +91,7 @@ class InteractiveMode():
             int(self.LED_BLUE_MAX[2] * (self.currentBatteryLevel/100)))
 
             self.board.setFuelCellLEDs(batteryLEDcolour)
-            self.board.turnOnFuelCell()
+            self.board.pulseFuelCell()
         elif batteryLevelChange < 0:
             #discharging
             batteryLEDcolour = (int(self.LED_YELLOW_MAX[0] * (self.currentBatteryLevel/100)),
@@ -99,10 +99,7 @@ class InteractiveMode():
             int((self.LED_YELLOW_MAX[2] * (self.currentBatteryLevel/100))))
 
             self.board.setFuelCellLEDs(batteryLEDcolour)
-            self.board.turnOffFuelCell()
         elif  batteryLevelChange == 0:
-            self.board.turnOffFuelCell()
-
             if self.currentBatteryLevel == 0:
                 self.board.setFuelCellLEDs(self.LED_RED_DIM)
             elif self.currentBatteryLevel == 100:
