@@ -1,4 +1,6 @@
 import time
+from plotting import *
+import matplotlib.pyplot as plt
 
 class GameMode():
     def __init__(self, gameWindow, mainWindow, board):
@@ -7,6 +9,10 @@ class GameMode():
         gameWindow.setGameModeObj(self)
 
         self.mainWindow = mainWindow
+
+        self.powerPlotter = PowerGraph()
+        self.supplyDemandPlotter = ConsumptionSupplyGraph()
+        self.storagePlotter = StoredEnergyGraph()        
 
         self.SUNNY_DAY_SOLAR_GENERATION = 1.28 #UK solar power capacity = 12.8GW
         self.CLOUDY_DAY_SOLAR_GENERATION = 0.64 #half max capacity for cloudy day
@@ -42,6 +48,9 @@ class GameMode():
         self.RESERVOIR_PUMP_ON = 5
         self.RESERVOIR_PUMP_TURNING_OFF = 6
 
+        self.RESERVOIR_MAX_OUTPUT_POWER = 4
+        self.RESERVOIR_MAX_INPUT_POWER = -2
+
 
     def mainLoop(self):
         self.currentHour = 0
@@ -55,6 +64,15 @@ class GameMode():
         demandNotMet = 0
 
         self.reservoirState = self.RESERVOIR_NO_ACTIVITY
+
+        fig = plt.figure(figsize=(15, 15), dpi=80)
+        plt.subplots_adjust(hspace=0.4)
+        self.powerPlotter.setupFigure(fig)
+        self.supplyDemandPlotter.setupFigure(fig)
+        self.storagePlotter.setupFigure(fig)
+
+        plt.ion()
+        plt.show()
 
         self.gameModeRunning = True
         gameNotLost = True     
@@ -98,16 +116,24 @@ class GameMode():
         
             self.incrementTime()
 
-            self.gameWindow.updateDisplayedTime(self.currentDay, self.currentHour)
-            self.gameWindow.updateReservoirStateDisplay(self.reservoirState)
-            self.gameWindow.updateEnergyDisplays(batteryEnergy, reservoirEnergy)
+            self.supplyDemandPlotter.setConsumption(self.consumptionValues[self.currentHour])
+            self.storagePlotter.setRemainingEnergies(batteryEnergy,reservoirEnergy)
 
             if self.board.areWindmillsOn():
-                self.gameWindow.updatePowerDisplays(self.solarGenerationValues[self.currentHour], self.windPower, self.reservoirPower, self.consumptionValues[self.currentHour])
+                self.powerPlotter.setPowers(self.solarGenerationValues[self.currentHour], self.windPower, self.reservoirPower)
+                self.supplyDemandPlotter.setRenewableSupply(self.solarGenerationValues[self.currentHour] + self.windPower + self.reservoirPower)
             else:
-                self.gameWindow.updatePowerDisplays(self.solarGenerationValues[self.currentHour], 0, self.reservoirPower, self.consumptionValues[self.currentHour])
+                self.powerPlotter.setPowers(self.solarGenerationValues[self.currentHour], 0, self.reservoirPower)
+                self.supplyDemandPlotter.setRenewableSupply(self.solarGenerationValues[self.currentHour] + self.reservoirPower)
 
-            self.gameWindow.updateSurplusShortageDisplays(max(0 , renewableSurplus), min(0, renewableSurplus))
+            self.powerPlotter.animate()
+            self.supplyDemandPlotter.animate()
+            self.storagePlotter.animate()
+
+            plt.pause(0.001)
+
+            self.gameWindow.updateDisplayedTime(self.currentDay, self.currentHour)
+            self.gameWindow.updateReservoirStateDisplay(self.reservoirState)
             self.gameWindow.updateWastedDemandNotMetDisplay(wastedEnergy, demandNotMet)
 
             self.animateWindmills()
@@ -130,6 +156,17 @@ class GameMode():
         self.windmillDrivingFrequency = windAmplitdue + 6
 
         self.windPower = round(self.MAX_WIND_POWER_GENERATION * windAmplitdue / 10,  2)
+
+        if typeOfDay == "Sunny":
+            maxPower = max(self.windPower, self.SUNNY_DAY_SOLAR_GENERATION, self.RESERVOIR_MAX_OUTPUT_POWER)
+            maxPowerSum = self.windPower + self.SUNNY_DAY_SOLAR_GENERATION + self.RESERVOIR_MAX_INPUT_POWER
+            
+        else:
+            maxPower = max(self.windPower, self.CLOUDY_DAY_SOLAR_GENERATION, self.RESERVOIR_MAX_OUTPUT_POWER)
+            maxPowerSum = self.windPower + self.CLOUDY_DAY_SOLAR_GENERATION + self.RESERVOIR_MAX_INPUT_POWER
+
+        self.powerPlotter.configure(maxPower, self.RESERVOIR_MAX_INPUT_POWER)
+        self.supplyDemandPlotter.configure(maxPowerSum, -self.MAX_CONSUMPTION + self.RESERVOIR_MAX_INPUT_POWER)
 
     def incrementTime(self):
         self.currentHour += 1
