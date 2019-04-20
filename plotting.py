@@ -29,7 +29,6 @@ class PowerGraph():
         else:
             self.bars[2].set_color('b')
 
-        plt.pause(0.001)
 
     def setupFigure(self):
         self.fig = plt.figure()
@@ -51,7 +50,7 @@ class PowerGraph():
 
 
 class ConsumptionSupplyGraph():
-
+    
     def __init__(self):
         self.consumption = 0
         self.renewableSupply = 0
@@ -88,10 +87,43 @@ class ConsumptionSupplyGraph():
         else:
             self.bars[2].set_color('g')
 
-        plt.pause(0.001)
+      
 
     def setConsumption(self, consumption):
         self.consumption = -consumption
 
     def setRenewableSupply(self, supply):
         self.renewableSupply = supply
+
+class StoredEnergyGraph():
+
+    def __init__(self):
+        self.reservoirEnergy = 0
+        self.batteryEnergy = 0
+
+        self.barLabels = ["Battery", "Reservoir"]
+        self.xlabel = "Energy Storage System"
+        self.ylabel = "Energy Remaining (GWh)"
+        self.title = "Energy Storage"
+
+        self.indicies = [1,2]
+
+    def setupFigure(self):
+        self.fig = plt.figure()
+        self.ax = self.fig.add_subplot(1,1,1)
+
+    #different to others because we don't know the maximum reservoir energy
+    def animate(self):
+        self.ax.clear()
+        self.bars = self.ax.bar(self.indicies, [self.batteryEnergy, self.reservoirEnergy])
+        self.bars[0].set_color('b')
+        self.bars[1].set_color('y')
+        self.ax.set_xticks(self.indicies)
+        self.ax.set_xticklabels(self.barLabels)
+        self.ax.set_ylabel(self.ylabel)
+        self.ax.set_title(self.title)
+
+
+    def setRemainingEnergies(self, batteryEnergy, reservoirEnergy):
+        self.batteryEnergy = batteryEnergy
+        self.reservoirEnergy = reservoirEnergy
