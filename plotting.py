@@ -30,9 +30,9 @@ class PowerGraph():
             self.bars[2].set_color('b')
 
 
-    def setupFigure(self):
-        self.fig = plt.figure()
-        self.ax = self.fig.add_subplot(1,1,1)
+    def setupFigure(self, figure):
+        self.fig = figure
+        self.ax = self.fig.add_subplot(3,1,1)
         self.ax.set_ylim([self.minPower,self.maxPower])
 
         self.bars = self.ax.bar(self.indicies, [self.solarPower, self.windPower, self.hydroPower])
@@ -64,9 +64,9 @@ class ConsumptionSupplyGraph():
         self.maxPower = maxPower
         self.minPower = minPower
 
-    def setupFigure(self):
-        self.fig = plt.figure()
-        self.ax = self.fig.add_subplot(1,1,1)
+    def setupFigure(self, figure):
+        self.fig = figure
+        self.ax = self.fig.add_subplot(3,1,2)
         self.ax.set_ylim([self.minPower,self.maxPower])
 
         self.bars = self.ax.bar(self.indicies, [self.consumption, self.renewableSupply, self.renewableSurplus])
@@ -108,9 +108,9 @@ class StoredEnergyGraph():
 
         self.indicies = [1,2]
 
-    def setupFigure(self):
-        self.fig = plt.figure()
-        self.ax = self.fig.add_subplot(1,1,1)
+    def setupFigure(self, figure):
+        self.fig = figure
+        self.ax = self.fig.add_subplot(3,1,3)
 
     #different to others because we don't know the maximum reservoir energy
     def animate(self):
