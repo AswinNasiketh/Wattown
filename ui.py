@@ -415,78 +415,6 @@ class GameWindow(Frame):
         self.reservoirStateValueLabel.pack(side = LEFT)
         reservoirStateContainer.pack(padx = 4, pady = 4)
 
-        batteryEnergyContainer = Frame(self)
-        batteryEnergyLabel = Label(batteryEnergyContainer, text= "Stored Battery Energy: ")
-        batteryEnergyLabel.pack(side=LEFT)
-        self.currentBatteryValueLabel = Label(batteryEnergyContainer, text = "0")
-        self.currentBatteryValueLabel.pack(side = LEFT)
-        batteryEnergyUnitsLabel = Label(batteryEnergyContainer, text = " GWh")
-        batteryEnergyUnitsLabel.pack(side=LEFT)
-        batteryEnergyContainer.pack(padx = 4, pady = 4)
-
-        reservoirEnergyContainer = Frame(self)
-        reservoirEnergyLabel = Label(reservoirEnergyContainer, text= "Stored Reservoir Energy: ")
-        reservoirEnergyLabel.pack(side=LEFT)
-        self.currentReservoirValueLabel = Label(reservoirEnergyContainer, text = "0")
-        self.currentReservoirValueLabel.pack(side = LEFT)
-        reservoirEnergyUnitsLabel = Label(reservoirEnergyContainer, text = " GWh")
-        reservoirEnergyUnitsLabel.pack(side=LEFT)
-        reservoirEnergyContainer.pack(padx = 4, pady = 4)
-
-        windPowerContainer = Frame(self)
-        windPowerGenerationLabel = Label(windPowerContainer, text= "Wind Power Generation: ")
-        windPowerGenerationLabel.pack(side=LEFT)
-        self.windPowerGenerationValueLabel = Label(windPowerContainer, text = "0")
-        self.windPowerGenerationValueLabel.pack(side = LEFT)
-        powerUnitsLabel = Label(windPowerContainer, text = " GW")
-        powerUnitsLabel.pack(side=LEFT)
-        windPowerContainer.pack(padx = 4, pady = 4)
-
-        solarPowerContainer = Frame(self)
-        solarPowerGenerationLabel = Label(solarPowerContainer, text= "Solar Power Generation: ")
-        solarPowerGenerationLabel.pack(side=LEFT)
-        self.solarPowerGenerationValueLabel = Label(solarPowerContainer, text = "0")
-        self.solarPowerGenerationValueLabel.pack(side = LEFT)
-        powerUnitsLabel = Label(solarPowerContainer, text = " GW")
-        powerUnitsLabel.pack(side=LEFT)
-        solarPowerContainer.pack(padx = 4, pady = 4)
-
-        hydroPowerContainer = Frame(self)
-        hydroPowerGenerationLabel = Label(hydroPowerContainer, text= "Reservoir Power: ")
-        hydroPowerGenerationLabel.pack(side=LEFT)
-        self.hydroPowerGenerationValueLabel = Label(hydroPowerContainer, text = "0")
-        self.hydroPowerGenerationValueLabel.pack(side = LEFT)
-        powerUnitsLabel = Label(hydroPowerContainer, text = " GW")
-        powerUnitsLabel.pack(side=LEFT)
-        hydroPowerContainer.pack(padx = 4, pady = 4)
-
-        currentConsumptionContainer = Frame(self)
-        currentConsumptionLabel = Label(currentConsumptionContainer, text= "City Energy Consumption: ")
-        currentConsumptionLabel.pack(side=LEFT)
-        self.currentConsumptionValueLabel = Label(currentConsumptionContainer, text = "0")
-        self.currentConsumptionValueLabel.pack(side = LEFT)
-        powerUnitsLabel = Label(currentConsumptionContainer, text = " GW")
-        powerUnitsLabel.pack(side=LEFT)
-        currentConsumptionContainer.pack(padx = 4, pady = 4)
-
-        renewableSurplusContainer = Frame(self)
-        renewableSurplusLabel = Label(renewableSurplusContainer, text= "Renewable Power Surplus: ")
-        renewableSurplusLabel.pack(side=LEFT)
-        self.renewableSurplusValueLabel = Label(renewableSurplusContainer, text = "0")
-        self.renewableSurplusValueLabel.pack(side = LEFT)
-        powerUnitsLabel = Label(renewableSurplusContainer, text = " GW")
-        powerUnitsLabel.pack(side=LEFT)
-        renewableSurplusContainer.pack(padx = 4, pady = 4)
-
-        renewableShortageContainer = Frame(self)
-        renewableShortageLabel = Label(renewableShortageContainer, text= "Renewable Power Shortage: ")
-        renewableShortageLabel.pack(side=LEFT)
-        self.renewableShortageValueLabel = Label(renewableShortageContainer, text = "0")
-        self.renewableShortageValueLabel.pack(side = LEFT)
-        powerUnitsLabel = Label(renewableShortageContainer, text = " GW")
-        powerUnitsLabel.pack(side=LEFT)
-        renewableShortageContainer.pack(padx = 4, pady = 4)
-
 
         wastedEnergyContainer = Frame(self)
         wastedEnergyLabel = Label(wastedEnergyContainer, text= "Wasted Energy: ")
@@ -568,29 +496,6 @@ class GameWindow(Frame):
             self.stopDrainingButton.config(state=DISABLED)
             self.pumpReservoirButton.config(state=DISABLED)
             self.stopPumpingButton.config(state=DISABLED)
-
-    def updateEnergyDisplays(self, batteryEnergy, reservoirEnergy):
-        self.currentBatteryValueLabel.configure(text = str(round(batteryEnergy, 2)))
-        self.currentReservoirValueLabel.configure(text = str(round(reservoirEnergy, 2)))
-
-        if reservoirEnergy == 0 :
-            self.drainReservoirButton.config(state=DISABLED)
-            self.stopDrainingButton.config(state=DISABLED)
-        
-        if batteryEnergy == 0:
-            self.pumpReservoirButton.config(state=DISABLED)
-            self.stopPumpingButton.config(state=DISABLED)
-
-
-    def updatePowerDisplays(self, solarPower, windPower, reservoirPower, consumption):
-        self.hydroPowerGenerationValueLabel.configure(text = str(reservoirPower))
-        self.solarPowerGenerationValueLabel.configure(text = str(solarPower))
-        self.windPowerGenerationValueLabel.configure(text = str(windPower))
-        self.currentConsumptionValueLabel.configure(text = str(consumption))
-
-    def updateSurplusShortageDisplays(self, surplus, shortage):
-        self.renewableSurplusValueLabel.configure(text = str(round(surplus, 2)))
-        self.renewableShortageValueLabel.configure(text = str(round(shortage, 2)))
 
     def updateWastedDemandNotMetDisplay(self, wastedEnergy, demandNotMet):
         self.wastedEnergyValueLabel.configure(text = str(round(wastedEnergy, 2)))
