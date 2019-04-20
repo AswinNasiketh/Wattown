@@ -5,6 +5,9 @@ from interactiveMode import *
 from cycleSim import *
 import time
 import threading
+import matplotlib as mpl
+
+mpl.rcParams['toolbar'] = 'None' 
 
 root = Tk()
 mainWindow = MainWindow(root)
