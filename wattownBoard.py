@@ -63,47 +63,11 @@ class WattownBoard():
                 self.windmillDriverThread.setPiGPIOHandle(self.pi)
                 self.windmillDriverThread.start()
 
-        # def driveWindmills(self, frequency):
-        #         # print("Drive windmills called")
-        #         # print("currently driving windmills?:", str(self.drivingWindmills))
-        #         if self.drivingWindmills:
-        #                 self.stopWindmills()
-
-        #         halfCyclePeriod = 1/(2 * frequency)
-        #         halfCyclePeriod = int(halfCyclePeriod  * (10**6)) #convert to microseconds
-        #         square = []
-
-        #         # print("Square wave half cycle period:", str(halfCyclePeriod), "us")
-
-        #         #                          ON       OFF    MICROS
-        #         square.append(pigpio.pulse(1<<self.windmillDriverPlus, 1<<self.windmillDriverMinus, halfCyclePeriod))
-        #         square.append(pigpio.pulse(1<<self.windmillDriverMinus,1<<self.windmillDriverPlus, halfCyclePeriod))
-        #         self.pi.wave_add_generic(square)
-        #         self.wid = self.pi.wave_create()
-                
-        #         # print("Wave ID: ", str(self.wid))
-
-        #         if self.wid >= 0:
-        #                 self.pi.wave_send_repeat(self.wid)
-        #                 self.drivingWindmills = True
-
         def stopWindmills(self):
                 if self.drivingWindmills:
                         self.windmillDriverThread.stopDriving()
                         self.windmillDriverThread.join()
                         self.drivingWindmills = False
-
-        # def stopWindmills(self): 
-        #         # print("Stop windmills called")
-        #         # print("currently driving windmills?:", str(self.drivingWindmills))    
-                
-        #         if self.drivingWindmills:
-        #                 # print("Stopping Wave ID: ", str(self.wid))
-        #                 self.pi.wave_tx_stop()
-        #                 self.pi.wave_delete(self.wid)
-        #                 self.drivingWindmills = False
-        #                 self.pi.write(self.windmillDriverPlus, 0)
-        #                 self.pi.write(self.windmillDriverMinus, 0)
 
         def releaseResources(self):
                 self.pi.stop()
@@ -204,4 +168,4 @@ class FuelCellPulseThread(threading.Thread):
         def run(self):
                 self.pi.write(self.fuelCellPin, 1)
                 time.sleep(0.5)
-                self.pi.write(self.fuelCellPin, 0.5)
+                self.pi.write(self.fuelCellPin, 0)
