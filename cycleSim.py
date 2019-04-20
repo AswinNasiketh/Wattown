@@ -2,6 +2,9 @@ import time
 import threading
 
 class CycleSim():
+    #City is powered by reservoir
+    #Solar and wind sources charge battery
+    #battery pumps water to reservoir reservoir during night
 
     def __init__(self, board, mainWindow):
         self.board = board
@@ -26,8 +29,8 @@ class CycleSim():
         self.LED_WATER_BLUE = (94,155,255)
 
         self.LED_RED_DIM = (100, 0 , 0)
-        self.LED_YELLOW = (242, 194, 99)
-        self.LED_BLUE = (94, 193, 255)
+        self.LED_YELLOW_MAX = (242, 194, 99)
+        self.LED_BLUE_MAX = (94, 193, 255)
         self.LED_GREEN_BRIGHT = (97, 255, 94)
 
         self.city_lights_yellow_delta = (self.LED_CITY_LIGHTS_YELLOW_MAX[0] - self.LED_CITY_LIGHTS_YELLOW_MIN[0],
@@ -43,14 +46,8 @@ class CycleSim():
 
         if self.windPresent:
             windPowerGenerationUnits = round(self.MAX_WIND_POWER_GENERATION * self.windAmplitude/10, 2)
-
             self.windmillDrivingFrequency = self.windAmplitude + 6
             print("Windmill Driving Frequency: ", str(self.windmillDrivingFrequency))
-
-            # runWindmillsLambda = lambda: self.animateWindmills(self.windmillSwitchingPeriod, windmillDrivingFrequency)
-            # windmillDriverThread = threading.Thread(target=runWindmillsLambda)
-            # windmillDriverThread.daemon = True
-            # windmillDriverThread.start()
         else:
             windPowerGenerationUnits = 0
         
@@ -60,10 +57,6 @@ class CycleSim():
 
         self.batteryCharging = False
 
-        batteryAnimatorThread = threading.Thread(target=self.animateBattery)
-        batteryAnimatorThread.daemon = True
-        batteryAnimatorThread.start()
-
         self.windStateCount = 0
         
         for j in range(0, self.numLoops):
@@ -72,7 +65,7 @@ class CycleSim():
             for i in range(0, 24):
 
                 if not self.mainWindow.getTaskRunning():
-                    break           
+                    break         
 
                 self.addToBattery(self.solarGenerationValues[i])
 
@@ -84,9 +77,9 @@ class CycleSim():
                     self.animateCityLights(self.consumptionValues[i], self.MAX_CONSUMPTION, self.MIN_CONSUMPTION)
                 else:
                     self.board.setCityLEDs((0,0,0))      
-
                                     
                 #when we have minimum consumption use battery to pump reservoir
+                #can assume battery is discharing because reservoir recharge rate is higher than sum of solar and wind generation
                 if self.consumptionValues[i] == self.MIN_CONSUMPTION:
                     self.batteryCharging = False
 
@@ -99,6 +92,7 @@ class CycleSim():
                     self.batteryCharging = True       
                    
                 self.animateReservoir(self.reservoirLevel)
+                self.animateBattery()
                 if self.windPresent:
                     self.animateWindmills()
 
@@ -186,35 +180,9 @@ class CycleSim():
                 self.board.stopWindmills()
             else:
                 self.board.driveWindmills(self.windmillDrivingFrequency)
+                self.board.pulseFuelCell()
         else:
             self.windStateCount += 1
-            
-
-    #not being used anymore
-    def animateWindmillsAndFuelCell(self, windmillSwitchingPeriod, windmillDrivingFrequency):       
-        windmillsOn = False
-
-        for i in range(0, 60, windmillSwitchingPeriod):
-            if not self.mainWindow.getTaskRunning():
-                break
-
-            if not windmillsOn:
-                self.board.driveWindmills(windmillDrivingFrequency)
-                windmillsOn = True
-                self.pulseFuelCell()
-                time.sleep(windmillSwitchingPeriod - 1)
-            else:
-                self.board.stopWindmills()
-                windmillsOn = False
-                time.sleep(windmillSwitchingPeriod)
-        self.board.stopWindmills()
-        self.board.turnOffFuelCell()
-            
-
-    def pulseFuelCell(self):
-        self.board.turnOnFuelCell()
-        time.sleep(0.5)
-        self.board.turnOffFuelCell()
 
     def configure(self, typeOfDay, daylightHours, windPresent, windmillSwitchingPeriod, windAmplitude, numLoops):
         self.typeOfDay = typeOfDay
@@ -252,48 +220,34 @@ class CycleSim():
             level3Colour = self.LED_WATER_BLUE
 
         self.board.setReservoirLEDs(level0Colour,level1Colour,level2Colour,level3Colour)
-        
+
     def animateBattery(self):
-        for i in range(0,60):
-            if self.mainWindow.getTaskRunning():
-                break
+        #charging
+        if self.batteryCharging:
+            batteryLEDcolour = (int(self.LED_BLUE_MAX[0] * (self.batteryRemaining/100)),
+            int(self.LED_BLUE_MAX[1] * (self.batteryRemaining/100)),
+            int(self.LED_BLUE_MAX[2] * (self.batteryRemaining/100)))
+        else:
+            #discharging
+            batteryLEDcolour = (int(self.LED_YELLOW_MAX[0] * (self.batteryRemaining/100)),
+            int((self.LED_YELLOW_MAX[1] * (self.batteryRemaining/100))),
+            int((self.LED_YELLOW_MAX[2] * (self.batteryRemaining/100))))
 
-            if self.batteryCharging:
-                chargingColour = self.LED_BLUE
-            else:
-                #if battery is discharging but no charge left
-                if self.batteryRemaining == 0:
-                    chargingColour = self.LED_RED_DIM
-                else:
-                    chargingColour = self.LED_YELLOW
-            
-            if self.batteryRemaining > 20:
-                batteryColour = self.LED_GREEN_BRIGHT
-            else:
-                batteryColour = self.LED_RED_DIM
-
-            self.board.setFuelCellLEDs(chargingColour)
-            time.sleep(0.5)
-            self.board.setFuelCellLEDs(batteryColour)
-            time.sleep(0.5)
-
-        self.board.setFuelCellLEDs((0,0,0))
+        self.board.setFuelCellLEDs(batteryLEDcolour)             
     
     def addToBattery(self, unitsToAdd):
         if (self.batteryRemaining + unitsToAdd) > 100:
             self.batteryRemaining = 100
         else:
             self.batteryRemaining += unitsToAdd
-            threading.Thread(target=self.pulseFuelCell).start()
-
+        
     def subtractFromBattery(self, unitsToSubtract):
         if(self.batteryRemaining - unitsToSubtract) < 0:
             return False
         else:
             self.batteryRemaining -= unitsToSubtract
-            threading.Thread(target=self.pulseFuelCell).start()
             return True
-            
+          
 
     def addToReservoir(self, unitsToAdd):
         if (self.reservoirLevel + unitsToAdd) > 100:
