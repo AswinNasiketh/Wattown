@@ -149,6 +149,13 @@ class WattownBoard():
         def turnOffFuelCell(self):
                self.pi.write(self.fuelCellPin, 0)
 
+        def pulseFuelCell(self):
+                pulseThread = FuelCellPulseThread()
+                pulseThread.daemon = True
+                pulseThread.setPiGPIOHandle(self.pi)
+                pulseThread.setFuelCellPin(self.fuelCellPin)
+                pulseThread.start()
+
         def resetBoard(self):
                 self.pixels.fill((0,0,0))
                 self.stopWindmills()
@@ -186,4 +193,15 @@ class WindmillDriveThread(threading.Thread):
                 self.pi.write(self.driveMinusPin, 0)
                 self.pi.write(self.drivePlusPin, 0)
 
-                
+class FuelCellPulseThread(threading.Thread):
+
+        def setPiGPIOHandle(self, handle):
+                self.pi = handle
+        
+        def setFuelCellPin(self, pin):
+                self.fuelCellPin = pin
+
+        def run(self):
+                self.pi.write(self.fuelCellPin, 1)
+                time.sleep(0.5)
+                self.pi.write(self.fuelCellPin, 0.5)
