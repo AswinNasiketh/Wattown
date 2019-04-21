@@ -132,6 +132,8 @@ class GameMode():
 
         if not gameNotLost:
             self.gameWindow.gameLost()
+        
+        self.board.resetBoard()
     
     def getRandomWindParams(self):
         randomAmplitude = random.randint(0, 10)
