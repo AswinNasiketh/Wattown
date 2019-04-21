@@ -182,11 +182,11 @@ class GameMode():
             self.windPower = self.calculateWindPower(windAmplitdue)
 
         if typeOfDay == "Sunny":
-            maxPower = max(self.windPower, self.SUNNY_DAY_SOLAR_GENERATION, self.RESERVOIR_MAX_OUTPUT_POWER)
+            maxPower = max(self.MAX_WIND_POWER_GENERATION, self.SUNNY_DAY_SOLAR_GENERATION, self.RESERVOIR_MAX_OUTPUT_POWER)
             maxPowerSum = self.MAX_WIND_POWER_GENERATION + self.SUNNY_DAY_SOLAR_GENERATION + self.RESERVOIR_MAX_OUTPUT_POWER
             
         else:
-            maxPower = max(self.windPower, self.CLOUDY_DAY_SOLAR_GENERATION, self.RESERVOIR_MAX_OUTPUT_POWER)
+            maxPower = max(self.MAX_WIND_POWER_GENERATION, self.CLOUDY_DAY_SOLAR_GENERATION, self.RESERVOIR_MAX_OUTPUT_POWER)
             maxPowerSum = self.MAX_WIND_POWER_GENERATION + self.CLOUDY_DAY_SOLAR_GENERATION + self.RESERVOIR_MAX_OUTPUT_POWER
 
         self.powerPlotter.configure(maxPower, self.RESERVOIR_MAX_INPUT_POWER)
