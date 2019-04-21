@@ -377,7 +377,11 @@ class GameModeParametersWindow(Frame):
             gameWindow = GameWindow(newWindow)
 
             self.gameModeObj = GameMode(gameWindow, self.mainWindow, self.board)
-            self.gameModeObj.configure(typeOfDay, daylightHours, windSwitchingPeriod, windAmplitude)
+            if randomiseWind:
+                self.gameModeObj.configure(typeOfDay, daylightHours, randomiseWind)
+            else:
+                 self.gameModeObj.configure(typeOfDay, daylightHours, randomiseWind, windSwitchingPeriod, windAmplitude)
+           
             
             gameModeThread = threading.Thread(target=self.gameModeObj.mainLoop)
             gameModeThread.daemon = True
@@ -385,13 +389,13 @@ class GameModeParametersWindow(Frame):
             
             self.master.destroy()
 
-    def onCheckRandomise(self, event):
+    def onCheckRandomise(self):
         if self.randomiseWindCheck.get() == 1:
             self.windSwitchingEntry.config(state=DISABLED)
-            self.windAmplitudeScale.config(state=DISABLED)
+            self.windAmplitudeScale.state(["disabled"])
         else:
             self.windSwitchingEntry.config(state=NORMAL)
-            self.windAmplitudeScale.config(state=NORMAL)
+            self.windAmplitudeScale.state(["!disabled"])
 
 class GameWindow(Frame):
     def __init__(self, master):
