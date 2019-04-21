@@ -287,6 +287,17 @@ class GameModeParametersWindow(Frame):
 
         Label(windControlsContainer, text="Wind control").pack()    
 
+        randomiseWindContainer = Frame(windControlsContainer)      
+
+        self.randomiseWindCheck = IntVar()
+        randomiseWindLabel = Label(randomiseWindContainer, text = "Randomise wind:")
+        randomiseWindLabel.pack(side=LEFT)
+
+        randomiseCheckBox = Checkbutton(randomiseWindContainer, variable=self.randomiseWindCheck, command = self.onCheckRandomise)
+        randomiseCheckBox.pack(side=LEFT)
+
+        randomiseWindContainer.pack(pady = 4)
+
         windmillSwitchingPeriodContainer = Frame(windControlsContainer)
 
         windmillTimeLabel = Label(windmillSwitchingPeriodContainer, text="Wind changes every: ")
@@ -295,8 +306,8 @@ class GameModeParametersWindow(Frame):
         self.windSwitchingPeriod = StringVar()
         self.windSwitchingPeriod.set("1")
 
-        windSwitchingEntry = Entry(windmillSwitchingPeriodContainer, textvariable=self.windSwitchingPeriod)
-        windSwitchingEntry.pack(side = LEFT)
+        self.windSwitchingEntry = Entry(windmillSwitchingPeriodContainer, textvariable=self.windSwitchingPeriod)
+        self.windSwitchingEntry.pack(side = LEFT)
 
         windSwitchingUnitsLabel = Label(windmillSwitchingPeriodContainer, text=" Hours")
         windSwitchingUnitsLabel.pack(side = LEFT)     
@@ -311,8 +322,8 @@ class GameModeParametersWindow(Frame):
         
         self.windAmplitude = IntVar()
         self.windAmplitude.set(0)
-        windAmplitudeScale = Scale(windAmplitudeContainer, orient= HORIZONTAL, from_=0, to=10, variable=self.windAmplitude, command= self.updateWindAmplitudeLabel)
-        windAmplitudeScale.pack(side = LEFT)
+        self.windAmplitudeScale = Scale(windAmplitudeContainer, orient= HORIZONTAL, from_=0, to=10, variable=self.windAmplitude, command= self.updateWindAmplitudeLabel)
+        self.windAmplitudeScale.pack(side = LEFT)
         self.currentWindAmplitudeLabel = Label(windAmplitudeContainer, text = "0")
         self.currentWindAmplitudeLabel.pack(side = LEFT)   
 
@@ -331,13 +342,17 @@ class GameModeParametersWindow(Frame):
 
         windSwitchingPeriod = self.windSwitchingPeriod.get() #string
         windAmplitude = self.windAmplitude.get() #int
-        
+
+        randomiseWind = self.randomiseWindCheck.get()
+
+        randomiseWind = bool(randomiseWind)        
         windSwitchingPeriod = int(windSwitchingPeriod)
         windAmplitude = int(windAmplitude)
         daylightHours = int(daylightHours)
 
         print("Type of day:", typeOfDay)
         print("Daylight Hours:", daylightHours)
+        print("Randomise wind", randomiseWind)
         print("Wind switching period: every", str(windSwitchingPeriod), "hours")
         print("Wind Amplitude:", str(windAmplitude))
         validated = True
@@ -362,13 +377,25 @@ class GameModeParametersWindow(Frame):
             gameWindow = GameWindow(newWindow)
 
             self.gameModeObj = GameMode(gameWindow, self.mainWindow, self.board)
-            self.gameModeObj.configure(typeOfDay, daylightHours, windSwitchingPeriod, windAmplitude)
+            if randomiseWind:
+                self.gameModeObj.configure(typeOfDay, daylightHours, randomiseWind)
+            else:
+                 self.gameModeObj.configure(typeOfDay, daylightHours, randomiseWind, windSwitchingPeriod, windAmplitude)
+           
             
             gameModeThread = threading.Thread(target=self.gameModeObj.mainLoop)
             gameModeThread.daemon = True
             gameModeThread.start()
             
             self.master.destroy()
+
+    def onCheckRandomise(self):
+        if self.randomiseWindCheck.get() == 1:
+            self.windSwitchingEntry.config(state=DISABLED)
+            self.windAmplitudeScale.state(["disabled"])
+        else:
+            self.windSwitchingEntry.config(state=NORMAL)
+            self.windAmplitudeScale.state(["!disabled"])
 
 class GameWindow(Frame):
     def __init__(self, master):
@@ -385,7 +412,9 @@ class GameWindow(Frame):
 
         self.RESERVOIR_MAX_OUTPUT_POWER = 4
         self.RESERVOIR_MAX_INPUT_POWER = -2
-    
+
+        self.DRAIN_START_STOP_RATE = 2 # must ensure max output power is divisible by this rate
+        self.PUMP_START_STOP_RATE = 1  # must ensure max input power is divisible by this rate
 
         self.initWindow()        
 
@@ -532,7 +561,7 @@ class GameWindow(Frame):
 
         while reservoirPower < self.RESERVOIR_MAX_OUTPUT_POWER:
             self.gameModeObj.setReservoirPower(reservoirPower + 1)
-            reservoirPower += 1
+            reservoirPower += self.DRAIN_START_STOP_RATE
             time.sleep(2.5)
         
         self.stopDrainingButton.config(state=NORMAL)
@@ -549,7 +578,7 @@ class GameWindow(Frame):
 
         while reservoirPower > 0:
             self.gameModeObj.setReservoirPower(reservoirPower - 1)
-            reservoirPower -= 1
+            reservoirPower -= self.DRAIN_START_STOP_RATE
             time.sleep(2.5)
         
         self.drainReservoirButton.config(state=NORMAL)
@@ -567,7 +596,7 @@ class GameWindow(Frame):
 
         while reservoirPower > self.RESERVOIR_MAX_INPUT_POWER:
             self.gameModeObj.setReservoirPower(reservoirPower - 1)
-            reservoirPower -= 1
+            reservoirPower -= self.PUMP_START_STOP_RATE
             time.sleep(2.5)
         
         self.stopPumpingButton.config(state=NORMAL)
@@ -584,7 +613,7 @@ class GameWindow(Frame):
 
         while reservoirPower < 0:
             self.gameModeObj.setReservoirPower(reservoirPower + 1)
-            reservoirPower += 1
+            reservoirPower += self.PUMP_START_STOP_RATE
             time.sleep(2.5)
         
         self.drainReservoirButton.config(state=NORMAL)
