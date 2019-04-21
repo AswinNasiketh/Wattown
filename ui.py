@@ -393,7 +393,6 @@ class GameModeParametersWindow(Frame):
             self.windSwitchingEntry.config(state=NORMAL)
             self.windAmplitudeScale.config(state=NORMAL)
 
-
 class GameWindow(Frame):
     def __init__(self, master):
         Frame.__init__(self, master)
@@ -409,7 +408,9 @@ class GameWindow(Frame):
 
         self.RESERVOIR_MAX_OUTPUT_POWER = 4
         self.RESERVOIR_MAX_INPUT_POWER = -2
-    
+
+        self.DRAIN_START_STOP_RATE = 2 # must ensure max output power is divisible by this rate
+        self.PUMP_START_STOP_RATE = 1  # must ensure max input power is divisible by this rate
 
         self.initWindow()        
 
@@ -651,7 +652,7 @@ class GameWindow(Frame):
 
         while reservoirPower < self.RESERVOIR_MAX_OUTPUT_POWER:
             self.gameModeObj.setReservoirPower(reservoirPower + 1)
-            reservoirPower += 1
+            reservoirPower += self.DRAIN_START_STOP_RATE
             time.sleep(2.5)
         
         self.stopDrainingButton.config(state=NORMAL)
@@ -668,7 +669,7 @@ class GameWindow(Frame):
 
         while reservoirPower > 0:
             self.gameModeObj.setReservoirPower(reservoirPower - 1)
-            reservoirPower -= 1
+            reservoirPower -= self.DRAIN_START_STOP_RATE
             time.sleep(2.5)
         
         self.drainReservoirButton.config(state=NORMAL)
@@ -686,7 +687,7 @@ class GameWindow(Frame):
 
         while reservoirPower > self.RESERVOIR_MAX_INPUT_POWER:
             self.gameModeObj.setReservoirPower(reservoirPower - 1)
-            reservoirPower -= 1
+            reservoirPower -= self.PUMP_START_STOP_RATE
             time.sleep(2.5)
         
         self.stopPumpingButton.config(state=NORMAL)
@@ -703,7 +704,7 @@ class GameWindow(Frame):
 
         while reservoirPower < 0:
             self.gameModeObj.setReservoirPower(reservoirPower + 1)
-            reservoirPower += 1
+            reservoirPower += self.PUMP_START_STOP_RATE
             time.sleep(2.5)
         
         self.drainReservoirButton.config(state=NORMAL)
