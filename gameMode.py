@@ -65,7 +65,7 @@ class GameMode():
 
         self.reservoirState = self.RESERVOIR_NO_ACTIVITY
 
-        fig = plt.figure(figsize=(15, 15), dpi=80)
+        fig = plt.figure(figsize=(8, 9), dpi=80)
         plt.subplots_adjust(hspace=0.4)
         self.powerPlotter.setupFigure(fig)
         self.supplyDemandPlotter.setupFigure(fig)
@@ -104,7 +104,8 @@ class GameMode():
                 reservoirEnergy = 0
                 self.gameWindow.disableDrainStartButton()
             else:
-                self.gameWindow.enableDrainStartButton()
+                if self.reservoirState == self.RESERVOIR_NO_ACTIVITY:
+                    self.gameWindow.enableDrainStartButton()
 
             if wastedEnergy > 5:
                 gameNotLost = False
@@ -146,6 +147,8 @@ class GameMode():
         if not gameNotLost:
             self.gameWindow.gameLost()
 
+        plt.close(fig)
+
 
     def configure(self, typeOfDay, daylightHours, windmillSwitchingPeriod, windAmplitdue):
         self.typeOfDay = typeOfDay
@@ -159,11 +162,11 @@ class GameMode():
 
         if typeOfDay == "Sunny":
             maxPower = max(self.windPower, self.SUNNY_DAY_SOLAR_GENERATION, self.RESERVOIR_MAX_OUTPUT_POWER)
-            maxPowerSum = self.windPower + self.SUNNY_DAY_SOLAR_GENERATION + self.RESERVOIR_MAX_INPUT_POWER
+            maxPowerSum = self.MAX_WIND_POWER_GENERATION + self.SUNNY_DAY_SOLAR_GENERATION + self.RESERVOIR_MAX_OUTPUT_POWER
             
         else:
             maxPower = max(self.windPower, self.CLOUDY_DAY_SOLAR_GENERATION, self.RESERVOIR_MAX_OUTPUT_POWER)
-            maxPowerSum = self.windPower + self.CLOUDY_DAY_SOLAR_GENERATION + self.RESERVOIR_MAX_INPUT_POWER
+            maxPowerSum = self.MAX_WIND_POWER_GENERATION + self.CLOUDY_DAY_SOLAR_GENERATION + self.RESERVOIR_MAX_OUTPUT_POWER
 
         self.powerPlotter.configure(maxPower, self.RESERVOIR_MAX_INPUT_POWER)
         self.supplyDemandPlotter.configure(maxPowerSum, -self.MAX_CONSUMPTION + self.RESERVOIR_MAX_INPUT_POWER)
