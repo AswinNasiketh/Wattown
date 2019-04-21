@@ -1,4 +1,5 @@
 import time
+import random
 
 class GameMode():
     def __init__(self, gameWindow, mainWindow, board):
@@ -64,8 +65,12 @@ class GameMode():
             renewableSurplus += self.solarGenerationValues[self.currentHour]
             renewableSurplus += self.reservoirPower
 
-            if self.board.areWindmillsOn():
+            if self.randomiseWind:
+                self.windmillDrivingFrequency, self.windPower = self.getRandomWindParams()
                 renewableSurplus += self.windPower
+            else:
+                if self.board.areWindmillsOn():
+                    renewableSurplus += self.windPower
 
             reservoirEnergy -= self.reservoirPower
 
@@ -109,8 +114,16 @@ class GameMode():
 
             self.gameWindow.updateSurplusShortageDisplays(max(0 , renewableSurplus), min(0, renewableSurplus))
             self.gameWindow.updateWastedDemandNotMetDisplay(wastedEnergy, demandNotMet)
+            
 
-            self.animateWindmills()
+            if self.randomiseWind:
+                if self.windmillDrivingFrequency != 0:
+                    self.board.driveWindmills(self.windmillDrivingFrequency)
+                else:
+                    self.board.stopWindmills()
+            else:
+                self.driveWindmillsRegular()
+
             self.animateBattery(batteryEnergy, previousBatteryEnergy)
             self.animateCityLights(self.consumptionValues[self.currentHour], self.MAX_CONSUMPTION, self.MIN_CONSUMPTION)
             self.animateReservoir(reservoirEnergy)
@@ -119,17 +132,28 @@ class GameMode():
 
         if not gameNotLost:
             self.gameWindow.gameLost()
+    
+    def getRandomWindParams(self):
+        randomAmplitude = random.randint(0, 10)
+        randomPower = self.calculateWindPower(randomAmplitude)
 
+        return randomAmplitude + 6, randomPower
 
-    def configure(self, typeOfDay, daylightHours, windmillSwitchingPeriod, windAmplitdue):
+    def configure(self, typeOfDay, daylightHours, randomiseWind, windmillSwitchingPeriod = None, windAmplitdue = None):
         self.typeOfDay = typeOfDay
         self.daylightHours = daylightHours
         self.setupSolarGenerationValues(typeOfDay, daylightHours)
         self.setupConsumptionValues(self.MAX_CONSUMPTION, self.MIN_CONSUMPTION, self.SIM_WAKEUP_TIME, self.SIM_SLEEP_TIME)
-        self.windmillSwitchingPeriod = windmillSwitchingPeriod
-        self.windmillDrivingFrequency = windAmplitdue + 6
+        self.randomiseWind = randomiseWind
 
-        self.windPower = round(self.MAX_WIND_POWER_GENERATION * windAmplitdue / 10,  2)
+        if not randomiseWind:
+            self.windmillSwitchingPeriod = windmillSwitchingPeriod
+            self.windmillDrivingFrequency = windAmplitdue + 6        
+            self.windPower = self.calculateWindPower(windAmplitdue)
+        
+
+    def calculateWindPower(self, amplitude):
+        return round(self.MAX_WIND_POWER_GENERATION * amplitude / 10,  2)
 
     def incrementTime(self):
         self.currentHour += 1
@@ -137,7 +161,7 @@ class GameMode():
             self.currentHour = 0
             self.currentDay += 1
 
-    def animateWindmills(self):
+    def driveWindmillsRegular(self):
         if self.windStateCount == self.windmillSwitchingPeriod:
             currentWindState = self.board.areWindmillsOn()
             self.windStateCount = 1

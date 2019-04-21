@@ -287,6 +287,17 @@ class GameModeParametersWindow(Frame):
 
         Label(windControlsContainer, text="Wind control").pack()    
 
+        randomiseWindContainer = Frame(windControlsContainer)      
+
+        self.randomiseWindCheck = IntVar()
+        randomiseWindLabel = Label(randomiseWindContainer, text = "Randomise wind:")
+        randomiseWindLabel.pack(side=LEFT)
+
+        randomiseCheckBox = Checkbutton(randomiseWindContainer, variable=self.randomiseWindCheck, command = self.onCheckRandomise)
+        randomiseCheckBox.pack(side=LEFT)
+
+        randomiseWindContainer.pack(pady = 4)
+
         windmillSwitchingPeriodContainer = Frame(windControlsContainer)
 
         windmillTimeLabel = Label(windmillSwitchingPeriodContainer, text="Wind changes every: ")
@@ -295,8 +306,8 @@ class GameModeParametersWindow(Frame):
         self.windSwitchingPeriod = StringVar()
         self.windSwitchingPeriod.set("1")
 
-        windSwitchingEntry = Entry(windmillSwitchingPeriodContainer, textvariable=self.windSwitchingPeriod)
-        windSwitchingEntry.pack(side = LEFT)
+        self.windSwitchingEntry = Entry(windmillSwitchingPeriodContainer, textvariable=self.windSwitchingPeriod)
+        self.windSwitchingEntry.pack(side = LEFT)
 
         windSwitchingUnitsLabel = Label(windmillSwitchingPeriodContainer, text=" Hours")
         windSwitchingUnitsLabel.pack(side = LEFT)     
@@ -311,8 +322,8 @@ class GameModeParametersWindow(Frame):
         
         self.windAmplitude = IntVar()
         self.windAmplitude.set(0)
-        windAmplitudeScale = Scale(windAmplitudeContainer, orient= HORIZONTAL, from_=0, to=10, variable=self.windAmplitude, command= self.updateWindAmplitudeLabel)
-        windAmplitudeScale.pack(side = LEFT)
+        self.windAmplitudeScale = Scale(windAmplitudeContainer, orient= HORIZONTAL, from_=0, to=10, variable=self.windAmplitude, command= self.updateWindAmplitudeLabel)
+        self.windAmplitudeScale.pack(side = LEFT)
         self.currentWindAmplitudeLabel = Label(windAmplitudeContainer, text = "0")
         self.currentWindAmplitudeLabel.pack(side = LEFT)   
 
@@ -331,13 +342,17 @@ class GameModeParametersWindow(Frame):
 
         windSwitchingPeriod = self.windSwitchingPeriod.get() #string
         windAmplitude = self.windAmplitude.get() #int
-        
+
+        randomiseWind = self.randomiseWindCheck.get()
+
+        randomiseWind = bool(randomiseWind)        
         windSwitchingPeriod = int(windSwitchingPeriod)
         windAmplitude = int(windAmplitude)
         daylightHours = int(daylightHours)
 
         print("Type of day:", typeOfDay)
         print("Daylight Hours:", daylightHours)
+        print("Randomise wind", randomiseWind)
         print("Wind switching period: every", str(windSwitchingPeriod), "hours")
         print("Wind Amplitude:", str(windAmplitude))
         validated = True
@@ -369,6 +384,15 @@ class GameModeParametersWindow(Frame):
             gameModeThread.start()
             
             self.master.destroy()
+
+    def onCheckRandomise(self, event):
+        if self.randomiseWindCheck.get() == 1:
+            self.windSwitchingEntry.config(state=DISABLED)
+            self.windAmplitudeScale.config(state=DISABLED)
+        else:
+            self.windSwitchingEntry.config(state=NORMAL)
+            self.windAmplitudeScale.config(state=NORMAL)
+
 
 class GameWindow(Frame):
     def __init__(self, master):
