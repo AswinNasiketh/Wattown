@@ -11,8 +11,7 @@ class PowerGraph():
         self.hydroPower = 0
         self.indicies = [1, 2, 3]
         self.barLabels = ["Solar Power", "Wind Power", "Hydro Power"]
-        self.xlabel = "Power Source"
-        self.ylabel = "Power Generated/Consumed this hour (GW)"
+        self.ylabel = "Power Generated/Consumed (GW)"
         self.title = "Renewable Energy Generation"
 
     def configure(self, maxPower, minPower):
@@ -38,7 +37,6 @@ class PowerGraph():
         self.bars = self.ax.bar(self.indicies, [self.solarPower, self.windPower, self.hydroPower])
         self.ax.set_xticks(self.indicies)
         self.ax.set_xticklabels(self.barLabels)
-        self.ax.set_xlabel(self.xlabel)
         self.ax.set_ylabel(self.ylabel)
         self.ax.set_title(self.title)
         
@@ -56,7 +54,7 @@ class ConsumptionSupplyGraph():
         self.renewableSupply = 0
         self.renewableSurplus = 0
         self.indicies = [1, 2, 3]
-        self.barLabels = ["City Consumption", "Renewable Supply ", "Renewable Surplus"]
+        self.barLabels = ["City Consumption", "Renewable Supply ", "Renewable Surplus/Shortage"]
         self.ylabel = "Power (GW)"
         self.title = "Supply and Demand"
 
@@ -116,8 +114,8 @@ class StoredEnergyGraph():
     def animate(self):
         self.ax.clear()
         self.bars = self.ax.bar(self.indicies, [self.batteryEnergy, self.reservoirEnergy])
-        self.bars[0].set_color('b')
-        self.bars[1].set_color('y')
+        self.bars[0].set_color('y')
+        self.bars[1].set_color('b')
         self.ax.set_xticks(self.indicies)
         self.ax.set_xticklabels(self.barLabels)
         self.ax.set_ylabel(self.ylabel)
