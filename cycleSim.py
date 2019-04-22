@@ -63,14 +63,19 @@ class CycleSim():
         self.windStateCount = 0
 
         print("Starting cycle mode loop")
+        self.runOuterLoop = True
         for j in range(0, self.numLoops):
-            print("New day")            
+            print("New day")          
+
+            if not self.runOuterLoop:
+                break  
 
             for i in range(0, 24):
                 
                 if not self.mainWindow.getTaskRunning():
+                    self.runOuterLoop = False 
                     break     
-
+                self.runOuterLoop = True
                 self.reservoirPower = 0
 
                 self.addToBattery(self.solarGenerationValues[i])
@@ -82,12 +87,17 @@ class CycleSim():
                     if self.board.areWindmillsOn():                    
                         self.addToBattery(self.windPowerGenerationUnits)
 
-                #only animate the city lights if we have enough capacity in the reservoir
+                #only animate the city lights if we have enough capacity in the reservoir or battery
                 if self.subtractFromReservoir(self.consumptionValues[i]):
                     self.animateCityLights(self.consumptionValues[i], self.MAX_CONSUMPTION, self.MIN_CONSUMPTION)
                     self.reservoirPower += self.consumptionValues[i]
+                elif self.subtractFromBattery(self.consumptionValues[i]):
+                    self.animateCityLights(self.consumptionValues[i], self.MAX_CONSUMPTION, self.MIN_CONSUMPTION)
                 else:
                     self.board.setCityLEDs((0,0,0))      
+                    print("Energy depleted!")
+                    self.runOuterLoop = False
+                    break
                                     
                 #when we have minimum consumption use battery to pump reservoir
                 #can assume battery is discharing because reservoir recharge rate is higher than sum of solar and wind generation
@@ -132,6 +142,14 @@ class CycleSim():
                 else:
                     if self.windPresent:
                         self.animateWindmillsRegular()
+
+                print("Hour", str(i))
+                print("City consumption: ", str(self.consumptionValues[i]))
+                print("Solar Panel Generation: ", str(self.solarGenerationValues[i]))
+                print("Wind Generation: ", str(self.windPowerGenerationUnits))
+                print("Battery Level: ", str(self.batteryRemaining))
+                print("Reservoir Level: ", str(self.reservoirLevel))
+                print("Battery Charging: ", str(self.batteryCharging))
 
                 time.sleep(2.5)
 
