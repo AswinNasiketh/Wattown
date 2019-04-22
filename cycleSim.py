@@ -1,5 +1,7 @@
 import time
 import threading
+import matplotlib.pyplot as plt
+from plotting import *
 
 class CycleSim():
     #City is powered by reservoir
@@ -9,6 +11,10 @@ class CycleSim():
     def __init__(self, board, mainWindow):
         self.board = board
         self.mainWindow = mainWindow
+
+        self.powerPlotter = PowerGraph()
+        self.supplyDemandPlotter = ConsumptionSupplyGraph()
+        self.storagePlotter = StoredEnergyGraph()   
 
         #1GW = 0.1 units
         self.SUNNY_DAY_SOLAR_GENERATION = 1.28 #UK solar power capacity = 12.8GW
@@ -37,8 +43,15 @@ class CycleSim():
         self.LED_CITY_LIGHTS_YELLOW_MAX[1] - self.LED_CITY_LIGHTS_YELLOW_MIN[1],
         self.LED_CITY_LIGHTS_YELLOW_MAX[2] - self.LED_CITY_LIGHTS_YELLOW_MIN[2])
 
-    def cycleModeLoop(self):
-        print("Starting cycle mode loop")
+    def cycleModeLoop(self):       
+
+        fig = plt.figure(figsize=(8, 9), dpi=80)
+        plt.subplots_adjust(hspace=0.4)
+        self.powerPlotter.setupFigure(fig)
+        self.supplyDemandPlotter.setupFigure(fig)
+        self.storagePlotter.setupFigure(fig)
+        plt.ion()
+        plt.show()
 
 
         self.setupConsumptionValues(self.MAX_CONSUMPTION, self.MIN_CONSUMPTION, self.SIM_WAKEUP_TIME, self.SIM_SLEEP_TIME)
@@ -58,14 +71,16 @@ class CycleSim():
         self.batteryCharging = False
 
         self.windStateCount = 0
-        
+
+        print("Starting cycle mode loop")
         for j in range(0, self.numLoops):
             print("New day")            
 
             for i in range(0, 24):
-
+                
                 if not self.mainWindow.getTaskRunning():
                     break         
+                self.reservoirPower = 0
 
                 self.addToBattery(self.solarGenerationValues[i])
 
@@ -75,6 +90,7 @@ class CycleSim():
                 #only animate the city lights if we have enough capacity in the reservoir
                 if self.subtractFromReservoir(self.consumptionValues[i]):
                     self.animateCityLights(self.consumptionValues[i], self.MAX_CONSUMPTION, self.MIN_CONSUMPTION)
+                    self.reservoirPower += self.consumptionValues[i]
                 else:
                     self.board.setCityLEDs((0,0,0))      
                                     
@@ -85,12 +101,29 @@ class CycleSim():
 
                     #only transfer energy to reservoir if we have enough in the battery
                     if self.subtractFromBattery(self.RESERVOIR_RECHARGE_RATE):
-                         self.addToReservoir(self.RESERVOIR_RECHARGE_RATE)     
+                         self.addToReservoir(self.RESERVOIR_RECHARGE_RATE)
+                         self.reservoirPower -= self.RESERVOIR_RECHARGE_RATE
 
                 #otherwise only charge battery   
                 else:
                     self.batteryCharging = True       
-                   
+
+                self.supplyDemandPlotter.setConsumption(self.consumptionValues[i])
+                self.storagePlotter.setRemainingEnergies(self.batteryRemaining,self.reservoirLevel)
+
+                if self.board.areWindmillsOn():
+                    self.powerPlotter.setPowers(self.solarGenerationValues[i], windPowerGenerationUnits, self.reservoirPower)
+                    self.supplyDemandPlotter.setRenewableSupply(self.solarGenerationValues[i] + windPowerGenerationUnits + self.reservoirPower)
+                else:
+                    self.powerPlotter.setPowers(self.solarGenerationValues[i], 0, self.reservoirPower)
+                    self.supplyDemandPlotter.setRenewableSupply(self.solarGenerationValues[i] + self.reservoirPower)
+
+                self.powerPlotter.animate()
+                self.supplyDemandPlotter.animate()
+                self.storagePlotter.animate()
+
+                plt.pause(0.001)
+
                 self.animateReservoir(self.reservoirLevel)
                 self.animateBattery()
                 if self.windPresent:
@@ -108,6 +141,7 @@ class CycleSim():
                 print("Battery Charging: ", str(self.batteryCharging))
                 time.sleep(2.5)
 
+        plt.close(fig)
         self.board.resetBoard()
         self.mainWindow.setTaskRunning(False)
 
@@ -191,6 +225,18 @@ class CycleSim():
         self.windmillSwitchingPeriod = windmillSwitchingPeriod
         self.windAmplitude = windAmplitude
         self.numLoops = numLoops
+
+
+        if typeOfDay == "Sunny":
+            maxPower = max(self.MAX_WIND_POWER_GENERATION, self.SUNNY_DAY_SOLAR_GENERATION, self.MAX_CONSUMPTION)
+            maxPowerSum = self.MAX_WIND_POWER_GENERATION + self.SUNNY_DAY_SOLAR_GENERATION + self.MAX_CONSUMPTION
+            
+        else:
+            maxPower = max(self.MAX_WIND_POWER_GENERATION, self.CLOUDY_DAY_SOLAR_GENERATION, self.MAX_CONSUMPTION)
+            maxPowerSum = self.MAX_WIND_POWER_GENERATION + self.CLOUDY_DAY_SOLAR_GENERATION + self.MAX_CONSUMPTION
+
+        self.powerPlotter.configure(maxPower, self.RESERVOIR_RECHARGE_RATE)
+        self.supplyDemandPlotter.configure(maxPowerSum, -self.MAX_CONSUMPTION - self.RESERVOIR_RECHARGE_RATE)
 
     def animateReservoir(self, reservoirLevel):
         if reservoirLevel == 0:
