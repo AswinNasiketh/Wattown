@@ -144,7 +144,7 @@ class GameMode():
             
 
             if self.randomiseWind:
-                if self.windmillDrivingFrequency != 0:
+                if self.windPower != 0:
                     self.board.driveWindmills(self.windmillDrivingFrequency)
                 else:
                     self.board.stopWindmills()
