@@ -2,6 +2,7 @@ import time
 import threading
 import matplotlib.pyplot as plt
 from plotting import *
+import random
 
 class CycleSim():
     #City is powered by reservoir
@@ -51,18 +52,7 @@ class CycleSim():
         self.supplyDemandPlotter.setupFigure(fig)
         self.storagePlotter.setupFigure(fig)
         plt.ion()
-        plt.show()
-
-
-        self.setupConsumptionValues(self.MAX_CONSUMPTION, self.MIN_CONSUMPTION, self.SIM_WAKEUP_TIME, self.SIM_SLEEP_TIME)
-        self.setupSolarGenerationValues(self.typeOfDay, self.daylightHours)
-
-        if self.windPresent:
-            windPowerGenerationUnits = round(self.MAX_WIND_POWER_GENERATION * self.windAmplitude/10, 2)
-            self.windmillDrivingFrequency = self.windAmplitude + 6
-            print("Windmill Driving Frequency: ", str(self.windmillDrivingFrequency))
-        else:
-            windPowerGenerationUnits = 0
+        plt.show()       
         
 
         self.batteryRemaining = 50 #percentage
@@ -79,13 +69,18 @@ class CycleSim():
             for i in range(0, 24):
                 
                 if not self.mainWindow.getTaskRunning():
-                    break         
+                    break     
+
                 self.reservoirPower = 0
 
                 self.addToBattery(self.solarGenerationValues[i])
 
-                if self.board.areWindmillsOn():                    
-                    self.addToBattery(windPowerGenerationUnits)
+                if self.randomiseWind:
+                    self.windmillDrivingFrequency, self.windPowerGenerationUnits = self.getRandomWindParams()
+                    self.addToBattery(self.windPowerGenerationUnits)
+                else:
+                    if self.board.areWindmillsOn():                    
+                        self.addToBattery(self.windPowerGenerationUnits)
 
                 #only animate the city lights if we have enough capacity in the reservoir
                 if self.subtractFromReservoir(self.consumptionValues[i]):
@@ -108,12 +103,13 @@ class CycleSim():
                 else:
                     self.batteryCharging = True       
 
+                #plotting
                 self.supplyDemandPlotter.setConsumption(self.consumptionValues[i])
                 self.storagePlotter.setRemainingEnergies(self.batteryRemaining,self.reservoirLevel)
 
                 if self.board.areWindmillsOn():
-                    self.powerPlotter.setPowers(self.solarGenerationValues[i], windPowerGenerationUnits, self.reservoirPower)
-                    self.supplyDemandPlotter.setRenewableSupply(self.solarGenerationValues[i] + windPowerGenerationUnits + self.reservoirPower)
+                    self.powerPlotter.setPowers(self.solarGenerationValues[i], self.windPowerGenerationUnits, self.reservoirPower)
+                    self.supplyDemandPlotter.setRenewableSupply(self.solarGenerationValues[i] + self.windPowerGenerationUnits + self.reservoirPower)
                 else:
                     self.powerPlotter.setPowers(self.solarGenerationValues[i], 0, self.reservoirPower)
                     self.supplyDemandPlotter.setRenewableSupply(self.solarGenerationValues[i] + self.reservoirPower)
@@ -124,27 +120,34 @@ class CycleSim():
 
                 plt.pause(0.001)
 
+                #board animation
                 self.animateReservoir(self.reservoirLevel)
                 self.animateBattery()
-                if self.windPresent:
-                    self.animateWindmills()
 
-                print("Hour", str(i))
-                print("City consumption: ", str(self.consumptionValues[i]))
-                print("Solar Panel Generation: ", str(self.solarGenerationValues[i]))
-                if self.board.areWindmillsOn():
-                    print("Wind Generation: ", str(windPowerGenerationUnits))
+                if self.randomiseWind:
+                    if self.windPowerGenerationUnits != 0:
+                        self.board.driveWindmills(self.windmillDrivingFrequency)
+                    else:
+                        self.board.stopWindmills()
                 else:
-                    print("Wind Generation: 0")
-                print("Battery Level: ", str(self.batteryRemaining))
-                print("Reservoir Level: ", str(self.reservoirLevel))
-                print("Battery Charging: ", str(self.batteryCharging))
+                    if self.windPresent:
+                        self.animateWindmillsRegular()
+
                 time.sleep(2.5)
 
+        #clean up before end
         plt.close(fig)
         self.board.resetBoard()
         self.mainWindow.setTaskRunning(False)
 
+    def calculateWindPower(self, amplitude):
+        return round(self.MAX_WIND_POWER_GENERATION * amplitude / 10,  2)
+
+    def getRandomWindParams(self):
+        randomAmplitude = random.randint(0, 10)
+        randomPower = self.calculateWindPower(randomAmplitude)       
+
+        return randomAmplitude + 6, randomPower
 
     def animateCityLights(self, consumption, maxConsumption, minConsumption):
         maxConsumptionDelta = maxConsumption - minConsumption
@@ -206,7 +209,7 @@ class CycleSim():
             consumption = round(consumption)
             self.consumptionValues.append(consumption)
 
-    def animateWindmills(self):
+    def animateWindmillsRegular(self):
         if self.windStateCount == self.windmillSwitchingPeriod:
             currentWindState = self.board.areWindmillsOn()
             self.windStateCount = 1
@@ -218,13 +221,25 @@ class CycleSim():
         else:
             self.windStateCount += 1
 
-    def configure(self, typeOfDay, daylightHours, windPresent, windmillSwitchingPeriod, windAmplitude, numLoops):
+    def configure(self, typeOfDay, daylightHours, windPresent, numLoops, randomiseWind = False, windmillSwitchingPeriod = 1, windAmplitude = 0):
         self.typeOfDay = typeOfDay
         self.daylightHours = daylightHours
         self.windPresent = windPresent
+        self.randomiseWind = randomiseWind
         self.windmillSwitchingPeriod = windmillSwitchingPeriod
         self.windAmplitude = windAmplitude
         self.numLoops = numLoops
+
+        self.setupConsumptionValues(self.MAX_CONSUMPTION, self.MIN_CONSUMPTION, self.SIM_WAKEUP_TIME, self.SIM_SLEEP_TIME)
+        self.setupSolarGenerationValues(self.typeOfDay, self.daylightHours)
+
+        if windPresent:
+            if not randomiseWind:             
+                self.windPowerGenerationUnits = self.calculateWindPower(windAmplitude)
+                self.windmillDrivingFrequency = self.windAmplitude + 6
+                print("Windmill Driving Frequency: ", str(self.windmillDrivingFrequency))
+        else:
+            self.windPowerGenerationUnits = 0
 
 
         if typeOfDay == "Sunny":

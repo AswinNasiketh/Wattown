@@ -135,10 +135,21 @@ class CycleModeControlsWindow(Frame):
         windPresentLabel = Label(windPresentContainer, text = "Wind Present?:")
         windPresentLabel.pack( side=LEFT)
 
-        windPresentCheckBox = Checkbutton(windPresentContainer, variable=self.windPresentCheck)
+        windPresentCheckBox = Checkbutton(windPresentContainer, variable=self.windPresentCheck, command = self.onCheckPresent)
         windPresentCheckBox.pack(side=LEFT)
 
         windPresentContainer.pack(pady = 4)
+
+        randomiseWindContainer = Frame(windControlsContainer)      
+
+        self.randomiseWindCheck = IntVar()
+        randomiseWindLabel = Label(randomiseWindContainer, text = "Randomise wind:")
+        randomiseWindLabel.pack(side=LEFT)
+
+        self.randomiseCheckBox = Checkbutton(randomiseWindContainer, variable=self.randomiseWindCheck, command = self.onCheckRandomise)
+        self.randomiseCheckBox.pack(side=LEFT)
+
+        randomiseWindContainer.pack(pady = 4)
 
         windmillSwitchingPeriodContainer = Frame(windControlsContainer)
 
@@ -148,8 +159,8 @@ class CycleModeControlsWindow(Frame):
         self.windSwitchingPeriod = StringVar()
         self.windSwitchingPeriod.set("1")
 
-        windSwitchingEntry = Entry(windmillSwitchingPeriodContainer, textvariable=self.windSwitchingPeriod)
-        windSwitchingEntry.pack(side = LEFT)
+        self.windSwitchingEntry = Entry(windmillSwitchingPeriodContainer, textvariable=self.windSwitchingPeriod)
+        self.windSwitchingEntry.pack(side = LEFT)
 
         windSwitchingUnitsLabel = Label(windmillSwitchingPeriodContainer, text=" Hours")
         windSwitchingUnitsLabel.pack(side = LEFT)     
@@ -164,9 +175,9 @@ class CycleModeControlsWindow(Frame):
         
         self.windAmplitude = IntVar()
         self.windAmplitude.set(0)
-        windAmplitudeScale = Scale(windAmplitudeContainer, orient= HORIZONTAL, from_=0, to=10, variable=self.windAmplitude, command= self.updateWindAmplitudeLabel)
-        windAmplitudeScale.pack(side = LEFT)
-        self.currentWindAmplitudeLabel = Label(windAmplitudeContainer, text = "0")
+        self.windAmplitudeScale = Scale(windAmplitudeContainer, orient= HORIZONTAL, from_=1, to=10, variable=self.windAmplitude, command= self.updateWindAmplitudeLabel)
+        self.windAmplitudeScale.pack(side = LEFT)
+        self.currentWindAmplitudeLabel = Label(windAmplitudeContainer, text = "1")
         self.currentWindAmplitudeLabel.pack(side = LEFT)   
 
         windAmplitudeContainer.pack(pady=4)
@@ -183,11 +194,13 @@ class CycleModeControlsWindow(Frame):
         daylightHours = self.daylightHoursVar.get() #string
 
         windPresent = self.windPresentCheck.get() #integer representing boolean
+        randomiseWind = self.randomiseWindCheck.get()
         windSwitchingPeriod = self.windSwitchingPeriod.get() #string
         windAmplitude = self.windAmplitude.get() #int
         numLoops = self.numLoops.get()
         
         windPresent = bool(windPresent)
+        randomiseWind = bool(randomiseWind)
         windSwitchingPeriod = int(windSwitchingPeriod)
         windAmplitude = int(windAmplitude)
         daylightHours = int(daylightHours)
@@ -196,6 +209,7 @@ class CycleModeControlsWindow(Frame):
         print("Type of day:", typeOfDay)
         print("Daylight Hours:", daylightHours)
         print("Wind Present:", str(windPresent))
+        print("Randomise Wind:", str(randomiseWind))
         print("Wind switching period: every", str(windSwitchingPeriod), "hours")
         print("Wind Amplitude:", str(windAmplitude))
         print("Number of loops:", numLoops)
@@ -219,12 +233,37 @@ class CycleModeControlsWindow(Frame):
 
         if validated:
             self.mainWindow.setTaskRunning(True, "Cycle mode")
-            self.simulation.configure(typeOfDay, daylightHours, windPresent, windSwitchingPeriod, windAmplitude, numLoops)
+            if windPresent:
+                if randomiseWind:                    
+                    self.simulation.configure(typeOfDay, daylightHours, windPresent, numLoops, True)
+                else:
+                    self.simulation.configure(typeOfDay, daylightHours, windPresent, numLoops, False, windSwitchingPeriod, windAmplitude)
+            else:
+                self.simulation.configure(typeOfDay, daylightHours, False, numLoops)
+            
             cycleSimulationThread = threading.Thread(target=self.simulation.cycleModeLoop)
             cycleSimulationThread.daemon = True
             cycleSimulationThread.start()
             
             self.master.destroy()
+
+    def onCheckRandomise(self):
+        if self.randomiseWindCheck.get() == 1:
+            self.windSwitchingEntry.config(state=DISABLED)
+            self.windAmplitudeScale.state(["disabled"])
+        else:
+            self.windSwitchingEntry.config(state=NORMAL)
+            self.windAmplitudeScale.state(["!disabled"])
+
+    def onCheckPresent(self):
+        if self.windPresentCheck.get() == 1:
+            self.randomiseCheckBox.config(state=NORMAL)
+            self.windSwitchingEntry.config(state=NORMAL)
+            self.windAmplitudeScale.state(["!disabled"])
+        else:
+            self.randomiseCheckBox.config(state=DISABLED)
+            self.windSwitchingEntry.config(state=DISABLED)
+            self.windAmplitudeScale.state(["disabled"])
             
 class GameModeParametersWindow(Frame):
 
@@ -322,9 +361,9 @@ class GameModeParametersWindow(Frame):
         
         self.windAmplitude = IntVar()
         self.windAmplitude.set(0)
-        self.windAmplitudeScale = Scale(windAmplitudeContainer, orient= HORIZONTAL, from_=0, to=10, variable=self.windAmplitude, command= self.updateWindAmplitudeLabel)
+        self.windAmplitudeScale = Scale(windAmplitudeContainer, orient= HORIZONTAL, from_=1, to=10, variable=self.windAmplitude, command= self.updateWindAmplitudeLabel)
         self.windAmplitudeScale.pack(side = LEFT)
-        self.currentWindAmplitudeLabel = Label(windAmplitudeContainer, text = "0")
+        self.currentWindAmplitudeLabel = Label(windAmplitudeContainer, text = "1")
         self.currentWindAmplitudeLabel.pack(side = LEFT)   
 
         windAmplitudeContainer.pack(pady=4)
