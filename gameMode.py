@@ -237,7 +237,7 @@ class GameMode():
             int(self.LED_BLUE_MAX[2] * (currentBatteryLevel/100)))
 
             self.board.setFuelCellLEDs(batteryLEDcolour)
-            self.pulseFuelCell()
+            self.board.pulseFuelCell()
         elif batteryLevelChange < 0:
             #discharging
             batteryLEDcolour = (int(self.LED_YELLOW_MAX[0] * (currentBatteryLevel/100)),
@@ -245,17 +245,12 @@ class GameMode():
             int((self.LED_YELLOW_MAX[2] * (currentBatteryLevel/100))))
 
             self.board.setFuelCellLEDs(batteryLEDcolour)
-            self.pulseFuelCell()
+            self.board.pulseFuelCell()
         elif  batteryLevelChange == 0:
             if currentBatteryLevel == 0:
                 self.board.setFuelCellLEDs(self.LED_RED_DIM)
             elif currentBatteryLevel == 100:
                 self.board.setFuelCellLEDs(self.LED_GREEN_BRIGHT)
-
-    def pulseFuelCell(self):
-        self.board.turnOnFuelCell()
-        time.sleep(0.5)
-        self.board.turnOffFuelCell()  
 
     def animateReservoir(self, reservoirLevel):
         if reservoirLevel == 0:
