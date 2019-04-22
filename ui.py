@@ -22,10 +22,10 @@ class MainWindow(Frame):
         self.statusLabel = Label(self, text = "Status = Idle")
         self.statusLabel.pack(fill = X, expand = 1)
 
-        self.interactiveModeButton = Button(self, text = "Start interactive mode")
+        self.interactiveModeButton = Button(self, text = "Start Interactive mode")
         self.interactiveModeButton.pack(fill=X, expand =1)
 
-        self.dailyCycleModeButton = Button(self, text = "Start Daily Cycle Mode")
+        self.dailyCycleModeButton = Button(self, text = "Start Cycle Mode")
         self.dailyCycleModeButton.pack(fill = X, expand =1)
 
         self.gameModeButton = Button(self, text = "Start Game Mode")
@@ -159,7 +159,7 @@ class CycleModeControlsWindow(Frame):
         self.windSwitchingPeriod = StringVar()
         self.windSwitchingPeriod.set("1")
 
-        self.windSwitchingEntry = Entry(windmillSwitchingPeriodContainer, textvariable=self.windSwitchingPeriod)
+        self.windSwitchingEntry = Entry(windmillSwitchingPeriodContainer, textvariable=self.windSwitchingPeriod, state = DISABLED)
         self.windSwitchingEntry.pack(side = LEFT)
 
         windSwitchingUnitsLabel = Label(windmillSwitchingPeriodContainer, text=" Hours")
@@ -176,6 +176,7 @@ class CycleModeControlsWindow(Frame):
         self.windAmplitude = IntVar()
         self.windAmplitude.set(0)
         self.windAmplitudeScale = Scale(windAmplitudeContainer, orient= HORIZONTAL, from_=1, to=10, variable=self.windAmplitude, command= self.updateWindAmplitudeLabel)
+        self.windAmplitudeScale.state(["disabled"])
         self.windAmplitudeScale.pack(side = LEFT)
         self.currentWindAmplitudeLabel = Label(windAmplitudeContainer, text = "1")
         self.currentWindAmplitudeLabel.pack(side = LEFT)   
