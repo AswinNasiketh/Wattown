@@ -137,6 +137,7 @@ class CycleSim():
                 if self.randomiseWind:
                     if self.windPowerGenerationUnits != 0:
                         self.board.driveWindmills(self.windmillDrivingFrequency)
+                        self.board.pulseFuelCell()
                     else:
                         self.board.stopWindmills()
                 else:
@@ -268,7 +269,7 @@ class CycleSim():
             maxPower = max(self.MAX_WIND_POWER_GENERATION, self.CLOUDY_DAY_SOLAR_GENERATION, self.MAX_CONSUMPTION)
             maxPowerSum = self.MAX_WIND_POWER_GENERATION + self.CLOUDY_DAY_SOLAR_GENERATION + self.MAX_CONSUMPTION
 
-        self.powerPlotter.configure(maxPower, self.RESERVOIR_RECHARGE_RATE)
+        self.powerPlotter.configure(maxPower, -self.RESERVOIR_RECHARGE_RATE)
         self.supplyDemandPlotter.configure(maxPowerSum, -self.MAX_CONSUMPTION - self.RESERVOIR_RECHARGE_RATE)
 
     def animateReservoir(self, reservoirLevel):
