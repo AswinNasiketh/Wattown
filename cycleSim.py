@@ -152,7 +152,7 @@ class CycleSim():
                 print("Reservoir Level: ", str(self.reservoirLevel))
                 print("Battery Charging: ", str(self.batteryCharging))
 
-                time.sleep(2.5)
+                time.sleep(1.5)
 
         #clean up before end
         plt.close(fig)

@@ -155,7 +155,7 @@ class GameMode():
             self.animateCityLights(self.consumptionValues[self.currentHour], self.MAX_CONSUMPTION, self.MIN_CONSUMPTION)
             self.animateReservoir(reservoirEnergy)
 
-            time.sleep(2.5)
+            time.sleep(1.5)
 
         if not gameNotLost:
             self.gameWindow.gameLost()
