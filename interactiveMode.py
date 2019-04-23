@@ -7,7 +7,7 @@ class InteractiveMode():
         self.board = board
 
         currentSolarPanelVoltage = board.getSolarPanelVoltage()
-        self.PV_THRESHOLD = currentSolarPanelVoltage + 0.2
+        self.PV_THRESHOLD = currentSolarPanelVoltage + 0.01
         self.WINDMILL_THRESHOLD = 2.0
 
         self.PV_GENERATION_UNIT = 5
@@ -18,7 +18,7 @@ class InteractiveMode():
         self.previousBatteryLevel = 0
 
         self.LED_RED_DIM = (100, 0 , 0)
-        self.LED_YELLOW_MAX = (242, 194, 99)
+        self.LED_YELLOW_MAX = (130, 130, 66)
         self.LED_BLUE_MAX = (94, 193, 255)
         self.LED_GREEN_BRIGHT = (97, 255, 94)
         self.LED_WATER_BLUE = (94,155,255)
@@ -60,6 +60,7 @@ class InteractiveMode():
     
     def areSolarPanelsOn(self):
         solarPanelVoltage = self.board.getSolarPanelVoltage()
+        print(solarPanelVoltage)
 
         if solarPanelVoltage >= self.PV_THRESHOLD:
             print("Solar panels on")

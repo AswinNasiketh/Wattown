@@ -33,7 +33,7 @@ class GameMode():
         self.LED_WATER_BLUE = (94,155,255)
 
         self.LED_RED_DIM = (100, 0 , 0)
-        self.LED_YELLOW_MAX = (242, 194, 99)
+        self.LED_YELLOW_MAX = (130, 130, 66)
         self.LED_BLUE_MAX = (94, 193, 255)
         self.LED_GREEN_BRIGHT = (97, 255, 94)
 
