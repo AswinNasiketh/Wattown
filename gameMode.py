@@ -28,18 +28,21 @@ class GameMode():
 
         self.RESERVOIR_RECHARGE_RATE = 5
 
-        self.LED_CITY_LIGHTS_YELLOW_MAX = (244, 217, 66)
-        self.LED_CITY_LIGHTS_YELLOW_MIN = (122, 108, 33)
         self.LED_WATER_BLUE = (94,155,255)
-
         self.LED_RED_DIM = (100, 0 , 0)
         self.LED_YELLOW_MAX = (130, 130, 66)
         self.LED_BLUE_MAX = (94, 193, 255)
         self.LED_GREEN_BRIGHT = (97, 255, 94)
+        self.LED_CITY_LIGHTS_YELLOW = (163, 145, 44)
 
-        self.city_lights_yellow_delta = (self.LED_CITY_LIGHTS_YELLOW_MAX[0] - self.LED_CITY_LIGHTS_YELLOW_MIN[0],
-        self.LED_CITY_LIGHTS_YELLOW_MAX[1] - self.LED_CITY_LIGHTS_YELLOW_MIN[1],
-        self.LED_CITY_LIGHTS_YELLOW_MAX[2] - self.LED_CITY_LIGHTS_YELLOW_MIN[2])
+        #city LED ranges
+        self.CITY_BLOCK_1_LOWER = 8
+        self.CITY_BLOCK_1_UPPER = 28
+        self.CITY_BLOCK_2_LOWER = 29
+        self.CITY_BLOCK_2_UPPER = 57
+        self.CITY_BLOCK_3_LOWER = 58
+        self.CITY_BLOCK_3_UPPER = 94
+
 
         self.RESERVOIR_NO_ACTIVITY = 0
         self.RESERVOIR_GATE_OPENING = 1
@@ -219,13 +222,15 @@ class GameMode():
         consumptionAboveMin = consumption - minConsumption
 
         cityLightsCoefficent = consumptionAboveMin/maxConsumptionDelta
-    
 
-        cityLightsColour = (int(self.city_lights_yellow_delta[0] * cityLightsCoefficent) + self.LED_CITY_LIGHTS_YELLOW_MIN[0],
-        int(self.city_lights_yellow_delta[1] * cityLightsCoefficent) + self.LED_CITY_LIGHTS_YELLOW_MIN[1],
-        int(self.city_lights_yellow_delta[2] * cityLightsCoefficent) + self.LED_CITY_LIGHTS_YELLOW_MIN[2])
-
-        self.board.setCityLEDs(cityLightsColour)  
+        if cityLightsCoefficent == 0:
+            self.board.setCityLEDs((0,0,0))
+        elif cityLightsCoefficent > 0 and cityLightsCoefficent <= 0.33:
+            self.board.setCityLEDs(self.LED_CITY_LIGHTS_YELLOW, self.CITY_BLOCK_1_LOWER, self.CITY_BLOCK_1_UPPER)
+        elif cityLightsCoefficent > 0.33 and cityLightsCoefficent <= 0.66:
+            self.board.setCityLEDs(self.LED_CITY_LIGHTS_YELLOW, self.CITY_BLOCK_1_LOWER, self.CITY_BLOCK_2_UPPER)
+        elif cityLightsCoefficent > 0.66:
+            self.board.setCityLEDs(self.LED_CITY_LIGHTS_YELLOW)    
                 
     def animateBattery(self, currentBatteryLevel, previousBatteryLevel):
         batteryLevelChange = currentBatteryLevel - previousBatteryLevel

@@ -79,8 +79,8 @@ class WattownBoard():
                 return [self.adcChannel1.voltage, self.adcChannel2.voltage, self.adcChannel3.voltage, self.adcChannel4.voltage, self.adcChannel5.voltage]
 
         #LED control code, colour must be inputted as tuple of three integers between 0 and 255 (i.e. setCityLEDs((255,255,0))
-        def setCityLEDs(self, colour):
-                for i in range(self.city_range_lower, self.city_range_upper + 1):
+        def setCityLEDs(self, colour, rangeLower = 8, rangeUpper = 94):
+                for i in range(rangeLower, rangeUpper + 1):
                         self.pixels[i] = colour
 
                 self.pixels.show()

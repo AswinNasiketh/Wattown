@@ -23,6 +23,14 @@ class InteractiveMode():
         self.LED_GREEN_BRIGHT = (97, 255, 94)
         self.LED_WATER_BLUE = (94,155,255)
         self.LED_CITY_LIGHTS_YELLOW = (163, 145, 44)
+        
+        #city LED ranges
+        self.CITY_BLOCK_1_LOWER = 8
+        self.CITY_BLOCK_1_UPPER = 28
+        self.CITY_BLOCK_2_LOWER = 29
+        self.CITY_BLOCK_2_UPPER = 57
+        self.CITY_BLOCK_3_LOWER = 58
+        self.CITY_BLOCK_3_UPPER = 94
 
     def interactiveModeLoop(self):
         print("Starting interactive mode loop")
@@ -136,11 +144,14 @@ class InteractiveMode():
         self.board.setReservoirLEDs(level0Colour,level1Colour,level2Colour,level3Colour)
 
     def animateCityLights(self):
-        if(self.currentBatteryLevel > 0):
-            self.board.setCityLEDs(self.LED_CITY_LIGHTS_YELLOW)
-        else:
+        if self.currentBatteryLevel == 0:
             self.board.setCityLEDs((0,0,0))
-
+        elif self.currentBatteryLevel > 0 and self.currentBatteryLevel <= 33:
+            self.board.setCityLEDs(self.LED_CITY_LIGHTS_YELLOW, self.CITY_BLOCK_1_LOWER, self.CITY_BLOCK_1_UPPER)
+        elif self.currentBatteryLevel > 33 and self.currentBatteryLevel <= 66:
+            self.board.setCityLEDs(self.LED_CITY_LIGHTS_YELLOW, self.CITY_BLOCK_1_LOWER, self.CITY_BLOCK_2_UPPER)
+        elif self.currentBatteryLevel > 66:
+            self.board.setCityLEDs(self.LED_CITY_LIGHTS_YELLOW)
 
 
     
