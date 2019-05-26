@@ -2,6 +2,7 @@ import time
 from plotting import *
 import matplotlib.pyplot as plt
 import random
+import values
 
 class GameMode():
     def __init__(self, gameWindow, mainWindow, board):
@@ -14,26 +15,6 @@ class GameMode():
         self.powerPlotter = PowerGraph()
         self.supplyDemandPlotter = ConsumptionSupplyGraph()
         self.storagePlotter = StoredEnergyGraph()        
-
-        self.SUNNY_DAY_SOLAR_GENERATION = 1.28 #UK solar power capacity = 12.8GW
-        self.CLOUDY_DAY_SOLAR_GENERATION = 0.64 #half max capacity for cloudy day
-
-        self.MAX_WIND_POWER_GENERATION = 2 #UK wind power capacity = 20.7GW
-
-        self.MAX_CONSUMPTION = 3.4 #UK max power demand on 06/04/19 was 34GW
-        self.MIN_CONSUMPTION = 2.46 #UK min power demand on 06/04/19 was 24.6GW http://gridwatch.co.uk/
-
-        self.SIM_WAKEUP_TIME = 6 #6AM
-        self.SIM_SLEEP_TIME = 20 #8PM
-
-        self.RESERVOIR_RECHARGE_RATE = 5
-
-        self.LED_WATER_BLUE = (94,155,255)
-        self.LED_RED_DIM = (100, 0 , 0)
-        self.LED_YELLOW_MAX = (130, 130, 66)
-        self.LED_BLUE_MAX = (94, 193, 255)
-        self.LED_GREEN_BRIGHT = (97, 255, 94)
-        self.LED_CITY_LIGHTS_YELLOW = (163, 145, 44)
 
         #states
         self.RESERVOIR_NO_ACTIVITY = 0
@@ -147,7 +128,7 @@ class GameMode():
                 self.driveWindmillsRegular()
 
             self.animateBattery(batteryEnergy, previousBatteryEnergy)
-            self.animateCityLights(self.consumptionValues[self.currentHour], self.MAX_CONSUMPTION, self.MIN_CONSUMPTION)
+            self.animateCityLights(self.consumptionValues[self.currentHour], values.MAX_CONSUMPTION, values.MIN_CONSUMPTION)
             self.animateReservoir(reservoirEnergy)
 
             time.sleep(1.5)
@@ -168,7 +149,7 @@ class GameMode():
         self.typeOfDay = typeOfDay
         self.daylightHours = daylightHours
         self.setupSolarGenerationValues(typeOfDay, daylightHours)
-        self.setupConsumptionValues(self.MAX_CONSUMPTION, self.MIN_CONSUMPTION, self.SIM_WAKEUP_TIME, self.SIM_SLEEP_TIME)
+        self.setupConsumptionValues(values.MAX_CONSUMPTION, values.MIN_CONSUMPTION, values.SIM_WAKEUP_TIME, values.SIM_SLEEP_TIME)
         self.randomiseWind = randomiseWind
 
         if not randomiseWind:
@@ -177,19 +158,19 @@ class GameMode():
             self.windPower = self.calculateWindPower(windAmplitdue)
 
         if typeOfDay == "Sunny":
-            maxPower = max(self.MAX_WIND_POWER_GENERATION, self.SUNNY_DAY_SOLAR_GENERATION, self.RESERVOIR_MAX_OUTPUT_POWER)
-            maxPowerSum = self.MAX_WIND_POWER_GENERATION + self.SUNNY_DAY_SOLAR_GENERATION + self.RESERVOIR_MAX_OUTPUT_POWER
+            maxPower = max(values.MAX_WIND_POWER_GENERATION, values.SUNNY_DAY_SOLAR_GENERATION, self.RESERVOIR_MAX_OUTPUT_POWER)
+            maxPowerSum = values.MAX_WIND_POWER_GENERATION + values.SUNNY_DAY_SOLAR_GENERATION + self.RESERVOIR_MAX_OUTPUT_POWER
             
         else:
-            maxPower = max(self.MAX_WIND_POWER_GENERATION, self.CLOUDY_DAY_SOLAR_GENERATION, self.RESERVOIR_MAX_OUTPUT_POWER)
-            maxPowerSum = self.MAX_WIND_POWER_GENERATION + self.CLOUDY_DAY_SOLAR_GENERATION + self.RESERVOIR_MAX_OUTPUT_POWER
+            maxPower = max(values.MAX_WIND_POWER_GENERATION, values.CLOUDY_DAY_SOLAR_GENERATION, self.RESERVOIR_MAX_OUTPUT_POWER)
+            maxPowerSum = values.MAX_WIND_POWER_GENERATION + values.CLOUDY_DAY_SOLAR_GENERATION + self.RESERVOIR_MAX_OUTPUT_POWER
 
         self.powerPlotter.configure(maxPower, self.RESERVOIR_MAX_INPUT_POWER)
-        self.supplyDemandPlotter.configure(maxPowerSum, -self.MAX_CONSUMPTION + self.RESERVOIR_MAX_INPUT_POWER)
+        self.supplyDemandPlotter.configure(maxPowerSum, -values.MAX_CONSUMPTION + self.RESERVOIR_MAX_INPUT_POWER)
         
 
     def calculateWindPower(self, amplitude):
-        return round(self.MAX_WIND_POWER_GENERATION * amplitude / 10,  2)
+        return round(values.MAX_WIND_POWER_GENERATION * amplitude / 10,  2)
 
     def incrementTime(self):
         self.currentHour += 1
@@ -213,7 +194,7 @@ class GameMode():
 
         consumptionAboveMin = consumption - minConsumption
 
-        cityLightsCoefficent = consumptionAboveMin/maxConsumptionDelta
+        cityLightsCoefficient = consumptionAboveMin/maxConsumptionDelta
 
         self.board.lightCityBlocks(cityLightsCoefficient)
                 
@@ -222,25 +203,25 @@ class GameMode():
 
         #charging
         if batteryLevelChange > 0:
-            batteryLEDcolour = (int(self.LED_BLUE_MAX[0] * (currentBatteryLevel/100)),
-            int(self.LED_BLUE_MAX[1] * (currentBatteryLevel/100)),
-            int(self.LED_BLUE_MAX[2] * (currentBatteryLevel/100)))
+            batteryLEDcolour = (int(values.LED_BLUE_MAX[0] * (currentBatteryLevel/100)),
+            int(values.LED_BLUE_MAX[1] * (currentBatteryLevel/100)),
+            int(values.LED_BLUE_MAX[2] * (currentBatteryLevel/100)))
 
             self.board.setFuelCellLEDs(batteryLEDcolour)
             self.board.pulseFuelCell()
         elif batteryLevelChange < 0:
             #discharging
-            batteryLEDcolour = (int(self.LED_YELLOW_MAX[0] * (currentBatteryLevel/100)),
-            int((self.LED_YELLOW_MAX[1] * (currentBatteryLevel/100))),
-            int((self.LED_YELLOW_MAX[2] * (currentBatteryLevel/100))))
+            batteryLEDcolour = (int(values.LED_YELLOW_MAX[0] * (currentBatteryLevel/100)),
+            int((values.LED_YELLOW_MAX[1] * (currentBatteryLevel/100))),
+            int((values.LED_YELLOW_MAX[2] * (currentBatteryLevel/100))))
 
             self.board.setFuelCellLEDs(batteryLEDcolour)
             self.board.pulseFuelCell()
         elif  batteryLevelChange == 0:
             if currentBatteryLevel == 0:
-                self.board.setFuelCellLEDs(self.LED_RED_DIM)
+                self.board.setFuelCellLEDs(values.LED_RED_DIM)
             elif currentBatteryLevel == 100:
-                self.board.setFuelCellLEDs(self.LED_GREEN_BRIGHT)
+                self.board.setFuelCellLEDs(values.LED_GREEN_BRIGHT)
 
     def animateReservoir(self, reservoirLevel):
         if reservoirLevel == 0:
@@ -249,25 +230,25 @@ class GameMode():
             level2Colour = (0,0,0)
             level3Colour = (0,0,0)
         elif reservoirLevel > 0 and reservoirLevel < 25:
-            level0Colour = self.LED_WATER_BLUE
+            level0Colour = values.LED_WATER_BLUE
             level1Colour = (0,0,0)
             level2Colour = (0,0,0)
             level3Colour = (0,0,0)
         elif reservoirLevel >= 25 and reservoirLevel < 50:
-            level0Colour = self.LED_WATER_BLUE
-            level1Colour = self.LED_WATER_BLUE
+            level0Colour = values.LED_WATER_BLUE
+            level1Colour = values.LED_WATER_BLUE
             level2Colour = (0,0,0)
             level3Colour = (0,0,0)
         elif reservoirLevel >= 50 and reservoirLevel < 75:
-            level0Colour = self.LED_WATER_BLUE
-            level1Colour = self.LED_WATER_BLUE
-            level2Colour = self.LED_WATER_BLUE
+            level0Colour = values.LED_WATER_BLUE
+            level1Colour = values.LED_WATER_BLUE
+            level2Colour = values.LED_WATER_BLUE
             level3Colour = (0,0,0)
         elif reservoirLevel >= 75:
-            level0Colour = self.LED_WATER_BLUE
-            level1Colour = self.LED_WATER_BLUE
-            level2Colour = self.LED_WATER_BLUE
-            level3Colour = self.LED_WATER_BLUE
+            level0Colour = values.LED_WATER_BLUE
+            level1Colour = values.LED_WATER_BLUE
+            level2Colour = values.LED_WATER_BLUE
+            level3Colour = values.LED_WATER_BLUE
 
         self.board.setReservoirLEDs(level0Colour,level1Colour,level2Colour,level3Colour)
 
@@ -276,9 +257,9 @@ class GameMode():
         sunset = 12 + int(daylightHours/2)
 
         if typeOfDay == "Sunny":
-            solarGeneration = self.SUNNY_DAY_SOLAR_GENERATION
+            solarGeneration = values.SUNNY_DAY_SOLAR_GENERATION
         else:
-            solarGeneration = self.CLOUDY_DAY_SOLAR_GENERATION
+            solarGeneration = values.CLOUDY_DAY_SOLAR_GENERATION
 
         self.solarGenerationValues = []
 

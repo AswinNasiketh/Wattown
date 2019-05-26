@@ -3,6 +3,7 @@ import threading
 import matplotlib.pyplot as plt
 from plotting import *
 import random
+import values
 
 class CycleSim():
     #City is powered by reservoir
@@ -16,28 +17,6 @@ class CycleSim():
         self.powerPlotter = PowerGraph()
         self.supplyDemandPlotter = ConsumptionSupplyGraph()
         self.storagePlotter = StoredEnergyGraph()   
-
-        #1GW = 0.1 units
-        self.SUNNY_DAY_SOLAR_GENERATION = 1.28 #UK solar power capacity = 12.8GW
-        self.CLOUDY_DAY_SOLAR_GENERATION = 0.64 #half max capacity for cloudy day
-
-        self.MAX_WIND_POWER_GENERATION = 2 #UK wind power capacity = 20.7GW
-
-        self.MAX_CONSUMPTION = 3.4 #UK max power demand on 06/04/19 was 34GW
-        self.MIN_CONSUMPTION = 2.46 #UK min power demand on 06/04/19 was 24.6GW http://gridwatch.co.uk/
-
-        self.SIM_WAKEUP_TIME = 6 #6AM
-        self.SIM_SLEEP_TIME = 20 #8PM
-
-        self.RESERVOIR_RECHARGE_RATE = 5
-
-        self.LED_WATER_BLUE = (94,155,255)
-        self.LED_CITY_LIGHTS_YELLOW = (163, 145, 44)
-
-        self.LED_RED_DIM = (100, 0 , 0)
-        self.LED_YELLOW_MAX = (130, 130, 66)
-        self.LED_BLUE_MAX = (94, 193, 255)
-        self.LED_GREEN_BRIGHT = (97, 255, 94)
 
     def cycleModeLoop(self):       
 
@@ -84,10 +63,10 @@ class CycleSim():
 
                 #only animate the city lights if we have enough capacity in the reservoir or battery
                 if self.subtractFromReservoir(self.consumptionValues[i]):
-                    self.animateCityLights(self.consumptionValues[i], self.MAX_CONSUMPTION, self.MIN_CONSUMPTION)
+                    self.animateCityLights(self.consumptionValues[i], values.MAX_CONSUMPTION, values.MIN_CONSUMPTION)
                     self.reservoirPower += self.consumptionValues[i]
                 elif self.subtractFromBattery(self.consumptionValues[i]):
-                    self.animateCityLights(self.consumptionValues[i], self.MAX_CONSUMPTION, self.MIN_CONSUMPTION)
+                    self.animateCityLights(self.consumptionValues[i], values.MAX_CONSUMPTION, values.MIN_CONSUMPTION)
                 else:
                     self.board.setCityLEDs((0,0,0))      
                     print("Energy depleted!")
@@ -96,13 +75,13 @@ class CycleSim():
                                     
                 #when we have minimum consumption use battery to pump reservoir
                 #can assume battery is discharing because reservoir recharge rate is higher than sum of solar and wind generation
-                if self.consumptionValues[i] == self.MIN_CONSUMPTION:
+                if self.consumptionValues[i] == values.MIN_CONSUMPTION:
                     self.batteryCharging = False
 
                     #only transfer energy to reservoir if we have enough in the battery
-                    if self.subtractFromBattery(self.RESERVOIR_RECHARGE_RATE):
-                         self.addToReservoir(self.RESERVOIR_RECHARGE_RATE)
-                         self.reservoirPower -= self.RESERVOIR_RECHARGE_RATE
+                    if self.subtractFromBattery(values.RESERVOIR_RECHARGE_RATE):
+                         self.addToReservoir(values.RESERVOIR_RECHARGE_RATE)
+                         self.reservoirPower -= values.RESERVOIR_RECHARGE_RATE
 
                 #otherwise only charge battery   
                 else:
@@ -155,7 +134,7 @@ class CycleSim():
         self.mainWindow.setTaskRunning(False)
 
     def calculateWindPower(self, amplitude):
-        return round(self.MAX_WIND_POWER_GENERATION * amplitude / 10,  2)
+        return round(values.MAX_WIND_POWER_GENERATION * amplitude / 10,  2)
 
     def getRandomWindParams(self):
         randomAmplitude = random.randint(0, 10)
@@ -177,9 +156,9 @@ class CycleSim():
         sunset = 12 + int(daylightHours/2)
 
         if typeOfDay == "Sunny":
-            solarGeneration = self.SUNNY_DAY_SOLAR_GENERATION
+            solarGeneration = values.SUNNY_DAY_SOLAR_GENERATION
         else:
-            solarGeneration = self.CLOUDY_DAY_SOLAR_GENERATION
+            solarGeneration = values.CLOUDY_DAY_SOLAR_GENERATION
 
         self.solarGenerationValues = []
 
@@ -238,7 +217,7 @@ class CycleSim():
         self.windAmplitude = windAmplitude
         self.numLoops = numLoops
 
-        self.setupConsumptionValues(self.MAX_CONSUMPTION, self.MIN_CONSUMPTION, self.SIM_WAKEUP_TIME, self.SIM_SLEEP_TIME)
+        self.setupConsumptionValues(values.MAX_CONSUMPTION, values.MIN_CONSUMPTION, values.SIM_WAKEUP_TIME, values.SIM_SLEEP_TIME)
         self.setupSolarGenerationValues(self.typeOfDay, self.daylightHours)
 
         if windPresent:
@@ -251,15 +230,15 @@ class CycleSim():
 
 
         if typeOfDay == "Sunny":
-            maxPower = max(self.MAX_WIND_POWER_GENERATION, self.SUNNY_DAY_SOLAR_GENERATION, self.MAX_CONSUMPTION)
-            maxPowerSum = self.MAX_WIND_POWER_GENERATION + self.SUNNY_DAY_SOLAR_GENERATION + self.MAX_CONSUMPTION
+            maxPower = max(values.MAX_WIND_POWER_GENERATION, values.SUNNY_DAY_SOLAR_GENERATION, values.MAX_CONSUMPTION)
+            maxPowerSum = values.MAX_WIND_POWER_GENERATION + values.SUNNY_DAY_SOLAR_GENERATION + values.MAX_CONSUMPTION
             
         else:
-            maxPower = max(self.MAX_WIND_POWER_GENERATION, self.CLOUDY_DAY_SOLAR_GENERATION, self.MAX_CONSUMPTION)
-            maxPowerSum = self.MAX_WIND_POWER_GENERATION + self.CLOUDY_DAY_SOLAR_GENERATION + self.MAX_CONSUMPTION
+            maxPower = max(values.MAX_WIND_POWER_GENERATION, values.CLOUDY_DAY_SOLAR_GENERATION, values.MAX_CONSUMPTION)
+            maxPowerSum = values.MAX_WIND_POWER_GENERATION + values.CLOUDY_DAY_SOLAR_GENERATION + values.MAX_CONSUMPTION
 
-        self.powerPlotter.configure(maxPower, -self.RESERVOIR_RECHARGE_RATE)
-        self.supplyDemandPlotter.configure(maxPowerSum, -self.MAX_CONSUMPTION - self.RESERVOIR_RECHARGE_RATE)
+        self.powerPlotter.configure(maxPower, -values.RESERVOIR_RECHARGE_RATE)
+        self.supplyDemandPlotter.configure(maxPowerSum, -values.MAX_CONSUMPTION - values.RESERVOIR_RECHARGE_RATE)
 
     def animateReservoir(self, reservoirLevel):
         if reservoirLevel == 0:
@@ -268,39 +247,39 @@ class CycleSim():
             level2Colour = (0,0,0)
             level3Colour = (0,0,0)
         elif reservoirLevel > 0 and reservoirLevel < 25:
-            level0Colour = self.LED_WATER_BLUE
+            level0Colour = values.LED_WATER_BLUE
             level1Colour = (0,0,0)
             level2Colour = (0,0,0)
             level3Colour = (0,0,0)
         elif reservoirLevel >= 25 and reservoirLevel < 50:
-            level0Colour = self.LED_WATER_BLUE
-            level1Colour = self.LED_WATER_BLUE
+            level0Colour = values.LED_WATER_BLUE
+            level1Colour = values.LED_WATER_BLUE
             level2Colour = (0,0,0)
             level3Colour = (0,0,0)
         elif reservoirLevel >= 50 and reservoirLevel < 75:
-            level0Colour = self.LED_WATER_BLUE
-            level1Colour = self.LED_WATER_BLUE
-            level2Colour = self.LED_WATER_BLUE
+            level0Colour = values.LED_WATER_BLUE
+            level1Colour = values.LED_WATER_BLUE
+            level2Colour = values.LED_WATER_BLUE
             level3Colour = (0,0,0)
         elif reservoirLevel >= 75:
-            level0Colour = self.LED_WATER_BLUE
-            level1Colour = self.LED_WATER_BLUE
-            level2Colour = self.LED_WATER_BLUE
-            level3Colour = self.LED_WATER_BLUE
+            level0Colour = values.LED_WATER_BLUE
+            level1Colour = values.LED_WATER_BLUE
+            level2Colour = values.LED_WATER_BLUE
+            level3Colour = values.LED_WATER_BLUE
 
         self.board.setReservoirLEDs(level0Colour,level1Colour,level2Colour,level3Colour)
 
     def animateBattery(self):
         #charging
         if self.batteryCharging:
-            batteryLEDcolour = (int(self.LED_BLUE_MAX[0] * (self.batteryRemaining/100)),
-            int(self.LED_BLUE_MAX[1] * (self.batteryRemaining/100)),
-            int(self.LED_BLUE_MAX[2] * (self.batteryRemaining/100)))
+            batteryLEDcolour = (int(values.LED_BLUE_MAX[0] * (self.batteryRemaining/100)),
+            int(values.LED_BLUE_MAX[1] * (self.batteryRemaining/100)),
+            int(values.LED_BLUE_MAX[2] * (self.batteryRemaining/100)))
         else:
             #discharging
-            batteryLEDcolour = (int(self.LED_YELLOW_MAX[0] * (self.batteryRemaining/100)),
-            int((self.LED_YELLOW_MAX[1] * (self.batteryRemaining/100))),
-            int((self.LED_YELLOW_MAX[2] * (self.batteryRemaining/100))))
+            batteryLEDcolour = (int(values.LED_YELLOW_MAX[0] * (self.batteryRemaining/100)),
+            int((values.LED_YELLOW_MAX[1] * (self.batteryRemaining/100))),
+            int((values.LED_YELLOW_MAX[2] * (self.batteryRemaining/100))))
 
         self.board.setFuelCellLEDs(batteryLEDcolour)             
     
