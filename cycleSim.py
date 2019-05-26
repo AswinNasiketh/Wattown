@@ -55,7 +55,7 @@ class CycleSim():
                 self.addToBattery(self.solarGenerationValues[i])
 
                 if self.randomiseWind:
-                    self.windmillDrivingFrequency, self.windPowerGenerationUnits = self.getRandomWindParams()
+                    self.windPowerGenerationUnits = self.getRandomWindPower()
                     self.addToBattery(self.windPowerGenerationUnits)
                 else:
                     if self.board.areWindmillsOn():                    
@@ -110,7 +110,7 @@ class CycleSim():
 
                 if self.randomiseWind:
                     if self.windPowerGenerationUnits != 0:
-                        self.board.driveWindmills(self.windmillDrivingFrequency)
+                        self.board.driveWindmills()
                         self.board.pulseFuelCell()
                     else:
                         self.board.stopWindmills()
@@ -136,11 +136,11 @@ class CycleSim():
     def calculateWindPower(self, amplitude):
         return round(values.MAX_WIND_POWER_GENERATION * amplitude / 10,  2)
 
-    def getRandomWindParams(self):
+    def getRandomWindPower(self):
         randomAmplitude = random.randint(0, 10)
         randomPower = self.calculateWindPower(randomAmplitude)       
 
-        return randomAmplitude + 6, randomPower
+        return randomPower
 
     def animateCityLights(self, consumption, maxConsumption, minConsumption):
         maxConsumptionDelta = maxConsumption - minConsumption
@@ -203,7 +203,7 @@ class CycleSim():
             if currentWindState:
                 self.board.stopWindmills()
             else:
-                self.board.driveWindmills(self.windmillDrivingFrequency)
+                self.board.driveWindmills()
                 self.board.pulseFuelCell()
         else:
             self.windStateCount += 1
@@ -223,8 +223,6 @@ class CycleSim():
         if windPresent:
             if not randomiseWind:             
                 self.windPowerGenerationUnits = self.calculateWindPower(windAmplitude)
-                self.windmillDrivingFrequency = self.windAmplitude + 6
-                print("Windmill Driving Frequency: ", str(self.windmillDrivingFrequency))
         else:
             self.windPowerGenerationUnits = 0
 

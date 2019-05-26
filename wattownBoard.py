@@ -32,6 +32,7 @@ class WattownBoard():
                 self.pi.write(self.windmillDriverMinus, 0)
                 self.wid = 0
                 self.drivingWindmills = False
+                self.WINDMILL_DRIVE_FREQUENCY = 4
 
                 self.fuelCellPin = 8
                 self.pi.set_mode(self.fuelCellPin, pigpio.OUTPUT)
@@ -60,14 +61,14 @@ class WattownBoard():
                 
                 self.pixels = neopixel.NeoPixel(board.D12, self.num_neopixels, auto_write = False)
 
-        def driveWindmills(self, frequency):
+        def driveWindmills(self):
                 if self.drivingWindmills:
                         self.stopWindmills()
                 
                 self.drivingWindmills = True
                 self.windmillDriverThread = WindmillDriveThread()
                 self.windmillDriverThread.daemon = True
-                self.windmillDriverThread.setDriveFrequency(frequency)
+                self.windmillDriverThread.setDriveFrequency(self.WINDMILL_DRIVE_FREQUENCY)
                 self.windmillDriverThread.setDrivePins(self.windmillDriverPlus, self.windmillDriverMinus)
                 self.windmillDriverThread.setPiGPIOHandle(self.pi)
                 self.windmillDriverThread.start()

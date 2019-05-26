@@ -60,7 +60,7 @@ class GameMode():
             renewableSurplus += self.reservoirPower
 
             if self.randomiseWind:
-                self.windmillDrivingFrequency, self.windPower = self.getRandomWindParams()
+                self.windPower = self.getRandomWindPower()
                 renewableSurplus += self.windPower
             else:
                 if self.board.areWindmillsOn():
@@ -121,7 +121,7 @@ class GameMode():
 
             if self.randomiseWind:
                 if self.windPower != 0:
-                    self.board.driveWindmills(self.windmillDrivingFrequency)
+                    self.board.driveWindmills()
                 else:
                     self.board.stopWindmills()
             else:
@@ -139,11 +139,11 @@ class GameMode():
         plt.close(fig)
         self.board.resetBoard()
     
-    def getRandomWindParams(self):
+    def getRandomWindPower(self):
         randomAmplitude = random.randint(0, 10)
         randomPower = self.calculateWindPower(randomAmplitude)       
 
-        return randomAmplitude + 6, randomPower
+        return randomPower
 
     def configure(self, typeOfDay, daylightHours, randomiseWind, windmillSwitchingPeriod = None, windAmplitdue = None):
         self.typeOfDay = typeOfDay
@@ -153,8 +153,7 @@ class GameMode():
         self.randomiseWind = randomiseWind
 
         if not randomiseWind:
-            self.windmillSwitchingPeriod = windmillSwitchingPeriod
-            self.windmillDrivingFrequency = windAmplitdue + 6        
+            self.windmillSwitchingPeriod = windmillSwitchingPeriod      
             self.windPower = self.calculateWindPower(windAmplitdue)
 
         if typeOfDay == "Sunny":
@@ -185,7 +184,7 @@ class GameMode():
             if currentWindState:
                 self.board.stopWindmills()
             else:
-                self.board.driveWindmills(self.windmillDrivingFrequency)
+                self.board.driveWindmills()
         else:
             self.windStateCount += 1
 
