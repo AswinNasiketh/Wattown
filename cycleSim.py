@@ -32,7 +32,7 @@ class CycleSim():
         self.batteryRemaining = 50 #percentage
         self.reservoirLevel = 50 #percentage
 
-        self.batteryCharging = False
+        # self.batteryCharging = False
 
         self.windStateCount = 0
 
@@ -76,7 +76,7 @@ class CycleSim():
                 #when we have minimum consumption use battery to pump reservoir
                 #can assume battery is discharing because reservoir recharge rate is higher than sum of solar and wind generation
                 if self.consumptionValues[i] == values.MIN_CONSUMPTION:
-                    self.batteryCharging = False
+                    # self.batteryCharging = False
 
                     #only transfer energy to reservoir if we have enough in the battery
                     if self.subtractFromBattery(values.RESERVOIR_RECHARGE_RATE):
@@ -85,7 +85,8 @@ class CycleSim():
 
                 #otherwise only charge battery   
                 else:
-                    self.batteryCharging = True       
+                    # self.batteryCharging = True
+                    pass       
 
                 #plotting
                 self.supplyDemandPlotter.setConsumption(self.consumptionValues[i])
@@ -124,7 +125,7 @@ class CycleSim():
                 print("Wind Generation: ", str(self.windPowerGenerationUnits))
                 print("Battery Level: ", str(self.batteryRemaining))
                 print("Reservoir Level: ", str(self.reservoirLevel))
-                print("Battery Charging: ", str(self.batteryCharging))
+                # print("Battery Charging: ", str(self.batteryCharging))
 
                 time.sleep(1.5)
 
@@ -239,13 +240,12 @@ class CycleSim():
         self.supplyDemandPlotter.configure(maxPowerSum, -values.MAX_CONSUMPTION - values.RESERVOIR_RECHARGE_RATE)
 
     def animateBattery(self):
-        #charging
-        if self.batteryCharging:
+        #changes colour when windmills are being driven
+        if self.board.areWindmillsOn():
             batteryLEDcolour = (int(values.LED_BLUE_MAX[0] * (self.batteryRemaining/100)),
             int(values.LED_BLUE_MAX[1] * (self.batteryRemaining/100)),
             int(values.LED_BLUE_MAX[2] * (self.batteryRemaining/100)))
         else:
-            #discharging
             batteryLEDcolour = (int(values.LED_YELLOW_MAX[0] * (self.batteryRemaining/100)),
             int((values.LED_YELLOW_MAX[1] * (self.batteryRemaining/100))),
             int((values.LED_YELLOW_MAX[2] * (self.batteryRemaining/100))))
