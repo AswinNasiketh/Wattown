@@ -39,14 +39,6 @@ class CycleSim():
         self.LED_BLUE_MAX = (94, 193, 255)
         self.LED_GREEN_BRIGHT = (97, 255, 94)
 
-        #city LED ranges
-        self.CITY_BLOCK_1_LOWER = 8
-        self.CITY_BLOCK_1_UPPER = 28
-        self.CITY_BLOCK_2_LOWER = 29
-        self.CITY_BLOCK_2_UPPER = 57
-        self.CITY_BLOCK_3_LOWER = 58
-        self.CITY_BLOCK_3_UPPER = 94
-
     def cycleModeLoop(self):       
 
         fig = plt.figure(figsize=(8, 9), dpi=80)
@@ -177,15 +169,7 @@ class CycleSim():
         consumptionAboveMin = consumption - minConsumption
 
         cityLightsCoefficent = consumptionAboveMin/maxConsumptionDelta
-
-        if cityLightsCoefficent == 0:
-            self.board.setCityLEDs((0,0,0))
-        elif cityLightsCoefficent > 0 and cityLightsCoefficent <= 0.33:
-            self.board.setCityLEDs(self.LED_CITY_LIGHTS_YELLOW, self.CITY_BLOCK_1_LOWER, self.CITY_BLOCK_1_UPPER)
-        elif cityLightsCoefficent > 0.33 and cityLightsCoefficent <= 0.66:
-            self.board.setCityLEDs(self.LED_CITY_LIGHTS_YELLOW, self.CITY_BLOCK_1_LOWER, self.CITY_BLOCK_2_UPPER)
-        elif cityLightsCoefficent > 0.66:
-            self.board.setCityLEDs(self.LED_CITY_LIGHTS_YELLOW)       
+        self.board.lightCityBlocks(cityLightsCoefficent)     
 
 
     def setupSolarGenerationValues(self, typeOfDay, daylightHours):

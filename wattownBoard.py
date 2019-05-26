@@ -48,6 +48,14 @@ class WattownBoard():
                 self.city_range_upper = 94
                 self.fuel_cell_range_lower = 95
                 self.fuel_cell_range_upper = 96
+
+                #city LED ranges
+                self.CITY_BLOCK_1_LOWER = 8
+                self.CITY_BLOCK_1_UPPER = 28
+                self.CITY_BLOCK_2_LOWER = 29
+                self.CITY_BLOCK_2_UPPER = 57
+                self.CITY_BLOCK_3_LOWER = 58
+                self.CITY_BLOCK_3_UPPER = 94
                 
                 self.pixels = neopixel.NeoPixel(board.D12, self.num_neopixels, auto_write = False)
 
@@ -127,6 +135,16 @@ class WattownBoard():
 
         def areWindmillsOn(self):
                 return self.drivingWindmills
+
+        def lightCityBlocks(self, cityLightsCoefficient):
+                if cityLightsCoefficent == 0:
+                self.setCityLEDs((0,0,0))
+                elif cityLightsCoefficent > 0 and cityLightsCoefficent <= 0.33:
+                self.setCityLEDs(self.LED_CITY_LIGHTS_YELLOW, self.CITY_BLOCK_1_LOWER, self.CITY_BLOCK_1_UPPER)
+                elif cityLightsCoefficent > 0.33 and cityLightsCoefficent <= 0.66:
+                self.setCityLEDs(self.LED_CITY_LIGHTS_YELLOW, self.CITY_BLOCK_1_LOWER, self.CITY_BLOCK_2_UPPER)
+                elif cityLightsCoefficent > 0.66:
+                self.setCityLEDs(self.LED_CITY_LIGHTS_YELLOW)
 
 class WindmillDriveThread(threading.Thread):
 
