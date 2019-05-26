@@ -129,7 +129,7 @@ class GameMode():
 
             self.animateBattery(batteryEnergy, previousBatteryEnergy)
             self.animateCityLights(self.consumptionValues[self.currentHour], values.MAX_CONSUMPTION, values.MIN_CONSUMPTION)
-            self.animateReservoir(reservoirEnergy)
+            self.board.lightReservoir(reservoirEnergy)
 
             time.sleep(1.5)
 
@@ -191,11 +191,8 @@ class GameMode():
 
     def animateCityLights(self, consumption, maxConsumption, minConsumption):
         maxConsumptionDelta = maxConsumption - minConsumption
-
         consumptionAboveMin = consumption - minConsumption
-
         cityLightsCoefficient = consumptionAboveMin/maxConsumptionDelta
-
         self.board.lightCityBlocks(cityLightsCoefficient)
                 
     def animateBattery(self, currentBatteryLevel, previousBatteryLevel):
@@ -223,34 +220,6 @@ class GameMode():
             elif currentBatteryLevel == 100:
                 self.board.setFuelCellLEDs(values.LED_GREEN_BRIGHT)
 
-    def animateReservoir(self, reservoirLevel):
-        if reservoirLevel == 0:
-            level0Colour = (0,0,0)
-            level1Colour = (0,0,0)
-            level2Colour = (0,0,0)
-            level3Colour = (0,0,0)
-        elif reservoirLevel > 0 and reservoirLevel < 25:
-            level0Colour = values.LED_WATER_BLUE
-            level1Colour = (0,0,0)
-            level2Colour = (0,0,0)
-            level3Colour = (0,0,0)
-        elif reservoirLevel >= 25 and reservoirLevel < 50:
-            level0Colour = values.LED_WATER_BLUE
-            level1Colour = values.LED_WATER_BLUE
-            level2Colour = (0,0,0)
-            level3Colour = (0,0,0)
-        elif reservoirLevel >= 50 and reservoirLevel < 75:
-            level0Colour = values.LED_WATER_BLUE
-            level1Colour = values.LED_WATER_BLUE
-            level2Colour = values.LED_WATER_BLUE
-            level3Colour = (0,0,0)
-        elif reservoirLevel >= 75:
-            level0Colour = values.LED_WATER_BLUE
-            level1Colour = values.LED_WATER_BLUE
-            level2Colour = values.LED_WATER_BLUE
-            level3Colour = values.LED_WATER_BLUE
-
-        self.board.setReservoirLEDs(level0Colour,level1Colour,level2Colour,level3Colour)
 
     def setupSolarGenerationValues(self, typeOfDay, daylightHours):
         sunrise = 12 - int(daylightHours/2)

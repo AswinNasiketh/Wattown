@@ -105,7 +105,7 @@ class CycleSim():
                 plt.pause(0.001)
 
                 #board animation
-                self.animateReservoir(self.reservoirLevel)
+                self.board.lightReservoir(self.reservoirLevel)
                 self.animateBattery()
 
                 if self.randomiseWind:
@@ -239,35 +239,6 @@ class CycleSim():
 
         self.powerPlotter.configure(maxPower, -values.RESERVOIR_RECHARGE_RATE)
         self.supplyDemandPlotter.configure(maxPowerSum, -values.MAX_CONSUMPTION - values.RESERVOIR_RECHARGE_RATE)
-
-    def animateReservoir(self, reservoirLevel):
-        if reservoirLevel == 0:
-            level0Colour = (0,0,0)
-            level1Colour = (0,0,0)
-            level2Colour = (0,0,0)
-            level3Colour = (0,0,0)
-        elif reservoirLevel > 0 and reservoirLevel < 25:
-            level0Colour = values.LED_WATER_BLUE
-            level1Colour = (0,0,0)
-            level2Colour = (0,0,0)
-            level3Colour = (0,0,0)
-        elif reservoirLevel >= 25 and reservoirLevel < 50:
-            level0Colour = values.LED_WATER_BLUE
-            level1Colour = values.LED_WATER_BLUE
-            level2Colour = (0,0,0)
-            level3Colour = (0,0,0)
-        elif reservoirLevel >= 50 and reservoirLevel < 75:
-            level0Colour = values.LED_WATER_BLUE
-            level1Colour = values.LED_WATER_BLUE
-            level2Colour = values.LED_WATER_BLUE
-            level3Colour = (0,0,0)
-        elif reservoirLevel >= 75:
-            level0Colour = values.LED_WATER_BLUE
-            level1Colour = values.LED_WATER_BLUE
-            level2Colour = values.LED_WATER_BLUE
-            level3Colour = values.LED_WATER_BLUE
-
-        self.board.setReservoirLEDs(level0Colour,level1Colour,level2Colour,level3Colour)
 
     def animateBattery(self):
         #charging

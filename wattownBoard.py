@@ -7,6 +7,7 @@ import time
 import pigpio
 import neopixel
 import threading
+import values
 
 class WattownBoard():
         def __init__(self):
@@ -137,14 +138,43 @@ class WattownBoard():
                 return self.drivingWindmills
 
         def lightCityBlocks(self, cityLightsCoefficient):
-                if cityLightsCoefficent == 0:
-                self.setCityLEDs((0,0,0))
-                elif cityLightsCoefficent > 0 and cityLightsCoefficent <= 0.33:
-                self.setCityLEDs(self.LED_CITY_LIGHTS_YELLOW, self.CITY_BLOCK_1_LOWER, self.CITY_BLOCK_1_UPPER)
-                elif cityLightsCoefficent > 0.33 and cityLightsCoefficent <= 0.66:
-                self.setCityLEDs(self.LED_CITY_LIGHTS_YELLOW, self.CITY_BLOCK_1_LOWER, self.CITY_BLOCK_2_UPPER)
-                elif cityLightsCoefficent > 0.66:
-                self.setCityLEDs(self.LED_CITY_LIGHTS_YELLOW)
+                if cityLightsCoefficient == 0:
+                        self.setCityLEDs((0,0,0))
+                elif cityLightsCoefficient > 0 and cityLightsCoefficient <= 0.33:
+                        self.setCityLEDs(values.LED_CITY_LIGHTS_YELLOW, self.CITY_BLOCK_1_LOWER, self.CITY_BLOCK_1_UPPER)
+                elif cityLightsCoefficient > 0.33 and cityLightsCoefficient <= 0.66:
+                        self.setCityLEDs(values.LED_CITY_LIGHTS_YELLOW, self.CITY_BLOCK_1_LOWER, self.CITY_BLOCK_2_UPPER)
+                elif cityLightsCoefficient > 0.66:
+                        self.setCityLEDs(values.LED_CITY_LIGHTS_YELLOW)
+
+        def lightReservoir(self, reservoirLevel):
+                if reservoirLevel == 0:
+                        level0Colour = (0,0,0)
+                        level1Colour = (0,0,0)
+                        level2Colour = (0,0,0)
+                        level3Colour = (0,0,0)
+                elif reservoirLevel > 0 and reservoirLevel < 25:
+                        level0Colour = values.LED_WATER_BLUE
+                        level1Colour = (0,0,0)
+                        level2Colour = (0,0,0)
+                        level3Colour = (0,0,0)
+                elif reservoirLevel >= 25 and reservoirLevel < 50:
+                        level0Colour = values.LED_WATER_BLUE
+                        level1Colour = values.LED_WATER_BLUE
+                        level2Colour = (0,0,0)
+                        level3Colour = (0,0,0)
+                elif reservoirLevel >= 50 and reservoirLevel < 75:
+                        level0Colour = values.LED_WATER_BLUE
+                        level1Colour = values.LED_WATER_BLUE
+                        level2Colour = values.LED_WATER_BLUE
+                        level3Colour = (0,0,0)
+                elif reservoirLevel >= 75:
+                        level0Colour = values.LED_WATER_BLUE
+                        level1Colour = values.LED_WATER_BLUE
+                        level2Colour = values.LED_WATER_BLUE
+                        level3Colour = values.LED_WATER_BLUE
+
+                self.setReservoirLEDs(level0Colour,level1Colour,level2Colour,level3Colour)
 
 class WindmillDriveThread(threading.Thread):
 
