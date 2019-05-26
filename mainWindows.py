@@ -1,3 +1,5 @@
+#for testing on Windows
+
 from tkinter import *
 from ui import *
 import time
