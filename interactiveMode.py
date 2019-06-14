@@ -144,14 +144,8 @@ class InteractiveMode():
         self.board.setReservoirLEDs(level0Colour,level1Colour,level2Colour,level3Colour)
 
     def animateCityLights(self):
-        if self.currentBatteryLevel == 0:
-            self.board.setCityLEDs((0,0,0))
-        elif self.currentBatteryLevel > 0 and self.currentBatteryLevel <= 33:
-            self.board.setCityLEDs(self.LED_CITY_LIGHTS_YELLOW, self.CITY_BLOCK_1_LOWER, self.CITY_BLOCK_1_UPPER)
-        elif self.currentBatteryLevel > 33 and self.currentBatteryLevel <= 66:
-            self.board.setCityLEDs(self.LED_CITY_LIGHTS_YELLOW, self.CITY_BLOCK_1_LOWER, self.CITY_BLOCK_2_UPPER)
-        elif self.currentBatteryLevel > 66:
-            self.board.setCityLEDs(self.LED_CITY_LIGHTS_YELLOW)
+        cityLightsCoefficient = self.currentBatteryLevel/100.0
+        self.board.lightCityBlocks(cityLightsCoefficient)
 
 
     
