@@ -140,7 +140,7 @@ class WattownBoard():
 
         def lightCityBlocks(self, cityLightsCoefficient):
                 if cityLightsCoefficient == 0:
-                        self.setCityLEDs((0,0,0))
+                        self.setCityLEDs(values.LED_RED_DIM)
                 elif cityLightsCoefficient > 0 and cityLightsCoefficient <= 0.33:
                         self.setCityLEDs(values.LED_CITY_LIGHTS_YELLOW, self.CITY_BLOCK_1_LOWER, self.CITY_BLOCK_1_UPPER)
                 elif cityLightsCoefficient > 0.33 and cityLightsCoefficient <= 0.66:
