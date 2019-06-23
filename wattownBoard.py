@@ -30,7 +30,7 @@ class WattownBoard():
                 self.pi.set_mode(self.windmillDriverMinus, pigpio.OUTPUT)
 
                 self.WINDMILL_DRIVE_FREQUENCY = 4
-                
+
                 self.windmillDriverThread = WindmillDriveThread()
                 self.windmillDriverThread.daemon = True
                 self.windmillDriverThread.setDriveFrequency(self.WINDMILL_DRIVE_FREQUENCY)
@@ -44,6 +44,12 @@ class WattownBoard():
                 self.fuelCellPin = 8
                 self.pi.set_mode(self.fuelCellPin, pigpio.OUTPUT)
                 self.pi.write(self.fuelCellPin, 0)
+
+                self.pulseThread = FuelCellPulseThread()
+                self.pulseThread.daemon = True
+                self.pulseThread.setPiGPIOHandle(self.pi)
+                self.pulseThread.setFuelCellPin(self.fuelCellPin)
+                self.pulseThread.start()
 
                 self.num_neopixels = 97
                 self.reservoir_level_0 = 0
@@ -129,11 +135,7 @@ class WattownBoard():
                self.pi.write(self.fuelCellPin, 0)
 
         def pulseFuelCell(self):
-                pulseThread = FuelCellPulseThread()
-                pulseThread.daemon = True
-                pulseThread.setPiGPIOHandle(self.pi)
-                pulseThread.setFuelCellPin(self.fuelCellPin)
-                pulseThread.start()
+                self.pulseThread.pulseFuelCell()
 
         def resetBoard(self):
                 self.pixels.fill((0,0,0))
@@ -222,7 +224,17 @@ class FuelCellPulseThread(threading.Thread):
         def setFuelCellPin(self, pin):
                 self.fuelCellPin = pin
 
+        def pulseFuelCell(self):
+                self.pulse = True
+
         def run(self):
-                self.pi.write(self.fuelCellPin, 1)
-                time.sleep(0.5)
-                self.pi.write(self.fuelCellPin, 0)
+                self.pulse = False #initially
+
+                while True:
+                        if self.pulse:
+                                self.pi.write(self.fuelCellPin, 1)
+                                time.sleep(0.5)
+                                self.pi.write(self.fuelCellPin, 0)
+                                self.pulse = False
+                        else:
+                                self.pi.write(self.fuelCellPin, 0)
