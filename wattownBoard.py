@@ -28,11 +28,18 @@ class WattownBoard():
                 self.pi = pigpio.pi()
                 self.pi.set_mode(self.windmillDriverPlus, pigpio.OUTPUT)
                 self.pi.set_mode(self.windmillDriverMinus, pigpio.OUTPUT)
-                self.pi.write(self.windmillDriverPlus, 0)
-                self.pi.write(self.windmillDriverMinus, 0)
-                self.wid = 0
-                self.drivingWindmills = False
+
                 self.WINDMILL_DRIVE_FREQUENCY = 4
+                
+                self.windmillDriverThread = WindmillDriveThread()
+                self.windmillDriverThread.daemon = True
+                self.windmillDriverThread.setDriveFrequency(self.WINDMILL_DRIVE_FREQUENCY)
+                self.windmillDriverThread.setDrivePins(self.windmillDriverPlus, self.windmillDriverMinus)
+                self.windmillDriverThread.setPiGPIOHandle(self.pi)
+                self.windmillDriverThread.start()
+                self.windmillDriverThread.stopDriving()
+                self.drivingWindmills = False
+                
 
                 self.fuelCellPin = 8
                 self.pi.set_mode(self.fuelCellPin, pigpio.OUTPUT)
@@ -66,17 +73,12 @@ class WattownBoard():
                         self.stopWindmills()
                 
                 self.drivingWindmills = True
-                self.windmillDriverThread = WindmillDriveThread()
-                self.windmillDriverThread.daemon = True
-                self.windmillDriverThread.setDriveFrequency(self.WINDMILL_DRIVE_FREQUENCY)
-                self.windmillDriverThread.setDrivePins(self.windmillDriverPlus, self.windmillDriverMinus)
-                self.windmillDriverThread.setPiGPIOHandle(self.pi)
-                self.windmillDriverThread.start()
+                self.windmillDriverThread.startDriving()
+               
 
         def stopWindmills(self):
                 if self.drivingWindmills:
                         self.windmillDriverThread.stopDriving()
-                        self.windmillDriverThread.join()
                         self.drivingWindmills = False
 
         def releaseResources(self):
@@ -195,19 +197,22 @@ class WindmillDriveThread(threading.Thread):
 
         def stopDriving(self):
                 self.keepDriving = False
+        
+        def startDriving(self):
+                self.keepDriving = True
 
         def run(self):
-                self.keepDriving = True
-                while self.keepDriving:
-                        self.pi.write(self.driveMinusPin, 0)
-                        self.pi.write(self.drivePlusPin, 1)                        
-                        time.sleep(self.halfPeriod)
-                        self.pi.write(self.drivePlusPin, 0)
-                        self.pi.write(self.driveMinusPin, 1)
-                        time.sleep(self.halfPeriod)
-                
-                self.pi.write(self.driveMinusPin, 0)
-                self.pi.write(self.drivePlusPin, 0)
+                while True: #thread is daemon, will exit when program exits 
+                        if self.keepDriving:
+                                self.pi.write(self.driveMinusPin, 0)
+                                self.pi.write(self.drivePlusPin, 1)                        
+                                time.sleep(self.halfPeriod)
+                                self.pi.write(self.drivePlusPin, 0)
+                                self.pi.write(self.driveMinusPin, 1)
+                                time.sleep(self.halfPeriod)
+                        else:                                              
+                                self.pi.write(self.driveMinusPin, 0)
+                                self.pi.write(self.drivePlusPin, 0)
 
 class FuelCellPulseThread(threading.Thread):
 
