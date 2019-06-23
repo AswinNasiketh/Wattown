@@ -38,28 +38,29 @@ class WattownBoard():
                 self.pi.set_mode(self.fuelCellPin, pigpio.OUTPUT)
                 self.pi.write(self.fuelCellPin, 0)
 
-                self.num_neopixels = 97
-                self.reservoir_level_0 = 0
-                self.reservoir_level_1_lower = 1
-                self.reservoir_level_1_upper = 2
-                self.reservoir_level_2_lower = 3
-                self.reservoir_level_2_upper = 4
-                self.reservoir_level_3_lower = 5
-                self.reservoir_level_3_upper = 7
-                self.city_range_lower = 8
-                self.city_range_upper = 94
-                self.fuel_cell_range_lower = 95
-                self.fuel_cell_range_upper = 96
+                self.NUM_NEOPIXELS = 100
+                self.RESERVOIR_LEVEL_0_LOWER = 0
+                self.RESERVOIR_LEVEL_0_UPPER = 2
+                self.RESERVOIR_LEVEL_1_LOWER = 3
+                self.RESERVOIR_LEVEL_1_UPPER = 5
+                self.RESERVOIR_LEVEL_2_LOWER = 6
+                self.RESERVOIR_LEVEL_2_UPPER = 8
+                self.RESERVOIR_LEVEL_3_LOWER = 9
+                self.RESERVOIR_LEVEL_3_UPPER = 11
+                self.CITY_RANGE_LOWER = 12
+                self.CITY_RANGE_UPPER = 98
+                self.FUEL_CELL_RANGE_LOWER = 99
+                self.FUEL_CELL_RANGE_UPPER = 100         
 
                 #city LED ranges
-                self.CITY_BLOCK_1_LOWER = 8
-                self.CITY_BLOCK_1_UPPER = 28
-                self.CITY_BLOCK_2_LOWER = 29
-                self.CITY_BLOCK_2_UPPER = 57
-                self.CITY_BLOCK_3_LOWER = 58
-                self.CITY_BLOCK_3_UPPER = 94
+                self.CITY_BLOCK_1_LOWER = 12
+                self.CITY_BLOCK_1_UPPER = 32
+                self.CITY_BLOCK_2_LOWER = 33
+                self.CITY_BLOCK_2_UPPER = 61
+                self.CITY_BLOCK_3_LOWER = 62
+                self.CITY_BLOCK_3_UPPER = 98
                 
-                self.pixels = neopixel.NeoPixel(board.D12, self.num_neopixels, auto_write = False)
+                self.pixels = neopixel.NeoPixel(board.D12, self.NUM_NEOPIXELS, auto_write = False)
 
         def driveWindmills(self):
                 if self.drivingWindmills:
@@ -100,22 +101,23 @@ class WattownBoard():
 
         def setReservoirLEDs(self, level0Colour, level1Colour, level2Colour, level3Colour):
 
-                self.pixels[self.reservoir_level_0] = level0Colour
+                for i in range(self.RESERVOIR_LEVEL_0_LOWER, self.RESERVOIR_LEVEL_0_UPPER + 1):
+                        self.pixels[i] = level0Colour
 
-                for i in range(self.reservoir_level_1_lower, self.reservoir_level_1_upper + 1):
+                for i in range(self.RESERVOIR_LEVEL_1_LOWER, self.RESERVOIR_LEVEL_1_UPPER + 1):
                         self.pixels[i] = level1Colour
 
-                for i in range(self.reservoir_level_2_lower, self.reservoir_level_2_upper + 1):
+                for i in range(self.RESERVOIR_LEVEL_2_LOWER, self.RESERVOIR_LEVEL_2_UPPER + 1):
                         self.pixels[i] = level2Colour
 
-                for i in range(self.reservoir_level_3_lower, self.reservoir_level_3_upper + 1):
+                for i in range(self.RESERVOIR_LEVEL_3_LOWER, self.RESERVOIR_LEVEL_3_UPPER + 1):
                         self.pixels[i] = level3Colour      
                 
                 self.pixels.show()
 
         def setFuelCellLEDs(self, colour):
 
-                for i in range(self.fuel_cell_range_lower, self.fuel_cell_range_upper + 1):
+                for i in range(self.FUEL_CELL_RANGE_LOWER, self.FUEL_CELL_RANGE_UPPER + 1):
                         self.pixels[i] = colour
 
                 self.pixels.show()
@@ -135,6 +137,7 @@ class WattownBoard():
 
         def resetBoard(self):
                 self.pixels.fill((0,0,0))
+                self.pixels.show()
                 self.stopWindmills()
                 self.turnOffFuelCell()
 
