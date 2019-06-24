@@ -1,8 +1,6 @@
 from tkinter import *
-from wattownBoard import *
-from ui import *
-from interactiveMode import *
-from cycleSim import *
+from wattownBoard import WattownBoard
+from ui import MainWindow
 import time
 import threading
 import matplotlib as mpl
@@ -10,28 +8,15 @@ import matplotlib as mpl
 mpl.rcParams['toolbar'] = 'None' 
 
 root = Tk()
-mainWindow = MainWindow(root)
 board = WattownBoard()
 
-interactiveModeObj = InteractiveMode(mainWindow, board)
-
-def interactiveMode():
-    mainWindow.setTaskRunning(True, "Interactive Mode")
-    runnerThread = threading.Thread(target = interactiveModeObj.interactiveModeLoop)
-    runnerThread.daemon = True #ensures thread is killed when program closes
-    runnerThread.start()
-
-def cycleMode():
-    newWindow = Toplevel(root)
-    cycleModeSim = CycleSim(board, mainWindow)
-    cycleModeConfigWindow = CycleModeControlsWindow(newWindow, cycleModeSim, mainWindow)
+mainWindow = MainWindow(board, root)
 
 def gameMode():
-    newWindow = Toplevel(root)
-    gameModeConfigWindow = GameModeParametersWindow(newWindow, board, mainWindow, root)
+    # newWindow = Toplevel(root)
+    # gameModeConfigWindow = GameModeParametersWindow(newWindow, board, mainWindow, root)
+    print("Not fully implemented!")
 
-mainWindow.setInteractiveBtnCommand(interactiveMode)
-mainWindow.setDailyCylceBtnCommand(cycleMode)
 mainWindow.setGameBtnCommand(gameMode)
 
     
