@@ -1,5 +1,4 @@
 import time
-import threading
 import matplotlib.pyplot as plt
 from plotting import *
 import random
