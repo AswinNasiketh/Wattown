@@ -1,10 +1,29 @@
 import time
 import values
+import threading
+
+class InteractiveModeThread(threading.Thread):
+
+    def __init__(self, board):
+        self.interactiveModeObj = InteractiveMode(board)
+        self.stopEvent = threading.Event()
+        board.resetBoard()
+        threading.Thread.__init__(self)
+
+    def run(self):
+        self.stopEvent.clear()
+        while not self.stopEvent.is_set():
+            self.interactiveModeObj.iterateLoop()
+
+    def join(self, timeOut=None):
+        self.stopEvent.set()
+        threading.Thread.join(self,timeOut)
+
+
 
 class InteractiveMode():
 
-    def __init__(self, window, board):
-        self.window = window
+    def __init__(self, board):
         self.board = board
 
         currentSolarPanelVoltage = board.getSolarPanelVoltage()
@@ -19,42 +38,40 @@ class InteractiveMode():
 
         self.currentBatteryLevel = 0
         self.previousBatteryLevel = 0
-        
 
-    def interactiveModeLoop(self):
-        print("Starting interactive mode loop")
         self.board.stopWindmills()
         self.currentBatteryLevel = 0
-        self.previousBatteryLevel = 0
+        self.previousBatteryLevel = 0       
+        
+    def iterateLoop(self):
 
         powerAvailableToConsume = 0
         lightBlock1 = False
         lightBlock2 = False
         lightBlock3 = False
 
-        while self.window.getTaskRunning():
-            self.previousBatteryLevel = self.currentBatteryLevel
+        self.previousBatteryLevel = self.currentBatteryLevel
 
-            if self.areSolarPanelsOn():
-                powerAvailableToConsume += self.PV_GENERATION_UNIT
+        if self.areSolarPanelsOn():
+            powerAvailableToConsume += self.PV_GENERATION_UNIT
 
-            powerAvailableToConsume += self.WINDMILL_GENERATION_UNIT * self.getWindmillsBlown()
+        powerAvailableToConsume += self.WINDMILL_GENERATION_UNIT * self.getWindmillsBlown()
 
-            lightBlock1, powerAvailableToConsume = self.usePower(powerAvailableToConsume, self.CITY_CONSUMPTION_1_BLOCK)
-            lightBlock2, powerAvailableToConsume = self.usePower(powerAvailableToConsume, self.CITY_CONSUMPTION_ADDITIONAL_BLOCK)
-            lightBlock3, powerAvailableToConsume = self.usePower(powerAvailableToConsume, self.CITY_CONSUMPTION_ADDITIONAL_BLOCK)
+        lightBlock1, powerAvailableToConsume = self.usePower(powerAvailableToConsume, self.CITY_CONSUMPTION_1_BLOCK)
+        lightBlock2, powerAvailableToConsume = self.usePower(powerAvailableToConsume, self.CITY_CONSUMPTION_ADDITIONAL_BLOCK)
+        lightBlock3, powerAvailableToConsume = self.usePower(powerAvailableToConsume, self.CITY_CONSUMPTION_ADDITIONAL_BLOCK)
 
 
-            if powerAvailableToConsume > 0 :
-                self.storeEnergy(powerAvailableToConsume)
+        if powerAvailableToConsume > 0 :
+            self.storeEnergy(powerAvailableToConsume)
 
-            self.animateBattery()
-            self.animateReservoir()
-            self.animateCityLights(lightBlock1, lightBlock2, lightBlock3)
-            print("Battery level: " + str(self.currentBatteryLevel))
-            time.sleep(1)
+        self.animateBattery()
+        self.animateReservoir()
+        self.animateCityLights(lightBlock1, lightBlock2, lightBlock3)
+        print("Battery level: " + str(self.currentBatteryLevel))
+        time.sleep(1)
 
-        self.board.resetBoard()
+
         
     
     def areSolarPanelsOn(self):
