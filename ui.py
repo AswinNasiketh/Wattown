@@ -4,13 +4,18 @@ from tkinter.ttk import *
 import threading
 import time
 from gameMode import GameMode
+from interactiveMode import InteractiveModeThread
+from cycleSim import CycleSimThread
 
 class MainWindow(Frame):
     
-    def __init__(self, master=None):
+    def __init__(self, board, master=None):
         Frame.__init__(self, master)
         self.master = master
+        self.board = board
         self.taskRunning = False
+        self.currentRunningSim = None
+        
         self.initWindow()
 
     def initWindow(self):
@@ -22,10 +27,10 @@ class MainWindow(Frame):
         self.statusLabel = Label(self, text = "Status = Idle")
         self.statusLabel.pack(fill = X, expand = 1)
 
-        self.interactiveModeButton = Button(self, text = "Start Interactive mode")
+        self.interactiveModeButton = Button(self, text = "Start Interactive mode", command = self.startInteractiveMode)
         self.interactiveModeButton.pack(fill=X, expand =1)
 
-        self.dailyCycleModeButton = Button(self, text = "Start Cycle Mode")
+        self.dailyCycleModeButton = Button(self, text = "Start Cycle Mode", command = self.getCycleParameters)
         self.dailyCycleModeButton.pack(fill = X, expand =1)
 
         self.gameModeButton = Button(self, text = "Start Game Mode")
@@ -34,11 +39,21 @@ class MainWindow(Frame):
         stopButton = Button(self, text = "Stop Current Activity", command = self.stopCurrentActivity)
         stopButton.pack(fill = X, expand =1)
 
-    def setInteractiveBtnCommand(self, interactiveButtonFunction):
-        self.interactiveModeButton.configure(command = interactiveButtonFunction)
-    
-    def setDailyCylceBtnCommand(self, dailyCylcleButtonFunction):
-        self.dailyCycleModeButton.configure(command = dailyCylcleButtonFunction)
+    def startInteractiveMode(self):
+        if self.taskRunning:
+            self.currentRunningSim.join()
+
+        self.setTaskRunning(True, "Interactive Mode")
+        self.currentRunningSim = InteractiveModeThread(self.board)
+        self.currentRunningSim.start()
+
+    def getCycleParameters(self):
+        if self.taskRunning:
+            self.currentRunningSim.join()
+
+        newWindow = Toplevel(self.master)
+        self.currentRunningSim = CycleSimThread(self.board, self)
+        CycleModeControlsWindow(newWindow, self.currentRunningSim, self)
 
     def setGameBtnCommand(self, gameButtonCommand):
         self.gameModeButton.configure(command = gameButtonCommand)
@@ -46,10 +61,14 @@ class MainWindow(Frame):
 
     def stopCurrentActivity(self):
         print("stopping activity")
-        self.taskRunning = False
-        self.statusLabel.configure(text = "Status: Idle")
+        if self.currentRunningSim != None:
+            self.currentRunningSim.join()
 
-    def getTaskRunning(self): #TODO: use this as global safety to not run two tasks at the same time
+        self.board.resetBoard()
+        self.setTaskRunning(False)
+        
+
+    def getTaskRunning(self):
         return self.taskRunning        
     
     def setTaskRunning(self, taskRunning, taskDescription = "Idle"):
@@ -61,10 +80,10 @@ class MainWindow(Frame):
      
 class CycleModeControlsWindow(Frame):
 
-    def __init__(self, master, simulation, mainWindow):
+    def __init__(self, master, simThread, mainWindow):
         Frame.__init__(self, master)
         self.master = master
-        self.simulation = simulation
+        self.simThread = simThread
         self.mainWindow = mainWindow
         self.initWindow()
         
@@ -233,19 +252,17 @@ class CycleModeControlsWindow(Frame):
                 validated = False        
 
         if validated:
-            self.mainWindow.setTaskRunning(True, "Cycle mode")
             if windPresent:
                 if randomiseWind:                    
-                    self.simulation.configure(typeOfDay, daylightHours, windPresent, numLoops, True)
+                    self.simThread.configure(typeOfDay, daylightHours, windPresent, numLoops, True)
                 else:
-                    self.simulation.configure(typeOfDay, daylightHours, windPresent, numLoops, False, windSwitchingPeriod, windAmplitude)
+                    self.simThread.configure(typeOfDay, daylightHours, windPresent, numLoops, False, windSwitchingPeriod, windAmplitude)
             else:
-                self.simulation.configure(typeOfDay, daylightHours, False, numLoops)
+                self.simThread.configure(typeOfDay, daylightHours, False, numLoops)
             
-            cycleSimulationThread = threading.Thread(target=self.simulation.cycleModeLoop)
-            cycleSimulationThread.daemon = True
-            cycleSimulationThread.start()
-            
+            self.simThread.start()
+
+            self.mainWindow.setTaskRunning(True, "Cycle mode")
             self.master.destroy()
 
     def onCheckRandomise(self):
