@@ -36,12 +36,19 @@ class GraphsProcessManager():
         self.plotProcess.terminate()
         self.plotProcess.join(timeout = 1.0)
 
+    def hidePlots(self):
+        self.controlDataPipeIn.send(2)
+
+    def showPlots(self):
+        self.controlDataPipeIn.send(3)
+
 class GraphsProcess():
 
     def __init__(self):
         self.powerPlotter  = PowerGraph()
         self.consPlotter = ConsumptionSupplyGraph()
         self.storagePlotter = StoredEnergyGraph()
+        self.plotVisible = True
 
     def configure(self, maxPower, minPower, maxCons, minCons):
         self.powerPlotter.configure(maxPower, minPower)
@@ -78,6 +85,15 @@ class GraphsProcess():
             if command == 1:
                 self.terminate()
                 return False
+            elif command == 2:
+                self.plotVisible = False
+                self.fig.set_visible(False)
+            elif command == 3:
+                self.plotVisible = True
+                self.fig.set_visible(True)
+
+            if not self.plotVisible:
+                return True
 
         if self.powerDataPipe.poll():
             solarPower, windPower, hydroPower = self.powerDataPipe.recv()

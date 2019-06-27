@@ -8,8 +8,8 @@ import threading
 
 class CycleSimThread(threading.Thread):
     
-    def __init__(self, board, mainWindow):
-        self.graphManager = GraphsProcessManager()
+    def __init__(self, board, mainWindow, graphManager):
+        self.graphManager = graphManager
         self.cycleModeObj = CycleSim(board, self.graphManager)
         self.stopEvent = threading.Event()
         self.mainWindow = mainWindow
@@ -19,7 +19,7 @@ class CycleSimThread(threading.Thread):
 
     def run(self):
         self.stopEvent.clear()
-        self.graphManager.startPlotting()
+        self.graphManager.showPlots()
         while (not self.stopEvent.is_set()) and (self.cycleModeObj.getStillRunning()):
             self.cycleModeObj.iterateLoop()
 
@@ -27,7 +27,7 @@ class CycleSimThread(threading.Thread):
             self.cleanUp()
 
     def cleanUp(self):
-        self.graphManager.stopPlotting()
+        self.graphManager.hidePlots()
         self.mainWindow.setTaskRunning(False)
 
     def join(self, timeOut = None):
@@ -56,9 +56,7 @@ class CycleSim():
         self.windStateCount = 0
         self.dayCount = 0
         self.hourCount = 0
-        self.stillRunning = True
-
-     
+        self.stillRunning = True     
 
     def iterateLoop(self):
 
@@ -253,7 +251,7 @@ class CycleSim():
             maxPower = max(values.MAX_WIND_POWER_GENERATION, values.CLOUDY_DAY_SOLAR_GENERATION, values.MAX_CONSUMPTION)
             maxPowerSum = values.MAX_WIND_POWER_GENERATION + values.CLOUDY_DAY_SOLAR_GENERATION + values.MAX_CONSUMPTION
 
-        self.graphManager.configure(maxPower, -values.RESERVOIR_RECHARGE_RATE, maxPowerSum, -values.MAX_CONSUMPTION - values.RESERVOIR_RECHARGE_RATE)
+        # self.graphManager.configure(maxPower, -values.RESERVOIR_RECHARGE_RATE, maxPowerSum, -values.MAX_CONSUMPTION - values.RESERVOIR_RECHARGE_RATE)
 
     def animateBattery(self):
         #changes colour when windmills are being driven
