@@ -1,6 +1,103 @@
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-import matplotlib.animation as animation
+import multiprocessing as mp
+
+class GraphsProcessManager():
+    def __init__(self):
+        self.powerDataPipeIn, self.powerDataPipeOut = mp.Pipe()
+        self.consDataPipeIn, self.consDataPipeOut = mp.Pipe()
+        self.storageDataPipeIn, self.storageDataPipeOut = mp.Pipe()
+        self.controlDataPipeIn, self.controlDataPipeOut = mp.Pipe()
+
+        self.plotProcessObj = GraphsProcess()
+
+    def configure(self, maxPower, minPower, maxCons, minCons):
+        self.plotProcessObj.configure(maxPower, minPower, maxCons, minCons)
+    
+    def startPlotting(self):
+        self.plotProcess = mp.Process(
+            target = self.plotProcessObj,
+            args=(self.powerDataPipeOut, self.consDataPipeOut, self.storageDataPipeOut, self.controlDataPipeOut),
+            daemon = True
+        )
+        self.plotProcess.start()
+
+    def setSupplyDemand(self, renewableSupply, consumption):
+        self.consDataPipeIn.send((consumption, renewableSupply))
+
+    def setRenewablePowers(self, solar, wind, hydro):
+        self.powerDataPipeIn.send((solar, wind, hydro))
+
+    def setStoredEnergy(self, battery, reservoir):
+        self.storageDataPipeIn.send((battery, reservoir))
+
+    def stopPlotting(self):
+        self.controlDataPipeIn.send(1)
+        self.plotProcess.terminate()
+        self.plotProcess.join(timeout = 1.0)
+
+class GraphsProcess():
+
+    def __init__(self):
+        self.powerPlotter  = PowerGraph()
+        self.consPlotter = ConsumptionSupplyGraph()
+        self.storagePlotter = StoredEnergyGraph()
+
+    def configure(self, maxPower, minPower, maxCons, minCons):
+        self.powerPlotter.configure(maxPower, minPower)
+        self.consPlotter.configure(maxCons, minCons)
+
+    def __call__(self, powerDataPipe, consDataPipe, storageDataPipe, controlDataPipe):
+        print("starting Graphs Process")
+        self.powerDataPipe = powerDataPipe
+        self.consDataPipe = consDataPipe
+        self.storageDataPipe = storageDataPipe
+        self.controlDataPipe = controlDataPipe
+
+
+        self.fig = plt.figure(figsize=(8, 9), dpi=80)
+        plt.subplots_adjust(hspace=0.4)
+
+        self.powerPlotter.setupFigure(self.fig)
+        self.consPlotter.setupFigure(self.fig)
+        self.storagePlotter.setupFigure(self.fig)
+
+        timer = self.fig.canvas.new_timer(interval = 250)
+        timer.add_callback(self.timerCallback)
+        timer.start()
+
+        plt.show()
+
+    def terminate(self):
+        plt.close('all')
+
+    def timerCallback(self):
+
+        if self.controlDataPipe.poll():
+            command = self.controlDataPipe.recv()
+            if command == 1:
+                self.terminate()
+                return False
+
+        if self.powerDataPipe.poll():
+            solarPower, windPower, hydroPower = self.powerDataPipe.recv()
+            self.powerPlotter.setPowers(solarPower, windPower, hydroPower)
+        
+        if self.consDataPipe.poll():
+            consumption, renewableSupply = self.consDataPipe.recv()
+            self.consPlotter.setConsumption(consumption)
+            self.consPlotter.setRenewableSupply(renewableSupply)
+        
+        if self.storageDataPipe.poll():
+            batteryEnergy, reservoirEnergy = self.storageDataPipe.recv()
+            self.storagePlotter.setRemainingEnergies(batteryEnergy, reservoirEnergy)
+
+        self.powerPlotter.animate()
+        self.consPlotter.animate()
+        self.storagePlotter.animate()
+
+        self.fig.canvas.draw()
+        return True
 
 class PowerGraph():
 
