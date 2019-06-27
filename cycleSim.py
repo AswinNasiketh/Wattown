@@ -1,6 +1,6 @@
 import time
 import matplotlib.pyplot as plt
-from plotting import *
+from plotting import GraphsProcessManager
 import random
 import values
 import threading
@@ -9,7 +9,8 @@ import threading
 class CycleSimThread(threading.Thread):
     
     def __init__(self, board, mainWindow):
-        self.cycleModeObj = CycleSim(board)
+        self.graphManager = GraphsProcessManager()
+        self.cycleModeObj = CycleSim(board, self.graphManager)
         self.stopEvent = threading.Event()
         self.mainWindow = mainWindow
         board.resetBoard()
@@ -18,6 +19,7 @@ class CycleSimThread(threading.Thread):
 
     def run(self):
         self.stopEvent.clear()
+        self.graphManager.startPlotting()
         while (not self.stopEvent.is_set()) and (self.cycleModeObj.getStillRunning()):
             self.cycleModeObj.iterateLoop()
 
@@ -25,7 +27,7 @@ class CycleSimThread(threading.Thread):
             self.cleanUp()
 
     def cleanUp(self):
-        self.cycleModeObj.closePlot()
+        self.graphManager.stopPlotting()
         self.mainWindow.setTaskRunning(False)
 
     def join(self, timeOut = None):
@@ -44,20 +46,9 @@ class CycleSim():
     #Solar and wind sources charge battery
     #battery pumps water to reservoir reservoir during night
 
-    def __init__(self, board):
+    def __init__(self, board, graphManager):
         self.board = board
-
-        self.powerPlotter = PowerGraph()
-        self.supplyDemandPlotter = ConsumptionSupplyGraph()
-        self.storagePlotter = StoredEnergyGraph()
-
-        self.fig = plt.figure(figsize=(8, 9), dpi=80)
-        plt.subplots_adjust(hspace=0.4)
-        self.powerPlotter.setupFigure(self.fig)
-        self.supplyDemandPlotter.setupFigure(self.fig)
-        self.storagePlotter.setupFigure(self.fig)
-        plt.ion()
-        plt.show()
+        self.graphManager = graphManager
 
         self.batteryRemaining = 50 #percentage
         self.reservoirLevel = 50 #percentage
@@ -122,21 +113,16 @@ class CycleSim():
        
 
         #plotting
-        self.supplyDemandPlotter.setConsumption(self.consumptionValues[self.hourCount])
-        self.storagePlotter.setRemainingEnergies(self.batteryRemaining,self.reservoirLevel)
+        windPower = 0
+        totalRenewableSupply = self.solarGenerationValues[self.hourCount] + self.reservoirPower
 
         if self.board.areWindmillsOn():
-            self.powerPlotter.setPowers(self.solarGenerationValues[self.hourCount], self.windPowerGenerationUnits, self.reservoirPower)
-            self.supplyDemandPlotter.setRenewableSupply(self.solarGenerationValues[self.hourCount] + self.windPowerGenerationUnits + self.reservoirPower)
-        else:
-            self.powerPlotter.setPowers(self.solarGenerationValues[self.hourCount], 0, self.reservoirPower)
-            self.supplyDemandPlotter.setRenewableSupply(self.solarGenerationValues[self.hourCount] + self.reservoirPower)
+            windPower += self.windPowerGenerationUnits
+            totalRenewableSupply += self.windPowerGenerationUnits
 
-        self.powerPlotter.animate()
-        self.supplyDemandPlotter.animate()
-        self.storagePlotter.animate()
-
-        plt.pause(0.001)
+        self.graphManager.setRenewablePowers(self.solarGenerationValues[self.hourCount], windPower, self.reservoirPower)
+        self.graphManager.setSupplyDemand(totalRenewableSupply, self.consumptionValues[self.hourCount])
+        self.graphManager.setStoredEnergy(self.batteryRemaining, self.reservoirLevel)
 
         #storage animation
         self.board.lightReservoir(self.reservoirLevel)
@@ -164,9 +150,6 @@ class CycleSim():
 
     def getStillRunning(self):
         return self.stillRunning
-
-    def closePlot(self):
-        plt.close(self.fig)
 
     def calculateWindPower(self, amplitude):
         return round(values.MAX_WIND_POWER_GENERATION * amplitude / 10,  2)
@@ -270,8 +253,7 @@ class CycleSim():
             maxPower = max(values.MAX_WIND_POWER_GENERATION, values.CLOUDY_DAY_SOLAR_GENERATION, values.MAX_CONSUMPTION)
             maxPowerSum = values.MAX_WIND_POWER_GENERATION + values.CLOUDY_DAY_SOLAR_GENERATION + values.MAX_CONSUMPTION
 
-        self.powerPlotter.configure(maxPower, -values.RESERVOIR_RECHARGE_RATE)
-        self.supplyDemandPlotter.configure(maxPowerSum, -values.MAX_CONSUMPTION - values.RESERVOIR_RECHARGE_RATE)
+        self.graphManager.configure(maxPower, -values.RESERVOIR_RECHARGE_RATE, maxPowerSum, -values.MAX_CONSUMPTION - values.RESERVOIR_RECHARGE_RATE)
 
     def animateBattery(self):
         #changes colour when windmills are being driven
