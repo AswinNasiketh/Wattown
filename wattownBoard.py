@@ -208,6 +208,7 @@ class WindmillDriveThread(threading.Thread):
                 self.keepDriving = True
 
         def run(self):
+                self.keepDriving = False
                 while True: #thread is daemon, will exit when program exits 
                         if self.keepDriving:
                                 self.pi.write(self.driveMinusPin, 0)
