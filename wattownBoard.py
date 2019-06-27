@@ -46,7 +46,7 @@ class WattownBoard():
                 self.pi.write(self.fuelCellPin, 0)
 
 
-                self.NUM_NEOPIXELS = 100
+                self.NUM_NEOPIXELS = 101
                 self.RESERVOIR_LEVEL_0_LOWER = 0
                 self.RESERVOIR_LEVEL_0_UPPER = 2
                 self.RESERVOIR_LEVEL_1_LOWER = 3
