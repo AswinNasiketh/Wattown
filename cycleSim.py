@@ -10,6 +10,7 @@ class CycleSimThread(threading.Thread):
     
     def __init__(self, board, mainWindow, graphManager):
         self.graphManager = graphManager
+        self.board = board
         self.cycleModeObj = CycleSim(board, self.graphManager)
         self.stopEvent = threading.Event()
         self.mainWindow = mainWindow
@@ -28,6 +29,7 @@ class CycleSimThread(threading.Thread):
 
     def cleanUp(self):
         self.graphManager.hidePlots()
+        self.board.resetBoard()
         self.mainWindow.setTaskRunning(False)
 
     def join(self, timeOut = None):
