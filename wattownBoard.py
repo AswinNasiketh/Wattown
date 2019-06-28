@@ -46,7 +46,7 @@ class WattownBoard():
                 self.pi.write(self.fuelCellPin, 0)
 
 
-                self.NUM_NEOPIXELS = 100
+                self.NUM_NEOPIXELS = 101
                 self.RESERVOIR_LEVEL_0_LOWER = 0
                 self.RESERVOIR_LEVEL_0_UPPER = 2
                 self.RESERVOIR_LEVEL_1_LOWER = 3
@@ -99,7 +99,7 @@ class WattownBoard():
                 return [self.adcChannel1.voltage, self.adcChannel2.voltage, self.adcChannel3.voltage, self.adcChannel4.voltage, self.adcChannel5.voltage]
 
         #LED control code, colour must be inputted as tuple of three integers between 0 and 255 (i.e. setCityLEDs((255,255,0))
-        def setCityLEDs(self, colour, rangeLower = 8, rangeUpper = 94):
+        def setCityLEDs(self, colour, rangeLower = 12, rangeUpper = 98):
                 for i in range(self.CITY_BLOCK_1_LOWER, self.CITY_BLOCK_3_UPPER + 1):
                         self.pixels[i] = (0,0,0)
                 
@@ -208,6 +208,7 @@ class WindmillDriveThread(threading.Thread):
                 self.keepDriving = True
 
         def run(self):
+                self.keepDriving = False
                 while True: #thread is daemon, will exit when program exits 
                         if self.keepDriving:
                                 self.pi.write(self.driveMinusPin, 0)

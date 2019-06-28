@@ -9,10 +9,11 @@ from cycleSim import CycleSimThread
 
 class MainWindow(Frame):
     
-    def __init__(self, board, master=None):
+    def __init__(self, board, graphManager, master=None):
         Frame.__init__(self, master)
         self.master = master
         self.board = board
+        self.graphManager = graphManager
         self.taskRunning = False
         self.currentRunningSim = None
         
@@ -52,7 +53,7 @@ class MainWindow(Frame):
             self.currentRunningSim.join()
 
         newWindow = Toplevel(self.master)
-        self.currentRunningSim = CycleSimThread(self.board, self)
+        self.currentRunningSim = CycleSimThread(self.board, self, self.graphManager)
         CycleModeControlsWindow(newWindow, self.currentRunningSim, self)
 
     def setGameBtnCommand(self, gameButtonCommand):

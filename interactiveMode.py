@@ -123,33 +123,7 @@ class InteractiveMode():
                 self.board.setFuelCellLEDs(values.LED_GREEN_BRIGHT)
         
     def animateReservoir(self):
-        if self.currentBatteryLevel == 0:
-            level0Colour = (0,0,0)
-            level1Colour = (0,0,0)
-            level2Colour = (0,0,0)
-            level3Colour = (0,0,0)
-        elif self.currentBatteryLevel > 0 and self.currentBatteryLevel < 25:
-            level0Colour = values.LED_WATER_BLUE
-            level1Colour = (0,0,0)
-            level2Colour = (0,0,0)
-            level3Colour = (0,0,0)
-        elif self.currentBatteryLevel >= 25 and self.currentBatteryLevel < 50:
-            level0Colour = values.LED_WATER_BLUE
-            level1Colour = values.LED_WATER_BLUE
-            level2Colour = (0,0,0)
-            level3Colour = (0,0,0)
-        elif self.currentBatteryLevel >= 50 and self.currentBatteryLevel < 75:
-            level0Colour = values.LED_WATER_BLUE
-            level1Colour = values.LED_WATER_BLUE
-            level2Colour = values.LED_WATER_BLUE
-            level3Colour = (0,0,0)
-        elif self.currentBatteryLevel >= 75:
-            level0Colour = values.LED_WATER_BLUE
-            level1Colour = values.LED_WATER_BLUE
-            level2Colour = values.LED_WATER_BLUE
-            level3Colour = values.LED_WATER_BLUE
-
-        self.board.setReservoirLEDs(level0Colour,level1Colour,level2Colour,level3Colour)
+        self.board.lightReservoir(self.currentBatteryLevel)
 
 
     def animateCityLights(self, lightBlock1, lightBlock2, lightBlock3):
