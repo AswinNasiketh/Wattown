@@ -11,6 +11,9 @@ class Windmills():
     #adc channels passed in as list
     def __init__(self, pigpioHandle, adcHandle):
         self.pi = pigpioHandle
+        self.pi.set_mode(DRIVE_POSITIVE_PIN, pigpio.OUTPUT)
+        self.pi.set_mode(DRIVE_NEGATIVE_PIN, pigpio.OUTPUT)
+
         self.driveWindmills = False
         self.timeSinceLastUpdate = getTimeMilliseconds()
         self.halfPeriod = 1000/DRIVE_FREQUENCY
@@ -34,6 +37,9 @@ class Windmills():
 
     def stopWindmills(self):
         self.driveWindmills = False
+
+    def areWindmillsOn(self):
+        return self.driveWindmills
 
     def update(self):       
         if self.driveWindmills:

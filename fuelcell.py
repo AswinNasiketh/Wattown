@@ -12,6 +12,7 @@ class FuelCell():
     def __init__(self, LEDHandle, pigpioHandle):
         self.LEDHandle = LEDHandle
         self.pi = pigpioHandle
+        self.pi.set_mode(FUEL_CELL_PIN, pigpio.OUTPUT)
 
         self.pulse = False
         self.pinOn = False
@@ -24,7 +25,7 @@ class FuelCell():
     def stopPulsing(self):
         self.pulse = False
 
-    def setEnergyLevel(self, energyLevel, levelChanging, charging):
+    def setEnergyLevel(self, energyLevel, levelChanging, charging = False):
         brightnessCoefficient = energyLevel/100.0
 
         if levelChanging:
@@ -39,7 +40,7 @@ class FuelCell():
             elif energyLevel == 100:
                 batteryLEDColour = LED_GREEN_BRIGHT
         
-        for i in range(LED_FUEL_CELL_RANGE_LOWER, LED_FUEL_CELL_RANGE_UPPER):
+        for i in range(LED_FUEL_CELL_RANGE_LOWER, LED_FUEL_CELL_RANGE_UPPER + 1):
             self.LEDHandle[i] = batteryLEDColour
         
 

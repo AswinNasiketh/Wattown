@@ -15,23 +15,23 @@ class City():
     #blocksToLight can take values from 0 - 3
     def lightCityBlocks(self, blocksToLight):
         if blocksToLight == 0:            
-            for i in range(CITY_BLOCK_1_LOWER, CITY_BLOCK_3_UPPER):
+            for i in range(CITY_BLOCK_1_LOWER, CITY_BLOCK_3_UPPER + 1):
                 self.LEDHandle[i] = LED_RED_DIM
 
         elif blocksToLight == 1:
-            for i in range(CITY_BLOCK_1_LOWER, CITY_BLOCK_1_UPPER):
+            for i in range(CITY_BLOCK_1_LOWER, CITY_BLOCK_1_UPPER + 1):
                 self.LEDHandle[i] = LED_CITY_LIGHTS_YELLOW
                 
-            for i in range(CITY_BLOCK_2_LOWER, CITY_BLOCK_3_UPPER):
+            for i in range(CITY_BLOCK_2_LOWER, CITY_BLOCK_3_UPPER + 1):
                 self.LEDHandle[i] = (0,0,0)
         elif blocksToLight == 2:
-            for i in range(CITY_BLOCK_1_LOWER, CITY_BLOCK_2_UPPER):
+            for i in range(CITY_BLOCK_1_LOWER, CITY_BLOCK_2_UPPER + 1):
                 self.LEDHandle[i] = LED_CITY_LIGHTS_YELLOW
                 
-            for i in range(CITY_BLOCK_3_LOWER, CITY_BLOCK_3_UPPER):
+            for i in range(CITY_BLOCK_3_LOWER, CITY_BLOCK_3_UPPER + 1):
                 self.LEDHandle[i] = (0,0,0)
         elif blocksToLight == 3:
-            for i in range(CITY_BLOCK_1_LOWER, CITY_BLOCK_3_UPPER):
+            for i in range(CITY_BLOCK_1_LOWER, CITY_BLOCK_3_UPPER + 1):
                 self.LEDHandle[i] = LED_CITY_LIGHTS_YELLOw
     
     #for more manual control
@@ -39,5 +39,5 @@ class City():
         if rangeLower < CITY_BLOCK_1_LOWER or rangeUpper > CITY_BLOCK_3_UPPER:
             raise IndexError
 
-        for i in range(rangeLower, rangeUpper):
+        for i in range(rangeLower, rangeUpper + 1):
             self.LEDHandle[i] = colour
