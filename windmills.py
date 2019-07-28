@@ -19,11 +19,10 @@ class Windmills():
     def stopWindmills(self):
         self.driveWindmills = False
 
-    def update(self):
-        timeElapsed = getTimeMilliseconds() - self.timeSinceLastUpdate
-        self.timeSinceLastUpdate = getTimeMilliseconds()
-
+    def update(self):       
         if self.driveWindmills:
+            timeElapsed = getTimeMilliseconds() - self.timeSinceLastUpdate
+
 
             if timeElapsed >= self.halfPeriod:
                 if self.positivePinOn:
@@ -37,7 +36,9 @@ class Windmills():
 
         else:
             self.pi.write(DRIVE_POSITIVE_PIN, 0)
-            self.pi.write(DRIVE_NEGATIVE_PIN, 0)                   
+            self.pi.write(DRIVE_NEGATIVE_PIN, 0)     
+
+        self.timeSinceLastUpdate = getTimeMilliseconds()              
 
     def getTimeMilliseconds(self):
         return int(round(time.time() * 1000))
