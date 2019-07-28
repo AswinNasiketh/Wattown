@@ -6,11 +6,25 @@ class Windmills():
     DRIVE_POSITIVE_PIN = 1
     DRIVE_NEGATIVE_PIN = 7
 
-    def __init__(self, pigpioHandle):
+    #adc channels passed in as list
+    def __init__(self, pigpioHandle, adcHandle):
         self.pi = pigpioHandle
         self.driveWindmills = False
         self.timeSinceLastUpdate = self.getTimeMilliseconds()
         self.halfPeriod = 1000/DRIVE_FREQUENCY
+
+        self.windmill1 = AnalogIn(adcHandle, MCP.P1)
+        self.windmill2 = AnalogIn(adcHandle, MCP.P2)
+        self.windmill3 = AnalogIn(adcHandle, MCP.P3)
+        self.windmill4 = AnalogIn(adcHandle, MCP.P4)
+        self.windmill5 = AnalogIn(adcHandle, MCP.P5)
+
+    def getWindmillVoltages(self):
+        return [self.windmill1.voltage,
+        self.windmill2.voltage,
+        self.windmill3.voltage,
+        self.windmill4.voltage,
+        self.windmill5.voltage]
 
     def startWindmills(self):
         self.driveWindmills = True
@@ -42,6 +56,3 @@ class Windmills():
 
     def getTimeMilliseconds(self):
         return int(round(time.time() * 1000))
-
-
-    
