@@ -1,3 +1,4 @@
+from values import *
 
 class Reservoir():
 
@@ -10,8 +11,6 @@ class Reservoir():
     RESERVOIR_LEVEL_3_LOWER = 9
     RESERVOIR_LEVEL_3_UPPER = 11
 
-    LED_WATER_BLUE = (94,155,255)
-
     def __init__(self, LEDHandle):
         self.LEDHandle = LEDHandle
 
@@ -23,12 +22,21 @@ class Reservoir():
         elif waterLevel == 1:
             for i in range(RESERVOIR_LEVEL_0_LOWER, RESERVOIR_LEVEL_0_UPPER):
                 self.LEDHandle[i] = LED_WATER_BLUE
+
+            for i in range(RESERVOIR_LEVEL_1_LOWER, RESERVOIR_LEVEL_3_UPPER):
+                self.LEDHandle[i] = (0,0,0)
         elif waterLevel == 2:
             for i in range(RESERVOIR_LEVEL_0_LOWER, RESERVOIR_LEVEL_1_UPPER):
                 self.LEDHandle[i] = LED_WATER_BLUE
+
+            for i in range(RESERVOIR_LEVEL_2_LOWER, RESERVOIR_LEVEL_3_UPPER):
+                self.LEDHandle[i] = (0,0,0)
         elif waterLevel == 3:
             for i in range(RESERVOIR_LEVEL_0_LOWER, RESERVOIR_LEVEL_2_UPPER):
                 self.LEDHandle[i] = LED_WATER_BLUE
+
+            for i in range(RESERVOIR_LEVEL_3_LOWER, RESERVOIR_LEVEL_3_UPPER):
+                self.LEDHandle[i] = (0,0,0)
         elif waterLevel == 4:
             for i in range(RESERVOIR_LEVEL_0_LOWER, RESERVOIR_LEVEL_3_UPPER):
                 self.LEDHandle[i] = LED_WATER_BLUE
