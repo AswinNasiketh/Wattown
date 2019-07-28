@@ -1,4 +1,4 @@
-import time
+from utilFunctions import *
 import adafruit_mcp3xxx.mcp3008 as MCP
 from adafruit_mcp3xxx.analog_in import AnalogIn
 
@@ -12,7 +12,7 @@ class Windmills():
     def __init__(self, pigpioHandle, adcHandle):
         self.pi = pigpioHandle
         self.driveWindmills = False
-        self.timeSinceLastUpdate = self.getTimeMilliseconds()
+        self.timeSinceLastUpdate = getTimeMilliseconds()
         self.halfPeriod = 1000/DRIVE_FREQUENCY
 
         self.windmill1 = AnalogIn(adcHandle, MCP.P1)
@@ -55,6 +55,3 @@ class Windmills():
             self.pi.write(DRIVE_NEGATIVE_PIN, 0)     
 
         self.timeSinceLastUpdate = getTimeMilliseconds()              
-
-    def getTimeMilliseconds(self):
-        return int(round(time.time() * 1000))
