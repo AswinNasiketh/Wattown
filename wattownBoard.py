@@ -21,7 +21,7 @@ class WattownBoard(threading.Thread):
                 mcp = MCP.MCP3008(spi, cs)               
                 self.pi = pigpio.pi()       
 
-                self.NUM_NEOPIXELS = 101     
+                self.NUM_NEOPIXELS = 117     
                 self.pixels = neopixel.NeoPixel(board.D12, self.NUM_NEOPIXELS, auto_write = False)
 
                 self.reservoir = Reservoir(self.pixels)

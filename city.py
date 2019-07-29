@@ -2,12 +2,14 @@ from values import *
 
 class City():
 
-    BLOCK_1_LOWER = 12
-    BLOCK_1_UPPER = 32
-    BLOCK_2_LOWER = 33
-    BLOCK_2_UPPER = 61
-    BLOCK_3_LOWER = 62
-    BLOCK_3_UPPER = 98
+    #TODO: change LED addresses to include added transmission network and distribution network LEDs
+
+    BLOCK_1_LOWER = 25
+    BLOCK_1_UPPER = 45
+    BLOCK_2_LOWER = 46
+    BLOCK_2_UPPER = 74
+    BLOCK_3_LOWER = 75
+    BLOCK_3_UPPER = 111
 
     def __init__(self, LEDHandle):
         self.LEDHandle = LEDHandle

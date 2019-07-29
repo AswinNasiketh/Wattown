@@ -3,11 +3,13 @@ import pigpio
 
 class FuelCell():
 
+    #TODO: change LED addresses to include added transmission network and distribution network LEDs
+
     PULSE_PERIOD = 500 #ms
     FUEL_CELL_PIN = 8
 
-    LED_FUEL_CELL_RANGE_LOWER = 99
-    LED_FUEL_CELL_RANGE_UPPER = 100  
+    LED_FUEL_CELL_RANGE_LOWER = 112
+    LED_FUEL_CELL_RANGE_UPPER = 113 
 
     def __init__(self, LEDHandle, pigpioHandle):
         self.LEDHandle = LEDHandle
@@ -16,7 +18,7 @@ class FuelCell():
 
         self.pulse = False
         self.pinOn = False
-        self.timeSinceLastChange = 0
+        self.timeOfLastChange = 0
 
     def startPulsing(self):
         self.pulse = True
@@ -49,7 +51,7 @@ class FuelCell():
     
     def update(self, currentTime):
         if self.pulse:
-            timeElapsed = currentTime - self.timeSinceLastChange
+            timeElapsed = currentTime - self.timeOfLastChange
 
             if timeElapsed >= FuelCell.PULSE_PERIOD:
                 if self.pinOn:
@@ -60,7 +62,7 @@ class FuelCell():
                     self.pi.write(FuelCell.FUEL_CELL_PIN, 1)
                     self.pinOn = True
                 
-                self.timeSinceLastChange = currentTime
+                self.timeOfLastChange = currentTime
 
         else:
             self.pi.write(FuelCell.FUEL_CELL_PIN, 0)
