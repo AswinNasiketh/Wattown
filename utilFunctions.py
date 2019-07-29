@@ -1,4 +1,4 @@
 import time
 
-def getTimeMilliseconds(self):
+def getTimeMilliseconds():
         return int(round(time.time() * 1000))

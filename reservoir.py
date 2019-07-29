@@ -37,6 +37,6 @@ class Reservoir():
 
             for i in range(Reservoir.LEVEL_3_LOWER, Reservoir.LEVEL_3_UPPER + 1):
                 self.LEDHandle[i] = (0,0,0)
-        elif waterLevel == 4:
+        elif waterLevel >= 4:
             for i in range(Reservoir.LEVEL_0_LOWER, Reservoir.LEVEL_3_UPPER + 1):
                 self.LEDHandle[i] = LED_WATER_BLUE

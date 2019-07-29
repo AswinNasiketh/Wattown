@@ -15,7 +15,7 @@ class Windmills():
         self.pi.set_mode(Windmills.DRIVE_NEGATIVE_PIN, pigpio.OUTPUT)
 
         self.driveWindmills = False
-        self.timeSinceLastUpdate = getTimeMilliseconds()
+        self.timeSinceLastChange = getTimeMilliseconds()
         self.halfPeriod = 1000/Windmills.DRIVE_FREQUENCY
 
         self.windmill1 = AnalogIn(adcHandle, MCP.P1)
@@ -43,8 +43,8 @@ class Windmills():
 
     def update(self):       
         if self.driveWindmills:
-            timeElapsed = getTimeMilliseconds() - self.timeSinceLastUpdate
-
+            timeElapsed = getTimeMilliseconds() - self.timeSinceLastChange
+            print("Windmill Time Elapsed", timeElapsed)
 
             if timeElapsed >= self.halfPeriod:
                 if self.positivePinOn:
@@ -55,9 +55,11 @@ class Windmills():
                     self.pi.write(Windmills.DRIVE_POSITIVE_PIN, 1)
                     self.pi.write(Windmills.DRIVE_NEGATIVE_PIN, 0)
                     self.positivePinOn = True
+                    
+                self.timeSinceLastChange = getTimeMilliseconds()
 
         else:
             self.pi.write(Windmills.DRIVE_POSITIVE_PIN, 0)
             self.pi.write(Windmills.DRIVE_NEGATIVE_PIN, 0)     
 
-        self.timeSinceLastUpdate = getTimeMilliseconds()              
+                      

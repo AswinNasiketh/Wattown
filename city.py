@@ -32,7 +32,7 @@ class City():
                 self.LEDHandle[i] = (0,0,0)
         elif blocksToLight == 3:
             for i in range(City.BLOCK_1_LOWER, City.BLOCK_3_UPPER + 1):
-                self.LEDHandle[i] = LED_CITY_LIGHTS_YELLOw
+                self.LEDHandle[i] = LED_CITY_LIGHTS_YELLOW
     
     #for more manual control
     def setCityLEDs(self, rangeLower, rangeUpper, colour):

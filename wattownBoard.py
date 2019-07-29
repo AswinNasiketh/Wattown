@@ -63,6 +63,7 @@ class WattownBoard(threading.Thread):
                 self.city.lightCityBlocks(numBlocksToLight)
 
         def lightReservoir(self, reservoirLevel):
-              levelsToLight = round(reservoirLevel/4)
+              levelsToLight = round(reservoirLevel/25)
+              
               self.reservoir.setWaterLevel(levelsToLight)
 

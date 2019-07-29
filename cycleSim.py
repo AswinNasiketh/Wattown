@@ -255,7 +255,7 @@ class CycleSim():
 
     def animateBattery(self):
         #changes colour when windmills are being driven        
-        self.board.fuelCell.setEnergyLevels(self.batteryRemaining, True, self.board.windmills.areWindmillsOn())
+        self.board.fuelCell.setEnergyLevel(self.batteryRemaining, True, self.board.windmills.areWindmillsOn())
           
     
     def addToBattery(self, unitsToAdd):

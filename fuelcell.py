@@ -17,7 +17,7 @@ class FuelCell():
 
         self.pulse = False
         self.pinOn = False
-        self.timeSinceLastUpdate = getTimeMilliseconds()
+        self.timeSinceLastChange = getTimeMilliseconds()
 
     def startPulsing(self):
         self.pulse = True
@@ -32,13 +32,15 @@ class FuelCell():
         if levelChanging:
             if charging:
                 self.pulse = True
-                batteryLEDColour = (int(LED_BLUE_MAX[i] * brightnessCoefficient) for i in range(3))
+                batteryLEDColour = [int(LED_BLUE_MAX[i] * brightnessCoefficient) for i in range(3)]
             else:
-                batteryLEDColour = (int(LED_YELLOW_MAX[i] * brightnessCoefficient) for i in range(3))
+                batteryLEDColour = [int(LED_YELLOW_MAX[i] * brightnessCoefficient) for i in range(3)]
+
+            batteryLEDColour = tuple(batteryLEDColour)
         else:
             if energyLevel == 0:
                 batteryLEDColour = LED_RED_DIM
-            elif energyLevel == 100:
+            else:
                 batteryLEDColour = LED_GREEN_BRIGHT
         
         for i in range(FuelCell.LED_FUEL_CELL_RANGE_LOWER, FuelCell.LED_FUEL_CELL_RANGE_UPPER + 1):
@@ -48,7 +50,7 @@ class FuelCell():
     
     def update(self):
         if self.pulse:
-            timeElapsed = getTimeMilliseconds() - self.timeSinceLastUpdate
+            timeElapsed = getTimeMilliseconds() - self.timeSinceLastChange
 
             if timeElapsed >= FuelCell.PULSE_PERIOD:
                 if self.pinOn:
@@ -58,8 +60,10 @@ class FuelCell():
                 else:
                     self.pi.write(FuelCell.FUEL_CELL_PIN, 1)
                     self.pinOn = True
+                
+                self.timeSinceLastChange = getTimeMilliseconds() 
 
         else:
             self.pi.write(FuelCell.FUEL_CELL_PIN, 0)
 
-        self.timeSinceLastUpdate = getTimeMilliseconds() 
+        

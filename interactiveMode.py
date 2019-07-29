@@ -26,8 +26,6 @@ class InteractiveMode():
     def __init__(self, board):
         self.board = board
 
-        currentSolarPanelVoltage = board.getSolarPanelVoltage()
-        self.PV_THRESHOLD = currentSolarPanelVoltage + 0.01
         self.WINDMILL_THRESHOLD = 2.0
 
         self.PV_GENERATION_UNIT = 4
