@@ -1,5 +1,6 @@
 from utilFunctions import *
 from values import *
+import pigpio
 
 class FuelCell():
 
@@ -12,7 +13,7 @@ class FuelCell():
     def __init__(self, LEDHandle, pigpioHandle):
         self.LEDHandle = LEDHandle
         self.pi = pigpioHandle
-        self.pi.set_mode(FUEL_CELL_PIN, pigpio.OUTPUT)
+        self.pi.set_mode(FuelCell.FUEL_CELL_PIN, pigpio.OUTPUT)
 
         self.pulse = False
         self.pinOn = False
@@ -40,7 +41,7 @@ class FuelCell():
             elif energyLevel == 100:
                 batteryLEDColour = LED_GREEN_BRIGHT
         
-        for i in range(LED_FUEL_CELL_RANGE_LOWER, LED_FUEL_CELL_RANGE_UPPER + 1):
+        for i in range(FuelCell.LED_FUEL_CELL_RANGE_LOWER, FuelCell.LED_FUEL_CELL_RANGE_UPPER + 1):
             self.LEDHandle[i] = batteryLEDColour
         
 
@@ -49,16 +50,16 @@ class FuelCell():
         if self.pulse:
             timeElapsed = getTimeMilliseconds() - self.timeSinceLastUpdate
 
-            if timeElapsed >= PULSE_PERIOD:
+            if timeElapsed >= FuelCell.PULSE_PERIOD:
                 if self.pinOn:
-                    self.pi.write(FUEL_CELL_PIN, 0)
+                    self.pi.write(FuelCell.FUEL_CELL_PIN, 0)
                     self.pinOn = False
                     self.pulse = False
                 else:
-                    self.pi.write(FUEL_CELL_PIN, 1)
+                    self.pi.write(FuelCell.FUEL_CELL_PIN, 1)
                     self.pinOn = True
 
         else:
-            self.pi.write(FUEL_CELL_PIN, 0)
+            self.pi.write(FuelCell.FUEL_CELL_PIN, 0)
 
         self.timeSinceLastUpdate = getTimeMilliseconds() 

@@ -24,7 +24,7 @@ class WattownBoard(threading.Thread):
                 self.pixels = neopixel.NeoPixel(board.D12, self.NUM_NEOPIXELS, auto_write = False)
 
                 self.reservoir = Reservoir(self.pixels)
-                self.windmills = Windmills(self.pixels, mcp)
+                self.windmills = Windmills(self.pi, mcp)
                 self.solarPanels = SolarPanels(mcp)
                 self.city = City(self.pixels)
                 self.fuelCell = FuelCell(self.pixels, self.pi)

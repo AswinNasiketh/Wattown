@@ -1,7 +1,7 @@
 from utilFunctions import *
 import adafruit_mcp3xxx.mcp3008 as MCP
 from adafruit_mcp3xxx.analog_in import AnalogIn
-
+import pigpio
 class Windmills():
 
     DRIVE_FREQUENCY = 4 #Hz
@@ -11,12 +11,12 @@ class Windmills():
     #adc channels passed in as list
     def __init__(self, pigpioHandle, adcHandle):
         self.pi = pigpioHandle
-        self.pi.set_mode(DRIVE_POSITIVE_PIN, pigpio.OUTPUT)
-        self.pi.set_mode(DRIVE_NEGATIVE_PIN, pigpio.OUTPUT)
+        self.pi.set_mode(Windmills.DRIVE_POSITIVE_PIN, pigpio.OUTPUT)
+        self.pi.set_mode(Windmills.DRIVE_NEGATIVE_PIN, pigpio.OUTPUT)
 
         self.driveWindmills = False
         self.timeSinceLastUpdate = getTimeMilliseconds()
-        self.halfPeriod = 1000/DRIVE_FREQUENCY
+        self.halfPeriod = 1000/Windmills.DRIVE_FREQUENCY
 
         self.windmill1 = AnalogIn(adcHandle, MCP.P1)
         self.windmill2 = AnalogIn(adcHandle, MCP.P2)
@@ -48,16 +48,16 @@ class Windmills():
 
             if timeElapsed >= self.halfPeriod:
                 if self.positivePinOn:
-                    self.pi.write(DRIVE_POSITIVE_PIN, 0)
-                    self.pi.write(DRIVE_NEGATIVE_PIN, 1)
+                    self.pi.write(Windmills.DRIVE_POSITIVE_PIN, 0)
+                    self.pi.write(Windmills.DRIVE_NEGATIVE_PIN, 1)
                     self.positivePinOn = False
                 else:
-                    self.pi.write(DRIVE_POSITIVE_PIN, 1)
-                    self.pi.write(DRIVE_NEGATIVE_PIN, 0)
+                    self.pi.write(Windmills.DRIVE_POSITIVE_PIN, 1)
+                    self.pi.write(Windmills.DRIVE_NEGATIVE_PIN, 0)
                     self.positivePinOn = True
 
         else:
-            self.pi.write(DRIVE_POSITIVE_PIN, 0)
-            self.pi.write(DRIVE_NEGATIVE_PIN, 0)     
+            self.pi.write(Windmills.DRIVE_POSITIVE_PIN, 0)
+            self.pi.write(Windmills.DRIVE_NEGATIVE_PIN, 0)     
 
         self.timeSinceLastUpdate = getTimeMilliseconds()              
