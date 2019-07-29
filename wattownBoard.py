@@ -12,6 +12,7 @@ from windmills import Windmills
 from solarPanels import SolarPanels
 from city import City
 from fuelcell import FuelCell
+import time
 
 class WattownBoard(threading.Thread):
         def __init__(self):
@@ -41,9 +42,10 @@ class WattownBoard(threading.Thread):
 
         def run(self):
                 while not self.stopEvent.wait(0.2): # provides delay as well instead of sleep
+                        currentTime = self.getTimeMilliseconds()
                         self.pixels.show()
-                        self.windmills.update()
-                        self.fuelCell.update()
+                        self.windmills.update(currentTime)
+                        self.fuelCell.update(currentTime)
 
         def releaseResources(self):
                 self.pi.stop()
@@ -66,4 +68,7 @@ class WattownBoard(threading.Thread):
               levelsToLight = round(reservoirLevel/25)
               
               self.reservoir.setWaterLevel(levelsToLight)
+
+        def getTimeMilliseconds(self):
+                return int(round(time.time() * 1000))
 

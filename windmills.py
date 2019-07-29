@@ -1,4 +1,3 @@
-from utilFunctions import *
 import adafruit_mcp3xxx.mcp3008 as MCP
 from adafruit_mcp3xxx.analog_in import AnalogIn
 import pigpio
@@ -15,7 +14,7 @@ class Windmills():
         self.pi.set_mode(Windmills.DRIVE_NEGATIVE_PIN, pigpio.OUTPUT)
 
         self.driveWindmills = False
-        self.timeSinceLastChange = getTimeMilliseconds()
+        self.timeSinceLastChange = 0
         self.halfPeriod = 1000/Windmills.DRIVE_FREQUENCY
 
         self.windmill1 = AnalogIn(adcHandle, MCP.P1)
@@ -41,9 +40,9 @@ class Windmills():
     def areWindmillsOn(self):
         return self.driveWindmills
 
-    def update(self):       
+    def update(self, currentTime):       
         if self.driveWindmills:
-            timeElapsed = getTimeMilliseconds() - self.timeSinceLastChange
+            timeElapsed = currentTime - self.timeSinceLastChange
             print("Windmill Time Elapsed", timeElapsed)
 
             if timeElapsed >= self.halfPeriod:
@@ -56,7 +55,7 @@ class Windmills():
                     self.pi.write(Windmills.DRIVE_NEGATIVE_PIN, 0)
                     self.positivePinOn = True
                     
-                self.timeSinceLastChange = getTimeMilliseconds()
+                self.timeSinceLastChange = currentTime
 
         else:
             self.pi.write(Windmills.DRIVE_POSITIVE_PIN, 0)

@@ -1,4 +1,3 @@
-from utilFunctions import *
 from values import *
 import pigpio
 
@@ -17,7 +16,7 @@ class FuelCell():
 
         self.pulse = False
         self.pinOn = False
-        self.timeSinceLastChange = getTimeMilliseconds()
+        self.timeSinceLastChange = 0
 
     def startPulsing(self):
         self.pulse = True
@@ -48,9 +47,9 @@ class FuelCell():
         
 
     
-    def update(self):
+    def update(self, currentTime):
         if self.pulse:
-            timeElapsed = getTimeMilliseconds() - self.timeSinceLastChange
+            timeElapsed = currentTime - self.timeSinceLastChange
 
             if timeElapsed >= FuelCell.PULSE_PERIOD:
                 if self.pinOn:
@@ -61,7 +60,7 @@ class FuelCell():
                     self.pi.write(FuelCell.FUEL_CELL_PIN, 1)
                     self.pinOn = True
                 
-                self.timeSinceLastChange = getTimeMilliseconds() 
+                self.timeSinceLastChange = currentTime
 
         else:
             self.pi.write(FuelCell.FUEL_CELL_PIN, 0)
