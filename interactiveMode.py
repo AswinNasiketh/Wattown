@@ -26,8 +26,6 @@ class InteractiveMode():
     def __init__(self, board):
         self.board = board
 
-        currentSolarPanelVoltage = board.getSolarPanelVoltage()
-        self.PV_THRESHOLD = currentSolarPanelVoltage + 0.01
         self.WINDMILL_THRESHOLD = 2.0
 
         self.PV_GENERATION_UNIT = 4
@@ -38,10 +36,7 @@ class InteractiveMode():
 
         self.currentBatteryLevel = 0
         self.previousBatteryLevel = 0
-
-        self.board.stopWindmills()
-        self.currentBatteryLevel = 0
-        self.previousBatteryLevel = 0       
+ 
         
     def iterateLoop(self):
 
@@ -52,7 +47,7 @@ class InteractiveMode():
 
         self.previousBatteryLevel = self.currentBatteryLevel
 
-        if self.areSolarPanelsOn():
+        if self.board.solarPanels.areSolarPanelsOn():
             powerAvailableToConsume += self.PV_GENERATION_UNIT
 
         powerAvailableToConsume += self.WINDMILL_GENERATION_UNIT * self.getWindmillsBlown()
@@ -70,24 +65,11 @@ class InteractiveMode():
         self.animateCityLights(lightBlock1, lightBlock2, lightBlock3)
         print("Battery level: " + str(self.currentBatteryLevel))
         time.sleep(1)
-
-
         
-    
-    def areSolarPanelsOn(self):
-        solarPanelVoltage = self.board.getSolarPanelVoltage()
-        print(solarPanelVoltage)
-
-        if solarPanelVoltage >= self.PV_THRESHOLD:
-            print("Solar panels on")
-            return True
-        else:
-            print("Solar panels off")
-            return False
 
     def getWindmillsBlown(self):
         windmillsBlown = 0
-        windmillVoltages = self.board.getWindmillVoltages()
+        windmillVoltages = self.board.windmills.getWindmillVoltages()
 
         for i in range(len(windmillVoltages)):
             if windmillVoltages[i] >= self.WINDMILL_THRESHOLD:
@@ -103,24 +85,12 @@ class InteractiveMode():
 
         #charging
         if batteryLevelChange > 0:
-            batteryLEDcolour = (int(values.LED_BLUE_MAX[0] * (self.currentBatteryLevel/100)),
-            int(values.LED_BLUE_MAX[1] * (self.currentBatteryLevel/100)),
-            int(values.LED_BLUE_MAX[2] * (self.currentBatteryLevel/100)))
-
-            self.board.setFuelCellLEDs(batteryLEDcolour)
-            self.board.pulseFuelCell()
+            self.board.fuelCell.setEnergyLevel(self.currentBatteryLevel, True, True)
         elif batteryLevelChange < 0:
             #discharging
-            batteryLEDcolour = (int(values.LED_YELLOW_MAX[0] * (self.currentBatteryLevel/100)),
-            int((values.LED_YELLOW_MAX[1] * (self.currentBatteryLevel/100))),
-            int((values.LED_YELLOW_MAX[2] * (self.currentBatteryLevel/100))))
-
-            self.board.setFuelCellLEDs(batteryLEDcolour)
-        elif  batteryLevelChange == 0:
-            if self.currentBatteryLevel == 0:
-                self.board.setFuelCellLEDs(values.LED_RED_DIM)
-            elif self.currentBatteryLevel == 100:
-                self.board.setFuelCellLEDs(values.LED_GREEN_BRIGHT)
+            self.board.fuelCell.setEnergyLevel(self.currentBatteryLevel, True, False)
+        else:
+            self.board.fuelCell.setEnergyLevel(self.currentBatteryLevel, False)
         
     def animateReservoir(self):
         self.board.lightReservoir(self.currentBatteryLevel)

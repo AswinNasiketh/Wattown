@@ -87,7 +87,7 @@ class CycleSim():
             self.windPowerGenerationUnits = self.getRandomWindPower()
             self.addToBattery(self.windPowerGenerationUnits)
         else:
-            if self.board.areWindmillsOn():                    
+            if self.board.windmills.areWindmillsOn():                    
                 self.addToBattery(self.windPowerGenerationUnits)
 
         #only animate the city lights if we have enough capacity in the reservoir or battery
@@ -97,7 +97,7 @@ class CycleSim():
         elif self.subtractFromBattery(self.consumptionValues[self.hourCount]):
             self.animateCityLights(self.consumptionValues[self.hourCount], values.MAX_CONSUMPTION, values.MIN_CONSUMPTION)
         else:
-            self.board.setCityLEDs((0,0,0))      
+            self.board.lightCityBlocks(0)      
             print("Energy depleted!")
             self.stillRunning = False
             return
@@ -116,7 +116,7 @@ class CycleSim():
         windPower = 0
         totalRenewableSupply = self.solarGenerationValues[self.hourCount] + self.reservoirPower
 
-        if self.board.areWindmillsOn():
+        if self.board.windmills.areWindmillsOn():
             windPower += self.windPowerGenerationUnits
             totalRenewableSupply += self.windPowerGenerationUnits
 
@@ -130,10 +130,9 @@ class CycleSim():
 
         if self.randomiseWind:
             if self.windPowerGenerationUnits != 0:
-                self.board.driveWindmills()
-                self.board.pulseFuelCell()
+                self.board.windmills.startWindmills()
             else:
-                self.board.stopWindmills()
+                self.board.windmills.stopWindmills()
         else:
             if self.windPresent:
                 self.animateWindmillsRegular()
@@ -216,13 +215,12 @@ class CycleSim():
 
     def animateWindmillsRegular(self):
         if self.windStateCount == self.windmillSwitchingPeriod:
-            currentWindState = self.board.areWindmillsOn()
+            currentWindState = self.board.windmills.areWindmillsOn()
             self.windStateCount = 1
             if currentWindState:
-                self.board.stopWindmills()
+                self.board.windmills.stopWindmills()
             else:
-                self.board.driveWindmills()
-                self.board.pulseFuelCell()
+                self.board.windmills.startWindmills()
         else:
             self.windStateCount += 1
 
@@ -256,17 +254,9 @@ class CycleSim():
         # self.graphManager.configure(maxPower, -values.RESERVOIR_RECHARGE_RATE, maxPowerSum, -values.MAX_CONSUMPTION - values.RESERVOIR_RECHARGE_RATE)
 
     def animateBattery(self):
-        #changes colour when windmills are being driven
-        if self.board.areWindmillsOn():
-            batteryLEDcolour = (int(values.LED_BLUE_MAX[0] * (self.batteryRemaining/100)),
-            int(values.LED_BLUE_MAX[1] * (self.batteryRemaining/100)),
-            int(values.LED_BLUE_MAX[2] * (self.batteryRemaining/100)))
-        else:
-            batteryLEDcolour = (int(values.LED_YELLOW_MAX[0] * (self.batteryRemaining/100)),
-            int((values.LED_YELLOW_MAX[1] * (self.batteryRemaining/100))),
-            int((values.LED_YELLOW_MAX[2] * (self.batteryRemaining/100))))
-
-        self.board.setFuelCellLEDs(batteryLEDcolour)             
+        #changes colour when windmills are being driven        
+        self.board.fuelCell.setEnergyLevel(self.batteryRemaining, True, self.board.windmills.areWindmillsOn())
+          
     
     def addToBattery(self, unitsToAdd):
         if (self.batteryRemaining + unitsToAdd) > 100:

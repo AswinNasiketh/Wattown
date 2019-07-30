@@ -22,6 +22,7 @@ def main():
     mpl.rcParams['toolbar'] = 'None'
     
     board = WattownBoard()
+    board.start()
 
     graphProcessManager = GraphsProcessManager()
     graphProcessManager.configure(values.GRAPH_MAX_POWER, values.GRAPH_MIN_POWER, values.GRAPH_MAX_CONS, values.GRAPH_MIN_CONS)
@@ -35,7 +36,7 @@ def main():
 
     root.mainloop()
 
-    board.resetBoard()
+    board.join()
     board.releaseResources()
     graphProcessManager.stopPlotting()
 
