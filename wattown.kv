@@ -1,0 +1,56 @@
+#:kivy 1.11.1
+
+<MainScreenManager>
+    SelectModeScreen:
+    InteractiveModeScreen:
+
+<SelectModeScreen>
+    name: 'selectMode'
+    GridLayout:
+        cols: 3
+        Button:
+            text: 'Interactive Mode'
+            font_size: 20
+            on_release: app.root.current = 'interactiveMode'
+        Button:
+            text: 'Cycle Mode'
+            font_size: 20
+        Button:
+            text: 'Substation Mode'
+            font_size: 20
+
+<InteractiveModeScreen>
+    name: 'interactiveMode'
+    BoxLayout:
+        orientation: 'vertical'
+        GridLayout:
+            cols: 2
+            Label:
+                text: 'Solar Panel Status:'
+            Label:
+                id: solarPanelStatusLabel
+                text: root.solarPanelStatus
+            Label:
+                text: 'Windmills Being Blown: '
+            Label:
+                id:numWindmillsOnLabel
+                text: str(root.numWindmillsOn)
+            Label:
+                text: 'City Powered (%)'
+            Label:
+                id:cityPoweredLabel
+                text: str(root.cityPowered)
+            Label:
+                text: 'Energy Stored (%)'
+            Label:
+                id:energyStoredLabel
+                text: str(root.storedEnergy)
+        Button:
+            text:'Stop'
+            font_size: 30
+            on_release: app.root.current = 'selectMode'
+        Button:
+            text: '+'
+            font_size:30
+            on_release: root.incrementProperties()
+        
