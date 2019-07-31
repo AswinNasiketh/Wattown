@@ -56,8 +56,8 @@ class WattownBoard(threading.Thread):
                 self.fuelCell.stopPulsing()
 
                 self.pixels.show()
-                self.windmills.update()
-                self.fuelCell.update()
+                self.windmills.update(0)
+                self.fuelCell.update(0)
 
         #provides interface with city lights coefficient 
         def lightCityBlocks(self, cityLightsCoefficient):
