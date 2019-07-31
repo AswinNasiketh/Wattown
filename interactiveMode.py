@@ -19,8 +19,6 @@ class InteractiveModeThread(threading.Thread):
         self.stopEvent.set()
         threading.Thread.join(self,timeOut)
 
-
-
 class InteractiveMode():
 
     def __init__(self, board):
@@ -41,9 +39,9 @@ class InteractiveMode():
     def iterateLoop(self):
 
         powerAvailableToConsume = 0
-        lightBlock1 = False
-        lightBlock2 = False
-        lightBlock3 = False
+        self.lightBlock1 = False
+        self.lightBlock2 = False
+        self.lightBlock3 = False
 
         self.previousBatteryLevel = self.currentBatteryLevel
 
@@ -52,9 +50,9 @@ class InteractiveMode():
 
         powerAvailableToConsume += self.WINDMILL_GENERATION_UNIT * self.getWindmillsBlown()
 
-        lightBlock1, powerAvailableToConsume = self.usePower(powerAvailableToConsume, self.CITY_CONSUMPTION_1_BLOCK)
-        lightBlock2, powerAvailableToConsume = self.usePower(powerAvailableToConsume, self.CITY_CONSUMPTION_ADDITIONAL_BLOCK)
-        lightBlock3, powerAvailableToConsume = self.usePower(powerAvailableToConsume, self.CITY_CONSUMPTION_ADDITIONAL_BLOCK)
+        self.lightBlock1, powerAvailableToConsume = self.usePower(powerAvailableToConsume, self.CITY_CONSUMPTION_1_BLOCK)
+        self.lightBlock2, powerAvailableToConsume = self.usePower(powerAvailableToConsume, self.CITY_CONSUMPTION_ADDITIONAL_BLOCK)
+        self.lightBlock3, powerAvailableToConsume = self.usePower(powerAvailableToConsume, self.CITY_CONSUMPTION_ADDITIONAL_BLOCK)
 
 
         if powerAvailableToConsume > 0 :
@@ -62,7 +60,7 @@ class InteractiveMode():
 
         self.animateBattery()
         self.animateReservoir()
-        self.animateCityLights(lightBlock1, lightBlock2, lightBlock3)
+        self.animateCityLights()
         print("Battery level: " + str(self.currentBatteryLevel))
         time.sleep(1)
         
@@ -96,17 +94,19 @@ class InteractiveMode():
         self.board.lightReservoir(self.currentBatteryLevel)
 
 
-    def animateCityLights(self, lightBlock1, lightBlock2, lightBlock3):
+    def animateCityLights(self):
         cityLightsCoefficient = 0.0
 
-        if lightBlock1:
+        if self.lightBlock1:
             cityLightsCoefficient += 0.33
 
-        if lightBlock2:
+        if self.lightBlock2:
             cityLightsCoefficient += 0.33
 
-        if lightBlock3:
+        if self.lightBlock3:
             cityLightsCoefficient += 0.33
+
+        self.cityPoweredPercent = round(cityLightsCoefficient * 100)
 
         self.board.lightCityBlocks(cityLightsCoefficient)
 
@@ -129,3 +129,6 @@ class InteractiveMode():
 
         if self.currentBatteryLevel > 100:
             self.currentBatteryLevel = 100
+
+    def getCityPoweredPercent(self):
+        return self.cityPoweredPercent
