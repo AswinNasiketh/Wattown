@@ -4,6 +4,9 @@ sys.path.append('/home/pi/.local/lib/python3.5/site-packages')
 import kivy
 kivy.require('1.11.1')
 
+from kivy.core.window import Window
+Window.fullscreen = 'auto'
+
 from kivy.app import App
 from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
@@ -16,6 +19,12 @@ from kivy.clock import Clock
 from wattownBoard import WattownBoard
 from interactiveMode import InteractiveModeThread
 from cycleSim import CycleSimThread
+
+class FieldLabel(Label):
+    pass
+
+class TitleLabel(Label):
+    pass
 
 class MainScreenManager(ScreenManager):
     pass

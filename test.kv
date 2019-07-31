@@ -1,5 +1,14 @@
 #:kivy 1.11.1
 
+<FieldLabel>
+    font_size:30
+
+<TitleLabel>
+    font_size:40
+
+<Button>
+    font_size:30
+    
 <TestScreenManager>
     SelectModeScreen:
     CycleModeConfigScreen:
@@ -9,30 +18,33 @@
     name: 'selectMode'
     BoxLayout:
         orientation: 'vertical'
-        Label:
+        TitleLabel:
             text: 'Select Mode to Run'
         GridLayout:
-            cols: 3
+            cols: 4
             Button:
                 text: 'Interactive Mode'
-                font_size: 20
+                font_size: 30
             Button:
                 text: 'Cycle Mode'
-                font_size: 20
+                font_size: 30
                 on_release: app.root.current = 'cycleModeConfig'
             Button:
                 text: 'Substation Mode'
-                font_size: 20
+                font_size: 30
+            Button:
+                text: 'Exit'
+                on_release: app.stop()
 
 <CycleModeConfigScreen>
     name: 'cycleModeConfig'
     BoxLayout:
         orientation: 'vertical'
-        Label:
+        TitleLabel:
             text: 'Cycle Mode Configuration'
         GridLayout:
             cols: 3
-            Label:
+            FieldLabel:
                 text: 'Wind Present?'
             ToggleButton:
                 id: windPresentYesButton
@@ -46,7 +58,7 @@
                 allow_no_selection: False        
         GridLayout:
             cols: 3
-            Label:
+            FieldLabel:
                 text: 'Randomise Wind?'
             ToggleButton:
                 id: randomiseWindYesButton
@@ -62,9 +74,9 @@
                 on_press: root.toggleWindControls(True)
         GridLayout:
             cols: 4
-            Label:
+            FieldLabel:
                 text: 'Wind Amplitude:'
-            Label:
+            FieldLabel:
                 text: str(root.windAmplitude)
             Button:
                 id: windAmpPlusButton
@@ -78,9 +90,9 @@
                 disabled : True
         GridLayout:
             cols: 4
-            Label:
+            FieldLabel:
                 text: 'Wind toggles every (hours):'
-            Label:
+            FieldLabel:
                 text: str(root.windSwitchingPeriod)
             Button:
                 id: windTogglePlusButton
@@ -94,7 +106,7 @@
                 disabled : True
         GridLayout:
             cols: 3
-            Label:
+            FieldLabel:
                 text: 'Sunny/Cloudy Day?'
             ToggleButton:
                 id: sunnyButton
@@ -108,9 +120,9 @@
                 allow_no_selection: False
         GridLayout:
             cols: 4
-            Label:
+            FieldLabel:
                 text: 'Daylight Hours:'
-            Label:
+            FieldLabel:
                 text: str(root.daylightHours)
             Button:
                 text: '+'
@@ -120,9 +132,9 @@
                 on_release: root.decrementDaylightHours()
         GridLayout:
             cols: 4
-            Label:
+            FieldLabel:
                 text: 'Days to Simulate:'
-            Label:
+            FieldLabel:
                 text: str(root.numDaysToSimulate)
             Button:
                 text: '+'
@@ -143,61 +155,65 @@
     name: 'cycleMode'
     BoxLayout:
         orientation: 'vertical'
-        Label:
+        TitleLabel:
             text: 'Cycle Mode'
-
+            size_hint_y:0.2
         GridLayout:
-            cols: 2
-            Label:
-                text: 'Wind Power:'
-            Label:
-                text: '0' + ' GW' #add numeric property
-            Label:
-                text: 'Solar Power:'
-            Label:
-                text: '0' + ' GW' #add numeric property
-            Label:
-                text: 'Hydroelectric Power:'
-            Label:
-                text: '0' + ' GW' #add numeric property
-                #add on_text for colour changing
-        GridLayout:
-            cols: 2
-            Label:
-                text: 'City Consumption:'
-            Label:
-                text: '0' + ' GW' #add numeric property
-            Label:
-                text: 'Total Renewable Supply:'
-            Label:
-                text: '0' + ' GW' #add numeric property
-            Label:
-                text: 'Renewable Surplus/Shortage:'
-            Label:
-                text: '0' + ' GWh' #add numeric property
-                #add on_text for colour changing
-        GridLayout:
-            cols: 2
-            Label:
-                text: 'Battery Energy:'
-            Label:
-                text: '0' + ' GWh' #add numeric property
-            Label:
-                text: 'Reservoir Energy:'
-            Label:
-                text: '0' + ' GWh' #add numeric property
-        
-        GridLayout:
-            cols: 2
-            Label:
-                text: 'Day:'
-            Label:
-                text: '0' #add numeric property
-            Label:
-                text: 'Hour:'
-            Label:
-                text: '0' #add numeric property
+            cols:2
+            size_hint_y:0.6
+            GridLayout:
+                cols: 2
+                FieldLabel:
+                    text: 'Wind Power:'
+                FieldLabel:
+                    text: '0' + ' GW' #add numeric property
+                FieldLabel:
+                    text: 'Solar Power:'
+                FieldLabel:
+                    text: '0' + ' GW' #add numeric property
+                FieldLabel:
+                    text: 'Hydroelectric Power:'
+                FieldLabel:
+                    text: '0' + ' GW' #add numeric property
+                    #add on_text for colour changing
+            GridLayout:
+                cols: 2
+                FieldLabel:
+                    text: 'City Consumption:'
+                FieldLabel:
+                    text: '0' + ' GW' #add numeric property
+                FieldLabel:
+                    text: 'Total Renewable Supply:'
+                FieldLabel:
+                    text: '0' + ' GW' #add numeric property
+                FieldLabel:
+                    text: 'Renewable Surplus/Shortage:'
+                FieldLabel:
+                    text: '0' + ' GWh' #add numeric property
+                    #add on_text for colour changing
+            GridLayout:
+                cols: 2
+                FieldLabel:
+                    text: 'Battery Energy:'
+                FieldLabel:
+                    text: '0' + ' GWh' #add numeric property
+                FieldLabel:
+                    text: 'Reservoir Energy:'
+                FieldLabel:
+                    text: '0' + ' GWh' #add numeric property
+            
+            GridLayout:
+                cols: 2
+                FieldLabel:
+                    text: 'Day:'
+                FieldLabel:
+                    text: '0' #add numeric property
+                FieldLabel:
+                    text: 'Hour:'
+                FieldLabel:
+                    text: '0' #add numeric property
 
         Button:
             text: 'Stop/Finish'
             on_release: app.root.current = 'selectMode'
+            size_hint_y: 0.2

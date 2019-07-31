@@ -2,6 +2,9 @@
 import kivy
 kivy.require('1.11.1')
 
+from kivy.core.window import Window
+Window.fullscreen = 'auto'
+
 from kivy.app import App
 from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
@@ -11,6 +14,11 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.properties import StringProperty, NumericProperty
 from kivy.clock import Clock
 
+class FieldLabel(Label):
+    pass
+
+class TitleLabel(Label):
+    pass
 
 class TestScreenManager(ScreenManager):
     pass
