@@ -21,6 +21,8 @@ class SelectModeScreen(Screen):
 class CycleModeConfigScreen(Screen):
     daylightHours = NumericProperty(12)
     numDaysToSimulate = NumericProperty(1)
+    windAmplitude = NumericProperty(1)
+    windSwitchingPeriod = NumericProperty(1)
 
     def stateToBool(self, state):
         return state == 'down'
@@ -36,6 +38,8 @@ class CycleModeConfigScreen(Screen):
 
         print('daylight horus', self.daylightHours)
         print('days to simulate', self.numDaysToSimulate)
+
+        self.manager.current = 'cycleMode'
 
     def incrementDaylightHours(self):
         self.daylightHours += 1
@@ -53,6 +57,52 @@ class CycleModeConfigScreen(Screen):
 
         if self.numDaysToSimulate < 0:
             self.numDaysToSimulate = 0
+
+    def incrementWindAmplitude(self):
+        self.windAmplitude += 1
+
+        if self.windAmplitude > 10:
+            self.windAmplitude = 1
+    
+    def decrementWindAmplitude(self):
+        self.windAmplitude -= 1
+
+        if self.windAmplitude < 1:
+            self.windAmplitude = 10
+
+    def incrementSwitchingPeriod(self):
+        self.windSwitchingPeriod += 1
+
+        if self.windSwitchingPeriod > 23:
+            self.windSwitchingPeriod = 1
+    
+    def decrementSwitchingPeriod(self):
+        self.windSwitchingPeriod -= 1
+
+        if self.windSwitchingPeriod < 1:
+            self.windSwitchingPeriod = 23
+
+    def toggleWindControls(self, enable):
+        windAmpPlusButton = self.ids.windAmpPlusButton
+        windAmpMinusButton = self.ids.windAmpMinusButton
+        windTogglePlusButton = self.ids.windTogglePlusButton
+        windToggleMinusButton = self.ids.windToggleMinusButton
+
+        if enable:
+            windAmpMinusButton.disabled = False
+            windAmpPlusButton.disabled = False
+            windToggleMinusButton.disabled = False
+            windTogglePlusButton.disabled = False
+        else:
+            windAmpMinusButton.disabled = True
+            windAmpPlusButton.disabled = True
+            windToggleMinusButton.disabled = True
+            windTogglePlusButton.disabled = True
+
+
+
+class CycleModeScreen(Screen):
+    pass
 
 class TestApp(App):
 

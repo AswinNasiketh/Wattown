@@ -4,9 +4,12 @@
     SelectModeScreen:
     InteractiveModeScreen:
     CycleModeConfigScreen:
+    CycleModeScreen:
 
 <SelectModeScreen>
     name: 'selectMode'
+    Label:
+        text: 'Select Mode to Run'
     GridLayout:
         cols: 3
         Button:
@@ -16,6 +19,7 @@
         Button:
             text: 'Cycle Mode'
             font_size: 20
+            on_release: root.configureCycleMode()
         Button:
             text: 'Substation Mode'
             font_size: 20
@@ -24,6 +28,8 @@
     name: 'interactiveMode'
     BoxLayout:
         orientation: 'vertical'
+        Label:
+            text: 'Interactive Mode'
         GridLayout:
             cols: 2
             Label:
@@ -50,15 +56,17 @@
             text:'Stop'
             font_size: 30
             on_release: root.stopInteractiveMode()
-        Button:
-            text: '+'
-            font_size:30
-            on_release: root.incrementProperties()
+        # Button:
+        #     text: '+'
+        #     font_size:30
+        #     on_release: root.incrementProperties()
 
 <CycleModeConfigScreen>
     name: 'cycleModeConfig'
     BoxLayout:
         orientation: 'vertical'
+        Label:
+            text: 'Cycle Mode Configuration'
         GridLayout:
             cols: 3
             Label:
@@ -72,7 +80,7 @@
             ToggleButton:
                 text: 'No'
                 group: 'windPresent'
-                allow_no_selection: False
+                allow_no_selection: False        
         GridLayout:
             cols: 3
             Label:
@@ -83,10 +91,44 @@
                 group: 'randomiseWind'
                 state: 'down'
                 allow_no_selection: False
+                on_press: root.toggleWindControls(False)
             ToggleButton:
                 text: 'No'
                 group: 'randomiseWind'
                 allow_no_selection: False
+                on_press: root.toggleWindControls(True)
+        GridLayout:
+            cols: 4
+            Label:
+                text: 'Wind Amplitude:'
+            Label:
+                text: str(root.windAmplitude)
+            Button:
+                id: windAmpPlusButton
+                text: '+'
+                on_release: root.incrementWindAmplitude()
+                disabled : True
+            Button:
+                id: windAmpMinusButton
+                text: '-'
+                on_release: root.decrementWindAmplitude()
+                disabled : True
+        GridLayout:
+            cols: 4
+            Label:
+                text: 'Wind toggles every (hours):'
+            Label:
+                text: str(root.windSwitchingPeriod)
+            Button:
+                id: windTogglePlusButton
+                text: '+'
+                on_release: root.incrementSwitchingPeriod()
+                disabled : True
+            Button:
+                id: windToggleMinusButton
+                text: '-'
+                on_release: root.decrementSwitchingPeriod()
+                disabled : True
         GridLayout:
             cols: 3
             Label:
@@ -134,3 +176,70 @@
                 text: 'Start'
                 on_release: root.startCycleMode()
 
+<CycleModeScreen>
+    name: 'cycleMode'
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: 'Cycle Mode'
+
+        GridLayout:
+            cols: 2
+            Label:
+                text: 'Wind Power:'
+            Label:
+                text: str(root.windPower) + ' GW' 
+                color: [0,1,0,1]#r, g, b, a
+            Label:
+                text: 'Solar Power:'
+            Label:
+                text: str(root.solarPower) + ' GW' 
+                color: [0,1,0,1] 
+            Label:                
+                text: 'Hydroelectric Power:'
+            Label:
+                id: hydroPowerValueLabel
+                text: str(root.hydroPower) + ' GW' 
+        GridLayout:
+            cols: 2
+            Label:
+                text: 'City Consumption:'
+            Label:
+                text: str(root.consumption) + ' GW'
+                color: [1, 0, 0, 1]
+            Label:
+                text: 'Total Renewable Supply:'
+            Label:
+                id: renewableSupplyLabel
+                text: str(root.renewableSupply) + ' GW' 
+            Label:
+                text: 'Renewable Surplus/Shortage:'
+            Label:
+                id: surplusValueLabel
+                text: str(root.renewableSurplus) + ' GW' 
+        GridLayout:
+            cols: 2
+            Label:
+                text: 'Battery Energy:'
+            Label:
+                text: str(root.batteryEnergy) + ' GWh' 
+            Label:
+                text: 'Reservoir Energy:'
+            Label:
+                text: str(root.hydroEnergy) + ' GWh'
+        
+        GridLayout:
+            cols: 2
+            Label:
+                text: 'Day:'
+            Label:
+                text: str(root.day)
+            Label:
+                text: 'Hour:'
+            Label:
+                text: str(root.hour)
+
+        Button:
+            text: 'Stop/Finish'
+            on_release: root.stopCycleMode()
+        

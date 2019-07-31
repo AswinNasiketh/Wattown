@@ -3,26 +3,33 @@
 <TestScreenManager>
     SelectModeScreen:
     CycleModeConfigScreen:
+    CycleModeScreen:
 
 <SelectModeScreen>
     name: 'selectMode'
-    GridLayout:
-        cols: 3
-        Button:
-            text: 'Interactive Mode'
-            font_size: 20
-        Button:
-            text: 'Cycle Mode'
-            font_size: 20
-            on_release: app.root.current = 'cycleModeConfig'
-        Button:
-            text: 'Substation Mode'
-            font_size: 20
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: 'Select Mode to Run'
+        GridLayout:
+            cols: 3
+            Button:
+                text: 'Interactive Mode'
+                font_size: 20
+            Button:
+                text: 'Cycle Mode'
+                font_size: 20
+                on_release: app.root.current = 'cycleModeConfig'
+            Button:
+                text: 'Substation Mode'
+                font_size: 20
 
 <CycleModeConfigScreen>
     name: 'cycleModeConfig'
     BoxLayout:
         orientation: 'vertical'
+        Label:
+            text: 'Cycle Mode Configuration'
         GridLayout:
             cols: 3
             Label:
@@ -36,7 +43,7 @@
             ToggleButton:
                 text: 'No'
                 group: 'windPresent'
-                allow_no_selection: False
+                allow_no_selection: False        
         GridLayout:
             cols: 3
             Label:
@@ -47,10 +54,44 @@
                 group: 'randomiseWind'
                 state: 'down'
                 allow_no_selection: False
+                on_press: root.toggleWindControls(False)
             ToggleButton:
                 text: 'No'
                 group: 'randomiseWind'
                 allow_no_selection: False
+                on_press: root.toggleWindControls(True)
+        GridLayout:
+            cols: 4
+            Label:
+                text: 'Wind Amplitude:'
+            Label:
+                text: str(root.windAmplitude)
+            Button:
+                id: windAmpPlusButton
+                text: '+'
+                on_release: root.incrementWindAmplitude()
+                disabled : True
+            Button:
+                id: windAmpMinusButton
+                text: '-'
+                on_release: root.decrementWindAmplitude()
+                disabled : True
+        GridLayout:
+            cols: 4
+            Label:
+                text: 'Wind toggles every (hours):'
+            Label:
+                text: str(root.windSwitchingPeriod)
+            Button:
+                id: windTogglePlusButton
+                text: '+'
+                on_release: root.incrementSwitchingPeriod()
+                disabled : True
+            Button:
+                id: windToggleMinusButton
+                text: '-'
+                on_release: root.decrementSwitchingPeriod()
+                disabled : True
         GridLayout:
             cols: 3
             Label:
@@ -97,3 +138,66 @@
             Button:
                 text: 'Start'
                 on_release: root.startCycleMode()
+
+<CycleModeScreen>
+    name: 'cycleMode'
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: 'Cycle Mode'
+
+        GridLayout:
+            cols: 2
+            Label:
+                text: 'Wind Power:'
+            Label:
+                text: '0' + ' GW' #add numeric property
+            Label:
+                text: 'Solar Power:'
+            Label:
+                text: '0' + ' GW' #add numeric property
+            Label:
+                text: 'Hydroelectric Power:'
+            Label:
+                text: '0' + ' GW' #add numeric property
+                #add on_text for colour changing
+        GridLayout:
+            cols: 2
+            Label:
+                text: 'City Consumption:'
+            Label:
+                text: '0' + ' GW' #add numeric property
+            Label:
+                text: 'Total Renewable Supply:'
+            Label:
+                text: '0' + ' GW' #add numeric property
+            Label:
+                text: 'Renewable Surplus/Shortage:'
+            Label:
+                text: '0' + ' GWh' #add numeric property
+                #add on_text for colour changing
+        GridLayout:
+            cols: 2
+            Label:
+                text: 'Battery Energy:'
+            Label:
+                text: '0' + ' GWh' #add numeric property
+            Label:
+                text: 'Reservoir Energy:'
+            Label:
+                text: '0' + ' GWh' #add numeric property
+        
+        GridLayout:
+            cols: 2
+            Label:
+                text: 'Day:'
+            Label:
+                text: '0' #add numeric property
+            Label:
+                text: 'Hour:'
+            Label:
+                text: '0' #add numeric property
+
+        Button:
+            text: 'Stop/Finish'
+            on_release: app.root.current = 'selectMode'
