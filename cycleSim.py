@@ -8,19 +8,19 @@ import threading
 
 class CycleSimThread(threading.Thread):
     
-    def __init__(self, board, mainWindow, graphManager):
-        self.graphManager = graphManager
+    def __init__(self, board):
+        # self.graphManager = graphManager
         self.board = board
-        self.cycleModeObj = CycleSim(board, self.graphManager)
+        self.cycleModeObj = CycleSim(board)
         self.stopEvent = threading.Event()
-        self.mainWindow = mainWindow
+        # self.mainWindow = mainWindow
         board.resetBoard()
         threading.Thread.__init__(self)
         
 
     def run(self):
         self.stopEvent.clear()
-        self.graphManager.showPlots()
+        # self.graphManager.showPlots()
         while (not self.stopEvent.is_set()) and (self.cycleModeObj.getStillRunning()):
             self.cycleModeObj.iterateLoop()
 
@@ -28,9 +28,9 @@ class CycleSimThread(threading.Thread):
             self.cleanUp()
 
     def cleanUp(self):
-        self.graphManager.hidePlots()
+        # self.graphManager.hidePlots()
         self.board.resetBoard()
-        self.mainWindow.setTaskRunning(False)
+        # self.mainWindow.setTaskRunning(False)
 
     def join(self, timeOut = None):
         self.stopEvent.set()  
@@ -48,9 +48,9 @@ class CycleSim():
     #Solar and wind sources charge battery
     #battery pumps water to reservoir reservoir during night
 
-    def __init__(self, board, graphManager):
+    def __init__(self, board):
         self.board = board
-        self.graphManager = graphManager
+        # self.graphManager = graphManager
 
         self.batteryRemaining = 50 #percentage
         self.reservoirLevel = 50 #percentage
@@ -113,16 +113,16 @@ class CycleSim():
        
 
         #plotting
-        windPower = 0
-        totalRenewableSupply = self.solarGenerationValues[self.hourCount] + self.reservoirPower
+        self.windPower = 0
+        self.totalRenewableSupply = self.solarGenerationValues[self.hourCount] + self.reservoirPower
 
         if self.board.windmills.areWindmillsOn():
-            windPower += self.windPowerGenerationUnits
-            totalRenewableSupply += self.windPowerGenerationUnits
+            self.windPower += self.windPowerGenerationUnits
+            self.totalRenewableSupply += self.windPowerGenerationUnits
 
-        self.graphManager.setRenewablePowers(self.solarGenerationValues[self.hourCount], windPower, self.reservoirPower)
-        self.graphManager.setSupplyDemand(totalRenewableSupply, self.consumptionValues[self.hourCount])
-        self.graphManager.setStoredEnergy(self.batteryRemaining, self.reservoirLevel)
+        # self.graphManager.setRenewablePowers(self.solarGenerationValues[self.hourCount], windPower, self.reservoirPower)
+        # self.graphManager.setSupplyDemand(totalRenewableSupply, self.consumptionValues[self.hourCount])
+        # self.graphManager.setStoredEnergy(self.batteryRemaining, self.reservoirLevel)
 
         #storage animation
         self.board.lightReservoir(self.reservoirLevel)
@@ -146,6 +146,18 @@ class CycleSim():
         # print("Battery Charging: ", str(self.batteryCharging))
 
         time.sleep(1.5)
+
+    def getUIData(self):
+        return [self.solarGenerationValues[self.hourCount], 
+        self.windPower,
+        self.reservoirPower,
+        self.consumptionValues[self.hourCount],
+        self.totalRenewableSupply,
+        self.batteryRemaining,
+        self.reservoirLevel,
+        self.dayCount,
+        self.hourCount]
+
 
     def getStillRunning(self):
         return self.stillRunning
@@ -243,13 +255,13 @@ class CycleSim():
             self.windPowerGenerationUnits = 0
 
 
-        if typeOfDay == "Sunny":
-            maxPower = max(values.MAX_WIND_POWER_GENERATION, values.SUNNY_DAY_SOLAR_GENERATION, values.MAX_CONSUMPTION)
-            maxPowerSum = values.MAX_WIND_POWER_GENERATION + values.SUNNY_DAY_SOLAR_GENERATION + values.MAX_CONSUMPTION
+        # if typeOfDay == "Sunny":
+        #     maxPower = max(values.MAX_WIND_POWER_GENERATION, values.SUNNY_DAY_SOLAR_GENERATION, values.MAX_CONSUMPTION)
+        #     maxPowerSum = values.MAX_WIND_POWER_GENERATION + values.SUNNY_DAY_SOLAR_GENERATION + values.MAX_CONSUMPTION
             
-        else:
-            maxPower = max(values.MAX_WIND_POWER_GENERATION, values.CLOUDY_DAY_SOLAR_GENERATION, values.MAX_CONSUMPTION)
-            maxPowerSum = values.MAX_WIND_POWER_GENERATION + values.CLOUDY_DAY_SOLAR_GENERATION + values.MAX_CONSUMPTION
+        # else:
+        #     maxPower = max(values.MAX_WIND_POWER_GENERATION, values.CLOUDY_DAY_SOLAR_GENERATION, values.MAX_CONSUMPTION)
+        #     maxPowerSum = values.MAX_WIND_POWER_GENERATION + values.CLOUDY_DAY_SOLAR_GENERATION + values.MAX_CONSUMPTION
 
         # self.graphManager.configure(maxPower, -values.RESERVOIR_RECHARGE_RATE, maxPowerSum, -values.MAX_CONSUMPTION - values.RESERVOIR_RECHARGE_RATE)
 
