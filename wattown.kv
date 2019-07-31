@@ -3,6 +3,7 @@
 <MainScreenManager>
     SelectModeScreen:
     InteractiveModeScreen:
+    CycleModeConfigScreen:
 
 <SelectModeScreen>
     name: 'selectMode'
@@ -11,7 +12,7 @@
         Button:
             text: 'Interactive Mode'
             font_size: 20
-            on_release: app.root.current = 'interactiveMode'
+            on_release: root.startInteractiveMode()
         Button:
             text: 'Cycle Mode'
             font_size: 20
@@ -48,9 +49,88 @@
         Button:
             text:'Stop'
             font_size: 30
-            on_release: app.root.current = 'selectMode'
+            on_release: root.stopInteractiveMode()
         Button:
             text: '+'
             font_size:30
             on_release: root.incrementProperties()
-        
+
+<CycleModeConfigScreen>
+    name: 'cycleModeConfig'
+    BoxLayout:
+        orientation: 'vertical'
+        GridLayout:
+            cols: 3
+            Label:
+                text: 'Wind Present?'
+            ToggleButton:
+                id: windPresentYesButton
+                text: 'Yes'
+                group: 'windPresent'
+                state: 'down'
+                allow_no_selection: False
+            ToggleButton:
+                text: 'No'
+                group: 'windPresent'
+                allow_no_selection: False
+        GridLayout:
+            cols: 3
+            Label:
+                text: 'Randomise Wind?'
+            ToggleButton:
+                id: randomiseWindYesButton
+                text: 'Yes'
+                group: 'randomiseWind'
+                state: 'down'
+                allow_no_selection: False
+            ToggleButton:
+                text: 'No'
+                group: 'randomiseWind'
+                allow_no_selection: False
+        GridLayout:
+            cols: 3
+            Label:
+                text: 'Sunny/Cloudy Day?'
+            ToggleButton:
+                id: sunnyButton
+                text: 'Sunny'
+                group: 'cloudCover'
+                state: 'down'
+                allow_no_selection: False
+            ToggleButton:
+                text: 'Cloudy'
+                group: 'cloudCover'
+                allow_no_selection: False
+        GridLayout:
+            cols: 4
+            Label:
+                text: 'Daylight Hours:'
+            Label:
+                text: str(root.daylightHours)
+            Button:
+                text: '+'
+                on_release: root.incrementDaylightHours()
+            Button:
+                text: '-'
+                on_release: root.decrementDaylightHours()
+        GridLayout:
+            cols: 4
+            Label:
+                text: 'Days to Simulate:'
+            Label:
+                text: str(root.numDaysToSimulate)
+            Button:
+                text: '+'
+                on_release: root.numDaysToSimulate += 1
+            Button:
+                text: '-'
+                on_release: root.decrementDaysToSimulate()
+        GridLayout:
+            cols: 2
+            Button:
+                text: 'Back'
+                on_release: app.root.current = 'selectMode'
+            Button:
+                text: 'Start'
+                on_release: root.startCycleMode()
+
