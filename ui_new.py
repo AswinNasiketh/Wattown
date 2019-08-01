@@ -4,6 +4,9 @@ sys.path.append('/home/pi/.local/lib/python3.5/site-packages')
 import kivy
 kivy.require('1.11.1')
 
+from kivy.core.window import Window
+Window.fullscreen = 'auto'
+
 from kivy.app import App
 from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
@@ -16,6 +19,12 @@ from kivy.clock import Clock
 from wattownBoard import WattownBoard
 from interactiveMode import InteractiveModeThread
 from cycleSim import CycleSimThread
+
+class FieldLabel(Label):
+    pass
+
+class TitleLabel(Label):
+    pass
 
 class MainScreenManager(ScreenManager):
     pass
@@ -188,6 +197,10 @@ class CycleModeScreen(Screen):
     hydroEnergy = NumericProperty(0)
     day = NumericProperty(0)
     hour = NumericProperty(0)
+
+
+    def setSimThread(self, simThread):
+        self.cycleSimThread = simThread
     
     def startCycleMode(self, simThread):
         self.cycleSimThread = simThread
@@ -205,16 +218,16 @@ class CycleModeScreen(Screen):
         renewableSupplyLabel = self.ids.renewableSupplyLabel
         surplusValueLabel = self.ids.surplusValueLabel
 
-        self.windPower = UIData[0]
-        self.solarPower = UIData[1]
-        self.hydroPower = UIData[2]
-        self.consumption = UIData[3]
-        self.renewableSupply = UIData[4]
-        self.renewableSurplus = self.renewableSupply + self.consumption # consumption always negative
-        self.batteryEnergy = UIData[5]
-        self.hydroEnergy = UIData[6]
-        self.day = UIData[7]
-        self.hour = UIData[8]
+        self.windPower = round(UIData[0] , 2)
+        self.solarPower = round(UIData[1], 2)
+        self.hydroPower = round(UIData[2], 2)
+        self.consumption = round(UIData[3], 2)
+        self.renewableSupply = round(UIData[4], 2)
+        self.renewableSurplus = round(self.renewableSupply + self.consumption, 2) # consumption always negative
+        self.batteryEnergy = round(UIData[5], 2)
+        self.hydroEnergy = round(UIData[6], 2)
+        self.day = round(UIData[7], 2)
+        self.hour = round(UIData[8], 2)
 
         if self.hydroPower < 0:
             hydroPowerValueLabel.color = [1,0,0,1] #r, g, b, a

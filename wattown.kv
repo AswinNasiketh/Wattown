@@ -1,5 +1,14 @@
 #:kivy 1.11.1
 
+<FieldLabel>
+    font_size:30
+
+<TitleLabel>
+    font_size:40
+
+<Button>
+    font_size:30
+
 <MainScreenManager>
     SelectModeScreen:
     InteractiveModeScreen:
@@ -8,68 +17,69 @@
 
 <SelectModeScreen>
     name: 'selectMode'
-    Label:
+    TitleLabel:
         text: 'Select Mode to Run'
     GridLayout:
-        cols: 3
+        cols: 4
         Button:
             text: 'Interactive Mode'
-            font_size: 20
             on_release: root.startInteractiveMode()
         Button:
             text: 'Cycle Mode'
-            font_size: 20
             on_release: root.configureCycleMode()
         Button:
             text: 'Substation Mode'
-            font_size: 20
+        Button:
+            text: 'Exit'
+            on_release: app.stop()
+
 
 <InteractiveModeScreen>
     name: 'interactiveMode'
     BoxLayout:
         orientation: 'vertical'
-        Label:
+        TitleLabel:
             text: 'Interactive Mode'
         GridLayout:
             cols: 2
-            Label:
+            FieldLabel:
                 text: 'Solar Panel Status:'
-            Label:
+            FieldLabel:
                 id: solarPanelStatusLabel
                 text: root.solarPanelStatus
-            Label:
+            FieldLabel:
                 text: 'Windmills Being Blown: '
-            Label:
+            FieldLabel:
                 id:numWindmillsOnLabel
                 text: str(root.numWindmillsOn)
-            Label:
+            FieldLabel:
                 text: 'City Powered (%)'
-            Label:
+            FieldLabel:
                 id:cityPoweredLabel
                 text: str(root.cityPowered)
-            Label:
+            FieldLabel:
                 text: 'Energy Stored (%)'
-            Label:
+            FieldLabel:
                 id:energyStoredLabel
                 text: str(root.storedEnergy)
         Button:
             text:'Stop'
             font_size: 30
             on_release: root.stopInteractiveMode()
-        Button:
-            text: '+'
-            font_size:30
-            on_release: root.incrementProperties()
+        # Button:
+        #     text: '+'
+        #     font_size:30
+        #     on_release: root.incrementProperties()
 
 <CycleModeConfigScreen>
     name: 'cycleModeConfig'
     BoxLayout:
         orientation: 'vertical'
-        Label:
+        TitleLabel:
             text: 'Cycle Mode Configuration'
         GridLayout:
             cols: 3
-            Label:
+            FieldLabel:
                 text: 'Wind Present?'
             ToggleButton:
                 id: windPresentYesButton
@@ -83,7 +93,7 @@
                 allow_no_selection: False        
         GridLayout:
             cols: 3
-            Label:
+            FieldLabel:
                 text: 'Randomise Wind?'
             ToggleButton:
                 id: randomiseWindYesButton
@@ -99,9 +109,9 @@
                 on_press: root.toggleWindControls(True)
         GridLayout:
             cols: 4
-            Label:
+            FieldLabel:
                 text: 'Wind Amplitude:'
-            Label:
+            FieldLabel:
                 text: str(root.windAmplitude)
             Button:
                 id: windAmpPlusButton
@@ -115,9 +125,9 @@
                 disabled : True
         GridLayout:
             cols: 4
-            Label:
+            FieldLabel:
                 text: 'Wind toggles every (hours):'
-            Label:
+            FieldLabel:
                 text: str(root.windSwitchingPeriod)
             Button:
                 id: windTogglePlusButton
@@ -131,7 +141,7 @@
                 disabled : True
         GridLayout:
             cols: 3
-            Label:
+            FieldLabel:
                 text: 'Sunny/Cloudy Day?'
             ToggleButton:
                 id: sunnyButton
@@ -145,9 +155,9 @@
                 allow_no_selection: False
         GridLayout:
             cols: 4
-            Label:
+            FieldLabel:
                 text: 'Daylight Hours:'
-            Label:
+            FieldLabel:
                 text: str(root.daylightHours)
             Button:
                 text: '+'
@@ -157,9 +167,9 @@
                 on_release: root.decrementDaylightHours()
         GridLayout:
             cols: 4
-            Label:
+            FieldLabel:
                 text: 'Days to Simulate:'
-            Label:
+            FieldLabel:
                 text: str(root.numDaysToSimulate)
             Button:
                 text: '+'
@@ -180,63 +190,63 @@
     name: 'cycleMode'
     BoxLayout:
         orientation: 'vertical'
-        Label:
+        TitleLabel:
             text: 'Cycle Mode'
 
         GridLayout:
             cols: 2
-            Label:
+            FieldLabel:
                 text: 'Wind Power:'
-            Label:
+            FieldLabel:
                 text: str(root.windPower) + ' GW' 
                 color: [0,1,0,1]#r, g, b, a
-            Label:
+            FieldLabel:
                 text: 'Solar Power:'
-            Label:
+            FieldLabel:
                 text: str(root.solarPower) + ' GW' 
                 color: [0,1,0,1] 
-            Label:
-                id: hydroPowerValueLabel
+            FieldLabel:                
                 text: 'Hydroelectric Power:'
-            Label:
+            FieldLabel:
+                id: hydroPowerValueLabel
                 text: str(root.hydroPower) + ' GW' 
         GridLayout:
             cols: 2
-            Label:
+            FieldLabel:
                 text: 'City Consumption:'
-            Label:
+            FieldLabel:
                 text: str(root.consumption) + ' GW'
                 color: [1, 0, 0, 1]
-            Label:
+            FieldLabel:
                 text: 'Total Renewable Supply:'
-            Label:
+            FieldLabel:
                 id: renewableSupplyLabel
                 text: str(root.renewableSupply) + ' GW' 
-            Label:
+            FieldLabel:
                 text: 'Renewable Surplus/Shortage:'
-            Label:
+            FieldLabel:
                 id: surplusValueLabel
                 text: str(root.renewableSurplus) + ' GW' 
         GridLayout:
             cols: 2
-            Label:
+            FieldLabel:
                 text: 'Battery Energy:'
-            Label:
+            FieldLabel:
                 text: str(root.batteryEnergy) + ' GWh' 
-            Label:
+            FieldLabel:
                 text: 'Reservoir Energy:'
-            Label:
+            FieldLabel:
                 text: str(root.hydroEnergy) + ' GWh'
         
         GridLayout:
             cols: 2
-            Label:
+            FieldLabel:
                 text: 'Day:'
-            Label:
+            FieldLabel:
                 text: str(root.day)
-            Label:
+            FieldLabel:
                 text: 'Hour:'
-            Label:
+            FieldLabel:
                 text: str(root.hour)
 
         Button:
