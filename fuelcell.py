@@ -8,8 +8,8 @@ class FuelCell():
     PULSE_PERIOD = 500 #ms
     FUEL_CELL_PIN = 8
 
-    LED_FUEL_CELL_RANGE_LOWER = 112
-    LED_FUEL_CELL_RANGE_UPPER = 113 
+    LED_FUEL_CELL_RANGE_LOWER = 99
+    LED_FUEL_CELL_RANGE_UPPER = 100 
 
     def __init__(self, LEDHandle, pigpioHandle):
         self.LEDHandle = LEDHandle

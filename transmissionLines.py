@@ -1,8 +1,8 @@
 class TransmissionLines():
 
-    LEFT_TOWER_ADDRESS = 14
-    MIDDLE_TOWER_ADDRESS = 15
-    RIGHT_TOWER_ADDRESS = 16
+    LEFT_TOWER_ADDRESS = 115
+    MIDDLE_TOWER_ADDRESS = 114
+    RIGHT_TOWER_ADDRESS = 113
 
     def __init__(self, LEDHandle):
         self.LEDHandle = LEDHandle
