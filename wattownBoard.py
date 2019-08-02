@@ -41,7 +41,7 @@ class WattownBoard(threading.Thread):
                 threading.Thread.join(self, timeout)
 
         def run(self):
-                while not self.stopEvent.wait(0.2): # provides delay as well instead of sleep
+                while not self.stopEvent.wait(0.1): # provides delay as well instead of sleep
                         currentTime = self.getTimeMilliseconds()
                         self.pixels.show()
                         self.windmills.update(currentTime)
