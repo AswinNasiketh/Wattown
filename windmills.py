@@ -63,7 +63,6 @@ class Windmills():
     def update(self, currentTime):       
         if self.driveWindmills:
             timeElapsed = currentTime - self.timeOfLastChange
-            print("Windmill Time Elapsed", timeElapsed)
 
             if timeElapsed >= self.halfPeriod:
                 if self.positivePinOn:

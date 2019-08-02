@@ -130,8 +130,6 @@ class InteractiveMode():
         if self.lightBlock3:
             cityLightsCoefficient += 0.33
 
-        self.cityPoweredPercent = round(cityLightsCoefficient * 100)
-
         self.board.lightCityBlocks(cityLightsCoefficient)
 
 
@@ -155,4 +153,14 @@ class InteractiveMode():
             self.currentBatteryLevel = 100
 
     def getCityPoweredPercent(self):
-        return self.cityPoweredPercent
+        poweredPercent = 0.0
+        if self.lightBlock1:
+            poweredPercent += 33.3
+
+        if self.lightBlock2:
+            poweredPercent += 33.3
+
+        if self.lightBlock3:
+            poweredPercent += 33.3
+
+        return round(poweredPercent)
