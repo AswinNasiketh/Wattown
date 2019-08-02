@@ -61,10 +61,13 @@ class InteractiveMode():
         self.animateBattery()
         self.animateReservoir()
         self.animateCityLights()
+<<<<<<< HEAD
         self.animateTransmissionLine()
         self.animateDistributionLines()
         self.animateWattownSign()
         
+=======
+>>>>>>> 2a5a14efbaa5c998764efa834b4bddd4b128a4ad
         print("Battery level: " + str(self.currentBatteryLevel))
         time.sleep(1)
         
