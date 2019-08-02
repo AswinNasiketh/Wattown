@@ -6,6 +6,7 @@ class Windmills():
     DRIVE_FREQUENCY = 4 #Hz
     DRIVE_POSITIVE_PIN = 1
     DRIVE_NEGATIVE_PIN = 7
+    BLOW_THRESHOLD_VOLTAGE = 2.0
 
     #adc channels passed in as list
     def __init__(self, pigpioHandle, adcHandle):
@@ -22,6 +23,25 @@ class Windmills():
         self.windmill3 = AnalogIn(adcHandle, MCP.P3)
         self.windmill4 = AnalogIn(adcHandle, MCP.P4)
         self.windmill5 = AnalogIn(adcHandle, MCP.P5)
+
+    def numWindmillsBlown(self):
+        numWindmillsBlown = 0
+        if self.windmill1.voltage > self.BLOW_THRESHOLD_VOLTAGE:
+            numWindmillsBlown += 1
+
+        if self.windmill2.voltage > self.BLOW_THRESHOLD_VOLTAGE:
+            numWindmillsBlown += 1
+
+        if self.windmill3.voltage > self.BLOW_THRESHOLD_VOLTAGE:
+            numWindmillsBlown += 1
+
+        if self.windmill4.voltage > self.BLOW_THRESHOLD_VOLTAGE:
+            numWindmillsBlown += 1
+
+        if self.windmill5.voltage > self.BLOW_THRESHOLD_VOLTAGE:
+            numWindmillsBlown += 1
+        
+        return numWindmillsBlown
 
     def getWindmillVoltages(self):
         return [self.windmill1.voltage,
