@@ -61,9 +61,33 @@ class InteractiveMode():
         self.animateBattery()
         self.animateReservoir()
         self.animateCityLights()
+        self.animateTransmissionLine()
+        self.animateDistributionLines()
+        self.animateWattownSign()
+        
         print("Battery level: " + str(self.currentBatteryLevel))
         time.sleep(1)
         
+    def animateWattownSign(self):
+        if self.lightBlock3: #only turn on sign if there's sufficient power to turn on all of the city
+            self.board.wattownSign.turnOn()
+        else:
+            self.board.wattownSign.turnOff()
+
+    def animateTransmissionLine(self):
+        if self.lightBlock1: #signifies some power is flowing
+            self.board.transmissionLine.setAllTowersColour((50, 50, 50)) # white for in use
+        else:
+            self.board.transmissionLine.setAllTowersColour((58, 51, 4)) # yellow for not in use
+
+    def animateDistributionLines(self):
+        if self.lightBlock1: #signifies some power is flowing
+            self.board.distributionMiddle.startPowerFlow()
+            self.board.distributionRight.startPowerFlow()
+        else:
+            self.board.distributionMiddle.stopPowerFlow()
+            self.board.distributionRight.stopPowerFlow()
+
 
     def getWindmillsBlown(self):
         windmillsBlown = 0

@@ -6,13 +6,20 @@ import time
 import pigpio
 import neopixel
 import threading
+import time
+
 import values
+
+
 from reservoir import Reservoir
 from windmills import Windmills
 from solarPanels import SolarPanels
 from city import City
 from fuelcell import FuelCell
-import time
+from distributionLines import DistributionLine
+from transmissionLines import TransmissionLines
+from wattownSign import WattownSign
+
 
 class WattownBoard(threading.Thread):
         def __init__(self):
@@ -21,7 +28,7 @@ class WattownBoard(threading.Thread):
                 mcp = MCP.MCP3008(spi, cs)               
                 self.pi = pigpio.pi()       
 
-                self.NUM_NEOPIXELS = 117     
+                self.NUM_NEOPIXELS = 118    
                 self.pixels = neopixel.NeoPixel(board.D12, self.NUM_NEOPIXELS, auto_write = False)
 
                 self.reservoir = Reservoir(self.pixels)
@@ -29,6 +36,10 @@ class WattownBoard(threading.Thread):
                 self.solarPanels = SolarPanels(mcp)
                 self.city = City(self.pixels)
                 self.fuelCell = FuelCell(self.pixels, self.pi)
+                self.distributionMiddle = DistributionLine(self.pixels, 101, 4)
+                self.distributionRight = DistributionLine(self.pixels, 105, 5, True)
+                self.transmissionLine = TransmissionLines(self.pixels)
+                self.wattownSign = WattownSign(self.pixels)
 
                 self.stopEvent = threading.Event()
                 self.stopEvent.clear()
@@ -46,6 +57,8 @@ class WattownBoard(threading.Thread):
                         self.pixels.show()
                         self.windmills.update(currentTime)
                         self.fuelCell.update(currentTime)
+                        self.distributionMiddle.update(currentTime)
+                        self.distributionRight.update(currentTime)
 
         def releaseResources(self):
                 self.pi.stop()
@@ -58,6 +71,8 @@ class WattownBoard(threading.Thread):
                 self.pixels.show()
                 self.windmills.update(0)
                 self.fuelCell.update(0)
+                self.distributionMiddle.update(0)
+                self.distributionRight.update(0)
 
         #provides interface with city lights coefficient 
         def lightCityBlocks(self, cityLightsCoefficient):

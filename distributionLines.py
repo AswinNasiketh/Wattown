@@ -2,7 +2,7 @@ import values
 
 class DistributionLine():
 
-    ANIMATION_FRAME_RATE = 4 #changes per second
+    ANIMATION_FRAME_RATE = 5 #changes per second
 
     def __init__(self, LEDHandle, startLEDAddress, numLEDs, reversed = False):
         self.LEDHandle = LEDHandle
@@ -33,12 +33,13 @@ class DistributionLine():
             if timeElapsed > self.animationFramePeriod:
                 self.LEDHandle[self.currentLEDAddress] = (0,0,0)
                 
-                if reversed:
+                if self.reversed:
                     self.decrementLEDAddress()
                 else:
                     self.incrementLEDAddress()
 
-                self.LEDHandle[self.currentLEDAddress] = values.LED_CITY_LIGHTS_YELLOW
+                self.LEDHandle[self.currentLEDAddress] = (50,50,50)
+                self.timeOfLastChange = currentTime
         else:
             for i in range(self.numLEDs):
                 self.LEDHandle[self.startLEDAddress + i] = (0,0,0)
@@ -52,5 +53,5 @@ class DistributionLine():
 
     def decrementLEDAddress(self):
         self.currentLEDAddress -= 1
-            if self.currentLEDAddress < self.startLEDAddress:
-                self.currentLEDAddress = self.startLEDAddress + self.numLEDs - 1 
+        if self.currentLEDAddress < self.startLEDAddress:
+            self.currentLEDAddress = self.startLEDAddress + self.numLEDs - 1 
