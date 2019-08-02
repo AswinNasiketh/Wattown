@@ -1,7 +1,6 @@
 from values import *
 
 class City():
-
     BLOCK_1_LOWER = 12
     BLOCK_1_UPPER = 32
     BLOCK_2_LOWER = 33
