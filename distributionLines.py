@@ -1,5 +1,3 @@
-import values
-
 class DistributionLine():
 
     ANIMATION_FRAME_RATE = 5 #changes per second
