@@ -19,6 +19,7 @@ from kivy.clock import Clock
 from wattownBoard import WattownBoard
 from interactiveMode import InteractiveModeThread
 from cycleSim import CycleSimThread
+from substationmode import SubstationModeThread
 
 class FieldLabel(Label):
     pass
@@ -45,6 +46,11 @@ class SelectModeScreen(Screen):
         cycleModeThread = CycleSimThread(self.board)
         self.manager.get_screen('cycleModeConfig').setSimThread(cycleModeThread)
         self.manager.current = 'cycleModeConfig'
+
+    def configureSubstationMode(self):
+        substationModeThread = SubstationModeThread(self.board)
+        self.manager.get_screen('substationModeConfig').setSimThread(substationModeThread)
+        self.manager.current = 'substationModeConfig'
         
     def __del__(self, **kwargs):
         self.board.join()
@@ -188,11 +194,10 @@ class SubstationModeConfigScreen(Screen):
         return state == 'down'
     
     def startSubstationMode(self):
-
         sustainable = self.stateToBool(self.ids.sustainableToggleButton.state)
         self.simThread.configure(sustainable)
         self.manager.current = 'substationMode'
-        self.manager.get_screen('substationMode').startCycleMode(self.simThread)
+        self.manager.get_screen('substationMode').startSubstationMode(self.simThread)
 
     def setSimThread(self, simThread):
         self.simThread = simThread
@@ -228,7 +233,7 @@ class SubstationModeScreen(CycleModeScreen):
         self.SW1Status = self.booleanToSwitchState(UIData[9])
         self.SW2Status = self.booleanToSwitchState(UIData[10])
         self.SW3Status = self.booleanToSwitchState(UIData[11])
-        
+
 
         if self.hydroPower < 0:
             hydroPowerValueLabel.color = [1,0,0,1] #r, g, b, a
@@ -251,6 +256,16 @@ class SubstationModeScreen(CycleModeScreen):
         else:
             surplusValueLabel.color = [1,1,1,1] #r, g, b, a
         
+
+    def startSubstationMode(self, simThread):
+        self.simThread = simThread
+        simThread.start()
+        self.UIUPdateEvent =  Clock.schedule_interval(self.UIUpdate, 0.5)
+    
+    def stopSubstationMode(self):
+        self.simThread.join()
+        Clock.unschedule(self.UIUPdateEvent)
+        self.manager.current = 'selectMode'
 
 class WattownApp(App):
 
