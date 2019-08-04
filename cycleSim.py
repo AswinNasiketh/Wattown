@@ -1,4 +1,3 @@
-import time
 import random
 import values
 import threading
@@ -16,9 +15,13 @@ class CycleSimThread(threading.Thread):
 
     def run(self):
         self.stopEvent.clear()
-        while (not self.stopEvent.is_set()) and (self.cycleModeObj.getStillRunning()):
+
+        while not self.stopEvent.wait(1.5):
+            if not self.cycleModeObj.getStillRunning():
+                break
             self.cycleModeObj.iterateLoop()
 
+        #if the stop event isn't set, but the simulation isn't still running
         if (not self.stopEvent.is_set()) and (not self.cycleModeObj.getStillRunning()):
             self.cleanUp()
 
@@ -127,9 +130,6 @@ class CycleSim():
         print("Wind Generation: ", str(self.windPower))
         print("Battery Level: ", str(self.batteryRemaining))
         print("Reservoir Level: ", str(self.reservoirLevel))
-        # print("Battery Charging: ", str(self.batteryCharging))
-
-        time.sleep(1.5)
 
     def getUIData(self):
         return [self.solarGenerationValues[self.hourCount], 
