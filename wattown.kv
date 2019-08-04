@@ -78,93 +78,17 @@
         TitleLabel:
             text: 'Cycle Mode Configuration'
         GridLayout:
-            cols: 3
-            FieldLabel:
-                text: 'Wind Present?'
+            cols: 2
             ToggleButton:
-                id: windPresentYesButton
-                text: 'Yes'
-                group: 'windPresent'
+                id: sustainableToggleButton
+                text: 'Sustainable'
+                group: 'sustainable'
                 state: 'down'
                 allow_no_selection: False
             ToggleButton:
-                text: 'No'
-                group: 'windPresent'
-                allow_no_selection: False        
-        GridLayout:
-            cols: 3
-            FieldLabel:
-                text: 'Randomise Wind?'
-            ToggleButton:
-                id: randomiseWindYesButton
-                text: 'Yes'
-                group: 'randomiseWind'
-                state: 'down'
-                allow_no_selection: False
-                on_press: root.toggleWindControls(False)
-            ToggleButton:
-                text: 'No'
-                group: 'randomiseWind'
-                allow_no_selection: False
-                on_press: root.toggleWindControls(True)
-        GridLayout:
-            cols: 4
-            FieldLabel:
-                text: 'Wind Amplitude:'
-            FieldLabel:
-                text: str(root.windAmplitude)
-            Button:
-                id: windAmpPlusButton
-                text: '+'
-                on_release: root.incrementWindAmplitude()
-                disabled : True
-            Button:
-                id: windAmpMinusButton
-                text: '-'
-                on_release: root.decrementWindAmplitude()
-                disabled : True
-        GridLayout:
-            cols: 4
-            FieldLabel:
-                text: 'Wind toggles every (hours):'
-            FieldLabel:
-                text: str(root.windSwitchingPeriod)
-            Button:
-                id: windTogglePlusButton
-                text: '+'
-                on_release: root.incrementSwitchingPeriod()
-                disabled : True
-            Button:
-                id: windToggleMinusButton
-                text: '-'
-                on_release: root.decrementSwitchingPeriod()
-                disabled : True
-        GridLayout:
-            cols: 3
-            FieldLabel:
-                text: 'Sunny/Cloudy Day?'
-            ToggleButton:
-                id: sunnyButton
-                text: 'Sunny'
-                group: 'cloudCover'
-                state: 'down'
-                allow_no_selection: False
-            ToggleButton:
-                text: 'Cloudy'
-                group: 'cloudCover'
-                allow_no_selection: False
-        GridLayout:
-            cols: 4
-            FieldLabel:
-                text: 'Daylight Hours:'
-            FieldLabel:
-                text: str(root.daylightHours)
-            Button:
-                text: '+'
-                on_release: root.incrementDaylightHours()
-            Button:
-                text: '-'
-                on_release: root.decrementDaylightHours()
+                text: 'Realistic'
+                group: 'sustainable'
+                allow_no_selection: False       
         GridLayout:
             cols: 4
             FieldLabel:
