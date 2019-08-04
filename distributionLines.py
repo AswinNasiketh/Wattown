@@ -1,13 +1,14 @@
 class DistributionLine():
 
-    ANIMATION_FRAME_RATE = 5 #changes per second
+    FAST_ANIMATION_FRAME_RATE = 5 #changes per second
+    SLOW_ANIMATION_FRAME_RATE = 4
 
     def __init__(self, LEDHandle, startLEDAddress, numLEDs, reversed = False):
         self.LEDHandle = LEDHandle
         self.showPowerFlow = False
 
         self.timeOfLastChange = 0
-        self.animationFramePeriod = 1000/DistributionLine.ANIMATION_FRAME_RATE #ms
+        self.animationFramePeriod = 1000/DistributionLine.FAST_ANIMATION_FRAME_RATE #ms
 
         self.startLEDAddress = startLEDAddress
         self.numLEDs = numLEDs
@@ -42,7 +43,8 @@ class DistributionLine():
             for i in range(self.numLEDs):
                 self.LEDHandle[self.startLEDAddress + i] = (0,0,0)
 
-
+    def setFrameRate(self, frameRate):
+        self.animationFramePeriod = 1000/frameRate
 
     def incrementLEDAddress(self):
         self.currentLEDAddress += 1
