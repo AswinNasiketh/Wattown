@@ -182,7 +182,20 @@ class CycleModeScreen(Screen):
         else:
             surplusValueLabel.color = [1,1,1,1] #r, g, b, a
 
+class SubstationModeConfigScreen(Screen):
 
+    def stateToBool(self, state):
+        return state == 'down'
+    
+    def startSubstationMode(self):
+
+        sustainable = self.stateToBool(self.ids.sustainableToggleButton.state)
+        self.simThread.configure(sustainable)
+        self.manager.current = 'substationMode'
+        self.manager.get_screen('substationMode').startCycleMode(self.simThread)
+
+    def setSimThread(self, simThread):
+        self.simThread = simThread
 
 class WattownApp(App):
 

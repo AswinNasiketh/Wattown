@@ -177,3 +177,29 @@
             text: 'Stop/Finish'
             on_release: root.stopCycleMode()
         
+<SubstationModeConfigScreen>
+    name: 'substationModeConfig'
+    BoxLayout:
+        orientation: 'vertical'
+        TitleLabel:
+            text: 'Substation Mode Configuration'
+        GridLayout:
+            cols: 2
+            ToggleButton:
+                id: sustainableToggleButton
+                text: 'Sustainable'
+                group: 'sustainable'
+                state: 'down'
+                allow_no_selection: False
+            ToggleButton:
+                text: 'Realistic'
+                group: 'sustainable'
+                allow_no_selection: False       
+        GridLayout:
+            cols: 2
+            Button:
+                text: 'Back'
+                on_release: app.root.current = 'selectMode'
+            Button:
+                text: 'Start'
+                on_release: root.startSubstationMode()
