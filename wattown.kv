@@ -203,3 +203,88 @@
             Button:
                 text: 'Start'
                 on_release: root.startSubstationMode()
+
+
+<SubstationModeScreen>
+    name: 'substationMode'
+    BoxLayout:
+        orientation: 'vertical'
+        TitleLabel:
+            text: 'Substation Mode'
+
+        GridLayout:
+            cols: 2
+            GridLayout:
+                cols: 2
+                FieldLabel:
+                    text: 'Wind Power:'
+                FieldLabel:
+                    text: str(root.windPower) + ' GW' 
+                    color: [0,1,0,1]#r, g, b, a
+                FieldLabel:
+                    text: 'Solar Power:'
+                FieldLabel:
+                    text: str(root.solarPower) + ' GW' 
+                    color: [0,1,0,1] 
+                FieldLabel:                
+                    text: 'Hydroelectric Power:'
+                FieldLabel:
+                    id: hydroPowerValueLabel
+                    text: str(root.hydroPower) + ' GW' 
+            GridLayout:
+                cols: 2
+                FieldLabel:
+                    text: 'City Consumption:'
+                FieldLabel:
+                    text: str(root.consumption) + ' GW'
+                    color: [1, 0, 0, 1]
+                FieldLabel:
+                    text: 'Total Renewable Supply:'
+                FieldLabel:
+                    id: renewableSupplyLabel
+                    text: str(root.renewableSupply) + ' GW' 
+                FieldLabel:
+                    text: 'Renewable Surplus/Shortage:'
+                FieldLabel:
+                    id: surplusValueLabel
+                    text: str(root.renewableSurplus) + ' GW' 
+            GridLayout:
+                cols: 2
+                FieldLabel:
+                    text: 'Battery Energy:'
+                FieldLabel:
+                    text: str(root.batteryEnergy) + ' GWh' 
+                FieldLabel:
+                    text: 'Reservoir Energy:'
+                FieldLabel:
+                    text: str(root.hydroEnergy) + ' GWh'
+            
+            GridLayout:
+                cols: 2
+                FieldLabel:
+                    text: 'Day:'
+                FieldLabel:
+                    text: str(root.day)
+                FieldLabel:
+                    text: 'Hour:'
+                FieldLabel:
+                    text: str(root.hour)
+
+            GridLayout:
+                cols: 2
+                FieldLabel:
+                    text: 'Switch 1 status'
+                FieldLabel:
+                    text: root.SW1Status
+                FieldLabel:
+                    text: 'Switch 2 status'
+                FieldLabel:
+                    text: root.SW2Status
+                FieldLabel:
+                    text: 'Switch 3 status'
+                FieldLabel:
+                    text: root.SW3Status
+
+        Button:
+            text: 'Stop/Finish'
+            on_release: root.stopCycleMode()

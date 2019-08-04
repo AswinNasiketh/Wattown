@@ -128,8 +128,7 @@ class CycleModeScreen(Screen):
     batteryEnergy = NumericProperty(0)
     hydroEnergy = NumericProperty(0)
     day = NumericProperty(0)
-    hour = NumericProperty(0)
-
+    hour = NumericProperty(0)  
 
     def setSimThread(self, simThread):
         self.cycleSimThread = simThread
@@ -143,7 +142,7 @@ class CycleModeScreen(Screen):
         self.cycleSimThread.join()
         Clock.unschedule(self.UIUPdateEvent)
         self.manager.current = 'selectMode'
-    
+
     def UIUpdate(self, dt):
         UIData = self.cycleSimThread.cycleModeObj.getUIData()
         hydroPowerValueLabel = self.ids.hydroPowerValueLabel
@@ -160,6 +159,7 @@ class CycleModeScreen(Screen):
         self.hydroEnergy = round(UIData[6], 2)
         self.day = round(UIData[7], 2)
         self.hour = round(UIData[8], 2)
+
 
         if self.hydroPower < 0:
             hydroPowerValueLabel.color = [1,0,0,1] #r, g, b, a
@@ -196,6 +196,61 @@ class SubstationModeConfigScreen(Screen):
 
     def setSimThread(self, simThread):
         self.simThread = simThread
+
+class SubstationModeScreen(CycleModeScreen):
+    SW1Status = StringProperty("Closed")
+    SW2Status = BooleanProperty("Closed")
+    SW3Status = BooleanProperty("Closed")
+
+    def booleanToSwitchState(self, boolean):
+        if boolean:
+            return "Closed"
+        else:
+            return "Open"
+
+    def UIUpdate(self, dt):
+        UIData = self.cycleSimThread.substationModeObj.getUIData()
+        hydroPowerValueLabel = self.ids.hydroPowerValueLabel
+        renewableSupplyLabel = self.ids.renewableSupplyLabel
+        surplusValueLabel = self.ids.surplusValueLabel
+
+        self.windPower = round(UIData[0] , 2)
+        self.solarPower = round(UIData[1], 2)
+        self.hydroPower = round(UIData[2], 2)
+        self.consumption = round(UIData[3], 2)
+        self.renewableSupply = round(UIData[4], 2)
+        self.renewableSurplus = round(self.renewableSupply + self.consumption, 2) # consumption always negative
+        self.batteryEnergy = round(UIData[5], 2)
+        self.hydroEnergy = round(UIData[6], 2)
+        self.day = round(UIData[7], 2)
+        self.hour = round(UIData[8], 2)
+
+        self.SW1Status = self.booleanToSwitchState(UIData[9])
+        self.SW2Status = self.booleanToSwitchState(UIData[10])
+        self.SW3Status = self.booleanToSwitchState(UIData[11])
+        
+
+        if self.hydroPower < 0:
+            hydroPowerValueLabel.color = [1,0,0,1] #r, g, b, a
+        elif self.hydroPower > 0:
+            hydroPowerValueLabel.color = [0,1,0,1] #r, g, b, a
+        else:
+            hydroPowerValueLabel.color = [1,1,1,1] #r, g, b, a
+        
+        if self.renewableSupply < 0:
+            renewableSupplyLabel.color = [1,0,0,1] #r, g, b, a
+        elif self.renewableSupply > 0:
+            renewableSupplyLabel.color = [0,1,0,1] #r, g, b, a
+        else:
+            renewableSupplyLabel.color = [1,1,1,1] #r, g, b, a
+        
+        if self.renewableSurplus < 0:
+            surplusValueLabel.color = [1,0,0,1] #r, g, b, a
+        elif self.renewableSupply > 0:
+            surplusValueLabel.color = [0,1,0,1] #r, g, b, a
+        else:
+            surplusValueLabel.color = [1,1,1,1] #r, g, b, a
+        
 
 class WattownApp(App):
 

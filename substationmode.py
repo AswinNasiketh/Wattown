@@ -95,3 +95,17 @@ class SubstationMode(CycleSim):
 
     def setSW3Closed(self, closed):
         self.switch3Closed = closed
+
+    def getUIData(self):
+        return [self.solarGenerationValues[self.hourCount], 
+        self.windPower,
+        self.reservoirPower,
+        self.consumptionValues[self.hourCount],
+        self.totalRenewableSupply,
+        self.batteryRemaining,
+        self.reservoirLevel,
+        self.dayCount,
+        self.hourCount,
+        self.switch1Closed,
+        self.switch2Closed,
+        self.switch3Closed]
