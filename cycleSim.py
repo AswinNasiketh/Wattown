@@ -1,6 +1,7 @@
 import random
 import values
 import threading
+from distributionLines import DistributionLine
 
 
 class CycleSimThread(threading.Thread):
@@ -20,6 +21,8 @@ class CycleSimThread(threading.Thread):
             if not self.cycleModeObj.getStillRunning():
                 break
             self.cycleModeObj.iterateLoop()
+            self.board.transmissionLine.setAllTowersColour(values.LED_WHITE)#to indicate cycle mode is running
+            #will be reset to off when clean up occurs
 
         #if the stop event isn't set, but the simulation isn't still running
         if (not self.stopEvent.is_set()) and (not self.cycleModeObj.getStillRunning()):
@@ -114,15 +117,16 @@ class CycleSim():
         #for UI
         self.totalRenewableSupply = self.solarGenerationValues[self.hourCount] + self.reservoirPower + self.windPower
 
-        #storage and windmill animation
+        #animation
         self.board.lightReservoir(self.reservoirLevel)
         self.animateBattery()
+        self.animateWattownSign()
+        self.animateDistributionLine()
    
         if self.windPower != 0:
             self.board.windmills.startWindmills()
         else:
             self.board.windmills.stopWindmills()
-        
 
         print("Hour", str(self.hourCount))
         print("City consumption: ", str(self.consumptionValues[self.hourCount]))
@@ -130,6 +134,21 @@ class CycleSim():
         print("Wind Generation: ", str(self.windPower))
         print("Battery Level: ", str(self.batteryRemaining))
         print("Reservoir Level: ", str(self.reservoirLevel))
+
+    def animateWattownSign(self):
+        if self.hourCount > self.SUNSET :
+            self.board.wattownSign.turnOn()
+        else:
+            self.board.wattownSign.turnOff()
+
+    def animateDistributionLine(self):
+        self.board.distributionMiddle.showPowerFlow()
+        self.board.distributionRight.showPowerFlow() # will be reset to off when cleanup occurs
+
+        if self.consumptionValues[self.hourCount] == values.MIN_CONSUMPTION:
+            self.board.distributionMiddle.setFrameRate(DistributionLine.SLOW_ANIMATION_FRAME_RATE)
+        else:
+            self.board.distributionMiddle.setFrameRate(DistributionLine.FAST_ANIMATION_FRAME_RATE)
 
     def getUIData(self):
         return [self.solarGenerationValues[self.hourCount], 
