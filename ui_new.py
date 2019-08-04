@@ -20,6 +20,7 @@ from wattownBoard import WattownBoard
 from interactiveMode import InteractiveModeThread
 from cycleSim import CycleSimThread
 from substationmode import SubstationModeThread
+from communication import WebServer, WattownRequestHandler, sendCommand, testConnection
 
 class FieldLabel(Label):
     pass
@@ -261,11 +262,15 @@ class SubstationModeScreen(CycleModeScreen):
         self.simThread = simThread
         simThread.start()
         self.UIUPdateEvent =  Clock.schedule_interval(self.UIUpdate, 0.5)
+        WattownRequestHandler.substationModeObj = simThread.substationModeObj
+        self.server = WebServer(WattownRequestHandler, 7301)
+        self.server.start()
     
     def stopSubstationMode(self):
         self.simThread.join()
         Clock.unschedule(self.UIUPdateEvent)
         self.manager.current = 'selectMode'
+        self.server.join()
 
 class WattownApp(App):
 
@@ -273,9 +278,4 @@ class WattownApp(App):
         self.mainScreenManager = MainScreenManager()
         return self.mainScreenManager
 
-
-if __name__ == '__main__':
-    w = WattownApp()
-    w.run()
-    
     
