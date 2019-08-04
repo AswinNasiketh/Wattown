@@ -17,11 +17,12 @@ class CycleSimThread(threading.Thread):
     def run(self):
         self.stopEvent.clear()
 
+        self.board.transmissionLine.setAllTowersColour(values.LED_WHITE)#to indicate cycle mode is running
+        
         while not self.stopEvent.wait(1.5):
             if not self.cycleModeObj.getStillRunning():
                 break
             self.cycleModeObj.iterateLoop()
-            self.board.transmissionLine.setAllTowersColour(values.LED_WHITE)#to indicate cycle mode is running
             #will be reset to off when clean up occurs
 
         #if the stop event isn't set, but the simulation isn't still running
@@ -90,21 +91,13 @@ class CycleSim():
                 self.windPower = values.CURRENT_WIND_POWER_GENERATION
         self.addToBattery(self.windPower)           
 
-        #consumption
-        #only light up the city if we have enough capacity in the reservoir or battery
-        self.reservoirPower = 0
-        if self.subtractFromReservoir(self.consumptionValues[self.hourCount]):
-            self.animateCityLights(self.consumptionValues[self.hourCount], values.MAX_CONSUMPTION, values.MIN_CONSUMPTION)
-            self.reservoirPower += self.consumptionValues[self.hourCount]
-        elif self.subtractFromBattery(self.consumptionValues[self.hourCount]):
-            self.animateCityLights(self.consumptionValues[self.hourCount], values.MAX_CONSUMPTION, values.MIN_CONSUMPTION)
-        else:
+        if not self.consumePower():
             #stop simulation if we have no energy
             self.board.lightCityBlocks(0)      
             print("Energy depleted!")
             self.stillRunning = False
             return
-                            
+
         #when we have minimum consumption use battery to pump reservoir
         if self.consumptionValues[self.hourCount] == values.MIN_CONSUMPTION:
 
@@ -134,6 +127,21 @@ class CycleSim():
         print("Wind Generation: ", str(self.windPower))
         print("Battery Level: ", str(self.batteryRemaining))
         print("Reservoir Level: ", str(self.reservoirLevel))
+
+   #returns true if there is sufficient power, otherwise false
+    def consumePower(self):
+        #only light up the city if we have enough capacity in the reservoir or battery
+        self.reservoirPower = 0
+        if self.subtractFromReservoir(self.consumptionValues[self.hourCount]):
+            self.animateCityLights(self.consumptionValues[self.hourCount], values.MAX_CONSUMPTION, values.MIN_CONSUMPTION)
+            self.reservoirPower += self.consumptionValues[self.hourCount]
+            return True
+        elif self.subtractFromBattery(self.consumptionValues[self.hourCount]):
+            self.animateCityLights(self.consumptionValues[self.hourCount], values.MAX_CONSUMPTION, values.MIN_CONSUMPTION)
+            return True
+        else:
+            return False
+
 
     def animateWattownSign(self):
         if self.hourCount > self.SUNSET :
