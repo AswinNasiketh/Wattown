@@ -67,6 +67,8 @@ class WattownBoard(threading.Thread):
                 self.pixels.fill((0,0,0))
                 self.windmills.stopWindmills()
                 self.fuelCell.stopPulsing()
+                self.distributionMiddle.stopPowerFlow()
+                self.distributionRight.stopPowerFlow()
 
                 self.pixels.show()
                 self.windmills.update(0)
