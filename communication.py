@@ -8,7 +8,7 @@ def sendCommand(IP, command):
     url = 'http://' + IP + '/' + command
 
     try:
-        requests.get(url, timeout = 0.5)
+        requests.get(url, timeout = 0.2)
     except requests.exceptions.Timeout:
         return False
     except requests.exceptions.ConnectionError:

@@ -205,8 +205,9 @@ class SubstationModeConfigScreen(Screen):
 
 class SubstationModeScreen(CycleModeScreen):
     SW1Status = StringProperty("Closed")
-    SW2Status = BooleanProperty("Closed")
-    SW3Status = BooleanProperty("Closed")
+    SW2Status = StringProperty("Closed")
+    SW3Status = StringProperty("Closed")
+    connectionStatus = StringProperty("Disconnected")
 
     def booleanToSwitchState(self, boolean):
         if boolean:
@@ -256,6 +257,11 @@ class SubstationModeScreen(CycleModeScreen):
             surplusValueLabel.color = [0,1,0,1] #r, g, b, a
         else:
             surplusValueLabel.color = [1,1,1,1] #r, g, b, a
+
+        if testConnection('192.168.4.5'):
+            self.connectionStatus = "Connected"
+        else:
+            self.connectionStatus = "Disconnected"
         
 
     def startSubstationMode(self, simThread):
