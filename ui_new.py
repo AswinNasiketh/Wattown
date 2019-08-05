@@ -136,9 +136,6 @@ class CycleModeScreen(Screen):
     hydroEnergy = NumericProperty(0)
     day = NumericProperty(0)
     hour = NumericProperty(0)  
-
-    def setSimThread(self, simThread):
-        self.cycleSimThread = simThread
     
     def startCycleMode(self, simThread):
         self.cycleSimThread = simThread
@@ -203,7 +200,18 @@ class SubstationModeConfigScreen(Screen):
     def setSimThread(self, simThread):
         self.simThread = simThread
 
-class SubstationModeScreen(CycleModeScreen):
+class SubstationModeScreen(Screen):
+    windPower = NumericProperty(0)
+    solarPower = NumericProperty(0)
+    hydroPower = NumericProperty(0)
+    consumption = NumericProperty(0)
+    renewableSupply = NumericProperty(0)
+    renewableSurplus = NumericProperty(0)
+    batteryEnergy = NumericProperty(0)
+    hydroEnergy = NumericProperty(0)
+    day = NumericProperty(0)
+    hour = NumericProperty(0)
+
     SW1Status = StringProperty("Closed")
     SW2Status = StringProperty("Closed")
     SW3Status = StringProperty("Closed")
