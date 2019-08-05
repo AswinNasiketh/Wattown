@@ -92,6 +92,9 @@ class InteractiveModeScreen(Screen):
         self.numWindmillsOn = self.board.windmills.numWindmillsBlown()
         self.cityPowered = self.interactiveModeThread.interactiveModeObj.getCityPoweredPercent()
         self.storedEnergy = self.interactiveModeThread.interactiveModeObj.currentBatteryLevel
+    
+    def resetPVThreshold(self):
+        self.board.solarPanels.resetThreshold()
 
 class CycleModeConfigScreen(Screen):
     numDaysToSimulate = NumericProperty(1)
@@ -181,7 +184,6 @@ class CycleModeScreen(Screen):
             surplusValueLabel.color = [0,1,0,1] #r, g, b, a
         else:
             surplusValueLabel.color = [1,1,1,1] #r, g, b, a
-
 
 
 class WattownApp(App):
