@@ -45,6 +45,7 @@ class SubstationMode(CycleSim):
         self.switch1Closed = True # currently controls city
         self.switch2Closed = True
         self.switch3Closed = True
+        self.currentConsumption = 0
 
     def animateCityLights(self, consumption, maxConsumption, minConsumption):
         maxConsumptionDelta = maxConsumption - minConsumption
@@ -59,15 +60,15 @@ class SubstationMode(CycleSim):
         #only light up the city if we have enough capacity in the reservoir or battery
         self.reservoirPower = 0
         if self.switch1Closed:
-            consumption = self.consumptionValues[self.hourCount]
+            self.currentConsumption = self.consumptionValues[self.hourCount]
         else:
-            consumption = self.consumptionValues[self.hourCount]/2
+            self.currentConsumption = self.consumptionValues[self.hourCount]/2
         
-        if self.subtractFromReservoir(consumption):
+        if self.subtractFromReservoir(self.currentConsumption):
             self.animateCityLights(self.consumptionValues[self.hourCount], values.MAX_CONSUMPTION, values.MIN_CONSUMPTION)#keep the same amount of city lights on
-            self.reservoirPower += consumption
+            self.reservoirPower += self.currentConsumption
             return True
-        elif self.subtractFromBattery(consumption):
+        elif self.subtractFromBattery(self.currentConsumption):
             self.animateCityLights(self.consumptionValues[self.hourCount], values.MAX_CONSUMPTION, values.MIN_CONSUMPTION)
             return True
         else:
@@ -100,7 +101,7 @@ class SubstationMode(CycleSim):
         return [self.solarGenerationValues[self.hourCount], 
         self.windPower,
         self.reservoirPower,
-        self.consumptionValues[self.hourCount],
+        self.currentConsumption, 
         self.totalRenewableSupply,
         self.batteryRemaining,
         self.reservoirLevel,
