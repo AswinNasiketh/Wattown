@@ -150,10 +150,10 @@ class CycleModeScreen(Screen):
         renewableSupplyLabel = self.ids.renewableSupplyLabel
         surplusValueLabel = self.ids.surplusValueLabel
 
-        self.windPower = round(UIData[0] , 2)
-        self.solarPower = round(UIData[1], 2)
+        self.solarPower = round(UIData[0] , 2)
+        self.windPower = round(UIData[1], 2)
         self.hydroPower = round(UIData[2], 2)
-        self.consumption = round(UIData[3], 2)
+        self.consumption = - round(UIData[3], 2)
         self.renewableSupply = round(UIData[4], 2)
         self.renewableSurplus = round(self.renewableSupply + self.consumption, 2) # consumption always negative
         self.batteryEnergy = round(UIData[5], 2)

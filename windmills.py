@@ -3,7 +3,7 @@ from adafruit_mcp3xxx.analog_in import AnalogIn
 import pigpio
 class Windmills():
 
-    DRIVE_FREQUENCY = 4 #Hz
+    DRIVE_FREQUENCY = 3 #Hz
     DRIVE_POSITIVE_PIN = 1
     DRIVE_NEGATIVE_PIN = 7
     BLOW_THRESHOLD_VOLTAGE = 2.0

@@ -1,7 +1,7 @@
 class DistributionLine():
 
     FAST_ANIMATION_FRAME_RATE = 5 #changes per second
-    SLOW_ANIMATION_FRAME_RATE = 4
+    SLOW_ANIMATION_FRAME_RATE = 3
 
     def __init__(self, LEDHandle, startLEDAddress, numLEDs, reversed = False):
         self.LEDHandle = LEDHandle
