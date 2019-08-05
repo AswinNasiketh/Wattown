@@ -57,6 +57,9 @@ class CycleSim():
 
         self.batteryRemaining = 50 #percentage
         self.reservoirLevel = 50 #percentage
+        self.windPower = 0
+        self.reservoirPower = 0
+        self.totalRenewableSupply = 0
 
         self.dayCount = 0
         self.hourCount = 0
@@ -150,8 +153,8 @@ class CycleSim():
             self.board.wattownSign.turnOff()
 
     def animateDistributionLine(self):
-        self.board.distributionMiddle.showPowerFlow()
-        self.board.distributionRight.showPowerFlow() # will be reset to off when cleanup occurs
+        self.board.distributionMiddle.startPowerFlow()
+        self.board.distributionRight.startPowerFlow() # will be reset to off when cleanup occurs
 
         if self.consumptionValues[self.hourCount] == values.MIN_CONSUMPTION:
             self.board.distributionMiddle.setFrameRate(DistributionLine.SLOW_ANIMATION_FRAME_RATE)
