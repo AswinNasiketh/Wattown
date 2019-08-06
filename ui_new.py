@@ -269,7 +269,7 @@ class SubstationModeScreen(Screen):
         else:
             surplusValueLabel.color = [1,1,1,1] #r, g, b, a
 
-        if testConnection('192.168.4.5'):
+        if testConnection('192.168.4.5:7302'):
             self.connectionStatus = "Connected"
         else:
             self.connectionStatus = "Disconnected"
@@ -278,7 +278,7 @@ class SubstationModeScreen(Screen):
     def startSubstationMode(self, simThread):
         self.simThread = simThread
         simThread.start()
-        self.UIUPdateEvent =  Clock.schedule_interval(self.UIUpdate, 0.5)
+        self.UIUPdateEvent =  Clock.schedule_interval(self.UIUpdate, 2.5)
         WattownRequestHandler.substationModeObj = simThread.substationModeObj
         self.server = WebServer(WattownRequestHandler, 7301)
         self.server.start()

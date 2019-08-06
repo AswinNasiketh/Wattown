@@ -79,9 +79,9 @@ class WattownBoard(threading.Thread):
                 self.distributionRight.update(0)
 
         #provides interface with city lights coefficient 
-        def lightCityBlocks(self, cityLightsCoefficient, supplyTripped = False):
+        def lightCityBlocks(self, cityLightsCoefficient, supplyTripped = False, offColourBlack = False):
                 numBlocksToLight = round(cityLightsCoefficient * 3)
-                self.city.lightCityBlocks(numBlocksToLight, supplyTripped)
+                self.city.lightCityBlocks(numBlocksToLight, supplyTripped, offColourBlack)
 
         def lightReservoir(self, reservoirLevel):
               levelsToLight = round(reservoirLevel/25)

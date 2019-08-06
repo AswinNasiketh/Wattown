@@ -185,7 +185,7 @@ class CycleSim():
         consumptionAboveMin = consumption - minConsumption
 
         cityLightsCoefficent = consumptionAboveMin/maxConsumptionDelta
-        self.board.lightCityBlocks(cityLightsCoefficent)     
+        self.board.lightCityBlocks(cityLightsCoefficent, offColourBlack = True)     
 
 
     def setupSolarGenerationValues(self, sustainable = True):
