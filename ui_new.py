@@ -19,6 +19,8 @@ from kivy.clock import Clock
 from wattownBoard import WattownBoard
 from interactiveMode import InteractiveModeThread
 from cycleSim import CycleSimThread
+from substationmode import SubstationModeThread
+from communication import WebServer, WattownRequestHandler, sendCommand, testConnection
 
 class FieldLabel(Label):
     pass
@@ -45,6 +47,11 @@ class SelectModeScreen(Screen):
         cycleModeThread = CycleSimThread(self.board)
         self.manager.get_screen('cycleModeConfig').setSimThread(cycleModeThread)
         self.manager.current = 'cycleModeConfig'
+
+    def configureSubstationMode(self):
+        substationModeThread = SubstationModeThread(self.board)
+        self.manager.get_screen('substationModeConfig').setSimThread(substationModeThread)
+        self.manager.current = 'substationModeConfig'
         
     def __del__(self, **kwargs):
         self.board.join()
@@ -131,11 +138,7 @@ class CycleModeScreen(Screen):
     batteryEnergy = NumericProperty(0)
     hydroEnergy = NumericProperty(0)
     day = NumericProperty(0)
-    hour = NumericProperty(0)
-
-
-    def setSimThread(self, simThread):
-        self.cycleSimThread = simThread
+    hour = NumericProperty(0)  
     
     def startCycleMode(self, simThread):
         self.cycleSimThread = simThread
@@ -146,7 +149,7 @@ class CycleModeScreen(Screen):
         self.cycleSimThread.join()
         Clock.unschedule(self.UIUPdateEvent)
         self.manager.current = 'selectMode'
-    
+
     def UIUpdate(self, dt):
         UIData = self.cycleSimThread.cycleModeObj.getUIData()
         hydroPowerValueLabel = self.ids.hydroPowerValueLabel
@@ -163,6 +166,7 @@ class CycleModeScreen(Screen):
         self.hydroEnergy = round(UIData[6], 2)
         self.day = round(UIData[7], 2)
         self.hour = round(UIData[8], 2)
+
 
         if self.hydroPower < 0:
             hydroPowerValueLabel.color = [1,0,0,1] #r, g, b, a
@@ -185,6 +189,106 @@ class CycleModeScreen(Screen):
         else:
             surplusValueLabel.color = [1,1,1,1] #r, g, b, a
 
+class SubstationModeConfigScreen(Screen):
+
+    def stateToBool(self, state):
+        return state == 'down'
+    
+    def startSubstationMode(self):
+        sustainable = self.stateToBool(self.ids.sustainableToggleButton.state)
+        self.simThread.configure(sustainable)
+        self.manager.current = 'substationMode'
+        self.manager.get_screen('substationMode').startSubstationMode(self.simThread)
+
+    def setSimThread(self, simThread):
+        self.simThread = simThread
+
+class SubstationModeScreen(Screen):
+    windPower = NumericProperty(0)
+    solarPower = NumericProperty(0)
+    hydroPower = NumericProperty(0)
+    consumption = NumericProperty(0)
+    renewableSupply = NumericProperty(0)
+    renewableSurplus = NumericProperty(0)
+    batteryEnergy = NumericProperty(0)
+    hydroEnergy = NumericProperty(0)
+    day = NumericProperty(0)
+    hour = NumericProperty(0)
+
+    SW1Status = StringProperty("Closed")
+    SW2Status = StringProperty("Closed")
+    SW3Status = StringProperty("Closed")
+    connectionStatus = StringProperty("Disconnected")
+
+    def booleanToSwitchState(self, boolean):
+        if boolean:
+            return "Closed"
+        else:
+            return "Open"
+
+    def UIUpdate(self, dt):
+        UIData = self.cycleSimThread.substationModeObj.getUIData()
+        hydroPowerValueLabel = self.ids.hydroPowerValueLabel
+        renewableSupplyLabel = self.ids.renewableSupplyLabel
+        surplusValueLabel = self.ids.surplusValueLabel
+
+        self.solarPower = round(UIData[0] , 2)
+        self.windPower = round(UIData[1], 2)
+        self.hydroPower = round(UIData[2], 2)
+        self.consumption = -round(UIData[3], 2)
+        self.renewableSupply = round(UIData[4], 2)
+        self.renewableSurplus = round(self.renewableSupply + self.consumption, 2) # consumption always negative
+        self.batteryEnergy = round(UIData[5], 2)
+        self.hydroEnergy = round(UIData[6], 2)
+        self.day = round(UIData[7], 2)
+        self.hour = round(UIData[8], 2)
+
+        self.SW1Status = self.booleanToSwitchState(UIData[9])
+        self.SW2Status = self.booleanToSwitchState(UIData[10])
+        self.SW3Status = self.booleanToSwitchState(UIData[11])
+
+
+        if self.hydroPower < 0:
+            hydroPowerValueLabel.color = [1,0,0,1] #r, g, b, a
+        elif self.hydroPower > 0:
+            hydroPowerValueLabel.color = [0,1,0,1] #r, g, b, a
+        else:
+            hydroPowerValueLabel.color = [1,1,1,1] #r, g, b, a
+        
+        if self.renewableSupply < 0:
+            renewableSupplyLabel.color = [1,0,0,1] #r, g, b, a
+        elif self.renewableSupply > 0:
+            renewableSupplyLabel.color = [0,1,0,1] #r, g, b, a
+        else:
+            renewableSupplyLabel.color = [1,1,1,1] #r, g, b, a
+        
+        if self.renewableSurplus < 0:
+            surplusValueLabel.color = [1,0,0,1] #r, g, b, a
+        elif self.renewableSupply > 0:
+            surplusValueLabel.color = [0,1,0,1] #r, g, b, a
+        else:
+            surplusValueLabel.color = [1,1,1,1] #r, g, b, a
+
+        if testConnection('192.168.4.5'):
+            self.connectionStatus = "Connected"
+        else:
+            self.connectionStatus = "Disconnected"
+        
+
+    def startSubstationMode(self, simThread):
+        self.simThread = simThread
+        simThread.start()
+        self.UIUPdateEvent =  Clock.schedule_interval(self.UIUpdate, 0.5)
+        WattownRequestHandler.substationModeObj = simThread.substationModeObj
+        self.server = WebServer(WattownRequestHandler, 7301)
+        self.server.start()
+    
+    def stopSubstationMode(self):
+        self.simThread.join()
+        Clock.unschedule(self.UIUPdateEvent)
+        self.manager.current = 'selectMode'
+        self.server.join()
+
 
 class WattownApp(App):
 
@@ -192,9 +296,4 @@ class WattownApp(App):
         self.mainScreenManager = MainScreenManager()
         return self.mainScreenManager
 
-
-if __name__ == '__main__':
-    w = WattownApp()
-    w.run()
-    
     

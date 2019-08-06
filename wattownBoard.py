@@ -19,6 +19,7 @@ from fuelcell import FuelCell
 from distributionLines import DistributionLine
 from transmissionLines import TransmissionLines
 from wattownSign import WattownSign
+from substation import Substation
 
 
 class WattownBoard(threading.Thread):
@@ -40,6 +41,7 @@ class WattownBoard(threading.Thread):
                 self.distributionRight = DistributionLine(self.pixels, 105, 5, True)
                 self.transmissionLine = TransmissionLines(self.pixels)
                 self.wattownSign = WattownSign(self.pixels)
+                self.substation = Substation(self.pixels)
 
                 self.stopEvent = threading.Event()
                 self.stopEvent.clear()
@@ -77,9 +79,9 @@ class WattownBoard(threading.Thread):
                 self.distributionRight.update(0)
 
         #provides interface with city lights coefficient 
-        def lightCityBlocks(self, cityLightsCoefficient):
+        def lightCityBlocks(self, cityLightsCoefficient, supplyTripped = False):
                 numBlocksToLight = round(cityLightsCoefficient * 3)
-                self.city.lightCityBlocks(numBlocksToLight)
+                self.city.lightCityBlocks(numBlocksToLight, supplyTripped)
 
         def lightReservoir(self, reservoirLevel):
               levelsToLight = round(reservoirLevel/25)
