@@ -64,14 +64,14 @@
             FieldLabel:
                 id:energyStoredLabel
                 text: str(root.storedEnergy)
-        Button:
-            text:'Stop'
-            font_size: 30
-            on_release: root.stopInteractiveMode()
-        # Button:
-        #     text: '+'
-        #     font_size:30
-        #     on_release: root.incrementProperties()
+            Button:
+                text:'Stop'
+                font_size: 30
+                on_release: root.stopInteractiveMode()
+            Button:
+                text: 'Reset Solar Panel Threshold'
+                font_size:30
+                on_release: root.resetPVThreshold()
 
 <CycleModeConfigScreen>
     name: 'cycleModeConfig'

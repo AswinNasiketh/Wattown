@@ -99,6 +99,9 @@ class InteractiveModeScreen(Screen):
         self.numWindmillsOn = self.board.windmills.numWindmillsBlown()
         self.cityPowered = self.interactiveModeThread.interactiveModeObj.getCityPoweredPercent()
         self.storedEnergy = self.interactiveModeThread.interactiveModeObj.currentBatteryLevel
+    
+    def resetPVThreshold(self):
+        self.board.solarPanels.resetThreshold()
 
 class CycleModeConfigScreen(Screen):
     numDaysToSimulate = NumericProperty(1)
@@ -285,6 +288,7 @@ class SubstationModeScreen(Screen):
         Clock.unschedule(self.UIUPdateEvent)
         self.manager.current = 'selectMode'
         self.server.join()
+
 
 class WattownApp(App):
 
