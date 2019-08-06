@@ -32,6 +32,10 @@ class InteractiveMode():
 
         self.currentBatteryLevel = 0
         self.previousBatteryLevel = 0
+
+        self.lightBlock1 = False
+        self.lightBlock2 = False
+        self.lightBlock3 = False
  
         
     def iterateLoop(self):
@@ -87,16 +91,7 @@ class InteractiveMode():
 
 
     def getWindmillsBlown(self):
-        windmillsBlown = 0
-        windmillVoltages = self.board.windmills.getWindmillVoltages()
-
-        for i in range(len(windmillVoltages)):
-            if windmillVoltages[i] >= self.WINDMILL_THRESHOLD:
-                print("Windmill " + str(i) + " Running")
-                windmillsBlown += 1
-            else:
-                print("Windmill " + str(i) + " stopped")
-
+        windmillsBlown = self.board.windmills.numWindmillsBlown()
         return windmillsBlown
 
     def animateBattery(self):
