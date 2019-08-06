@@ -227,7 +227,7 @@ class SubstationModeScreen(Screen):
             return "Open"
 
     def UIUpdate(self, dt):
-        UIData = self.cycleSimThread.substationModeObj.getUIData()
+        UIData = self.simThread.substationModeObj.getUIData()
         hydroPowerValueLabel = self.ids.hydroPowerValueLabel
         renewableSupplyLabel = self.ids.renewableSupplyLabel
         surplusValueLabel = self.ids.surplusValueLabel
