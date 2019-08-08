@@ -7,8 +7,8 @@ import threading
 WATTOWN_SERVER_SOCKET = '192.168.4.1:7301'
 SUBSTATION_SERVER_SOCKET = '192.168.4.5:7302'
 
-def sendCommand(IP, command):
-    url = 'http://' + IP + '/' + command
+def sendCommand(socket, command):
+    url = 'http://' + socket + '/' + command
 
     try:
         requests.get(url, timeout = 0.2)
@@ -17,8 +17,8 @@ def sendCommand(IP, command):
     except requests.exceptions.ConnectionError:
         return True # python HTTP server causes connection error with requests module
 
-def testConnection(IP):
-    return sendCommand(IP, '')
+def testConnection(socket):
+    return sendCommand(socket, '')
 
 class WebServer(threading.Thread):
 
