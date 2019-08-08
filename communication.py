@@ -4,6 +4,9 @@ import requests
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import threading
 
+WATTOWN_SERVER_SOCKET = '192.168.4.1:7301'
+SUBSTATION_SERVER_SOCKET = '192.168.4.5:7302'
+
 def sendCommand(IP, command):
     url = 'http://' + IP + '/' + command
 
@@ -43,6 +46,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         return self.path[1:]
 
     def do_GET(self):
+        self.setHeaders()
         command = self.getCommand()
         self.handleCommand(command)
         self.wfile.write(bytes("<html><head></head><body>Hello World!</body></html>", 'utf-8'))
