@@ -53,7 +53,7 @@ class SubstationMode(CycleSim):
         consumptionAboveMin = consumption - minConsumption
 
         cityLightsCoefficent = consumptionAboveMin/maxConsumptionDelta
-        self.board.lightCityBlocks(cityLightsCoefficent, not self.switch1Closed)
+        self.board.lightCityBlocks(cityLightsCoefficent, not self.switch1Closed, True)
 
     #returns true if there is sufficient power, otherwise false
     def consumePower(self):
