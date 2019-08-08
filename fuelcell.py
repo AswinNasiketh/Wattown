@@ -1,4 +1,3 @@
-from utilFunctions import *
 from values import *
 import pigpio
 
@@ -19,7 +18,7 @@ class FuelCell():
 
         self.pulse = False
         self.pinOn = False
-        self.timeSinceLastChange = getTimeMilliseconds()
+        self.timeSinceLastChange = 0
 
     def startPulsing(self):
         self.pulse = True
