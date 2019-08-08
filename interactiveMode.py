@@ -1,5 +1,3 @@
-import time
-import values
 import threading
 
 class InteractiveModeThread(threading.Thread):
@@ -12,7 +10,7 @@ class InteractiveModeThread(threading.Thread):
 
     def run(self):
         self.stopEvent.clear()
-        while not self.stopEvent.is_set():
+        while not self.stopEvent.wait(1):
             self.interactiveModeObj.iterateLoop()
 
     def join(self, timeOut=None):
@@ -34,6 +32,10 @@ class InteractiveMode():
 
         self.currentBatteryLevel = 0
         self.previousBatteryLevel = 0
+
+        self.lightBlock1 = False
+        self.lightBlock2 = False
+        self.lightBlock3 = False
  
         
     def iterateLoop(self):
@@ -65,8 +67,7 @@ class InteractiveMode():
         self.animateDistributionLines()
         self.animateWattownSign()
         
-        print("Battery level: " + str(self.currentBatteryLevel))
-        time.sleep(1)
+        # print("Battery level: " + str(self.currentBatteryLevel))
         
     def animateWattownSign(self):
         if self.lightBlock3: #only turn on sign if there's sufficient power to turn on all of the city
@@ -90,16 +91,7 @@ class InteractiveMode():
 
 
     def getWindmillsBlown(self):
-        windmillsBlown = 0
-        windmillVoltages = self.board.windmills.getWindmillVoltages()
-
-        for i in range(len(windmillVoltages)):
-            if windmillVoltages[i] >= self.WINDMILL_THRESHOLD:
-                print("Windmill " + str(i) + " Running")
-                windmillsBlown += 1
-            else:
-                print("Windmill " + str(i) + " stopped")
-
+        windmillsBlown = self.board.windmills.numWindmillsBlown()
         return windmillsBlown
 
     def animateBattery(self):

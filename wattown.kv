@@ -14,6 +14,8 @@
     InteractiveModeScreen:
     CycleModeConfigScreen:
     CycleModeScreen:
+    SubstationModeConfigScreen:
+    SubstationModeScreen:
 
 <SelectModeScreen>
     name: 'selectMode'
@@ -29,6 +31,7 @@
             on_release: root.configureCycleMode()
         Button:
             text: 'Substation Mode'
+            on_release: root.configureSubstationMode()
         Button:
             text: 'Exit'
             on_release: app.stop()
@@ -62,14 +65,14 @@
             FieldLabel:
                 id:energyStoredLabel
                 text: str(root.storedEnergy)
-        Button:
-            text:'Stop'
-            font_size: 30
-            on_release: root.stopInteractiveMode()
-        # Button:
-        #     text: '+'
-        #     font_size:30
-        #     on_release: root.incrementProperties()
+            Button:
+                text:'Stop'
+                font_size: 30
+                on_release: root.stopInteractiveMode()
+            Button:
+                text: 'Reset Solar Panel Threshold'
+                font_size:30
+                on_release: root.resetPVThreshold()
 
 <CycleModeConfigScreen>
     name: 'cycleModeConfig'
@@ -78,93 +81,17 @@
         TitleLabel:
             text: 'Cycle Mode Configuration'
         GridLayout:
-            cols: 3
-            FieldLabel:
-                text: 'Wind Present?'
+            cols: 2
             ToggleButton:
-                id: windPresentYesButton
-                text: 'Yes'
-                group: 'windPresent'
+                id: sustainableToggleButton
+                text: 'Sustainable'
+                group: 'sustainable'
                 state: 'down'
                 allow_no_selection: False
             ToggleButton:
-                text: 'No'
-                group: 'windPresent'
-                allow_no_selection: False        
-        GridLayout:
-            cols: 3
-            FieldLabel:
-                text: 'Randomise Wind?'
-            ToggleButton:
-                id: randomiseWindYesButton
-                text: 'Yes'
-                group: 'randomiseWind'
-                state: 'down'
-                allow_no_selection: False
-                on_press: root.toggleWindControls(False)
-            ToggleButton:
-                text: 'No'
-                group: 'randomiseWind'
-                allow_no_selection: False
-                on_press: root.toggleWindControls(True)
-        GridLayout:
-            cols: 4
-            FieldLabel:
-                text: 'Wind Amplitude:'
-            FieldLabel:
-                text: str(root.windAmplitude)
-            Button:
-                id: windAmpPlusButton
-                text: '+'
-                on_release: root.incrementWindAmplitude()
-                disabled : True
-            Button:
-                id: windAmpMinusButton
-                text: '-'
-                on_release: root.decrementWindAmplitude()
-                disabled : True
-        GridLayout:
-            cols: 4
-            FieldLabel:
-                text: 'Wind toggles every (hours):'
-            FieldLabel:
-                text: str(root.windSwitchingPeriod)
-            Button:
-                id: windTogglePlusButton
-                text: '+'
-                on_release: root.incrementSwitchingPeriod()
-                disabled : True
-            Button:
-                id: windToggleMinusButton
-                text: '-'
-                on_release: root.decrementSwitchingPeriod()
-                disabled : True
-        GridLayout:
-            cols: 3
-            FieldLabel:
-                text: 'Sunny/Cloudy Day?'
-            ToggleButton:
-                id: sunnyButton
-                text: 'Sunny'
-                group: 'cloudCover'
-                state: 'down'
-                allow_no_selection: False
-            ToggleButton:
-                text: 'Cloudy'
-                group: 'cloudCover'
-                allow_no_selection: False
-        GridLayout:
-            cols: 4
-            FieldLabel:
-                text: 'Daylight Hours:'
-            FieldLabel:
-                text: str(root.daylightHours)
-            Button:
-                text: '+'
-                on_release: root.incrementDaylightHours()
-            Button:
-                text: '-'
-                on_release: root.decrementDaylightHours()
+                text: 'Realistic'
+                group: 'sustainable'
+                allow_no_selection: False       
         GridLayout:
             cols: 4
             FieldLabel:
@@ -192,64 +119,181 @@
         orientation: 'vertical'
         TitleLabel:
             text: 'Cycle Mode'
-
         GridLayout:
             cols: 2
-            FieldLabel:
-                text: 'Wind Power:'
-            FieldLabel:
-                text: str(root.windPower) + ' GW' 
-                color: [0,1,0,1]#r, g, b, a
-            FieldLabel:
-                text: 'Solar Power:'
-            FieldLabel:
-                text: str(root.solarPower) + ' GW' 
-                color: [0,1,0,1] 
-            FieldLabel:                
-                text: 'Hydroelectric Power:'
-            FieldLabel:
-                id: hydroPowerValueLabel
-                text: str(root.hydroPower) + ' GW' 
-        GridLayout:
-            cols: 2
-            FieldLabel:
-                text: 'City Consumption:'
-            FieldLabel:
-                text: str(root.consumption) + ' GW'
-                color: [1, 0, 0, 1]
-            FieldLabel:
-                text: 'Total Renewable Supply:'
-            FieldLabel:
-                id: renewableSupplyLabel
-                text: str(root.renewableSupply) + ' GW' 
-            FieldLabel:
-                text: 'Renewable Surplus/Shortage:'
-            FieldLabel:
-                id: surplusValueLabel
-                text: str(root.renewableSurplus) + ' GW' 
-        GridLayout:
-            cols: 2
-            FieldLabel:
-                text: 'Battery Energy:'
-            FieldLabel:
-                text: str(root.batteryEnergy) + ' GWh' 
-            FieldLabel:
-                text: 'Reservoir Energy:'
-            FieldLabel:
-                text: str(root.hydroEnergy) + ' GWh'
-        
-        GridLayout:
-            cols: 2
-            FieldLabel:
-                text: 'Day:'
-            FieldLabel:
-                text: str(root.day)
-            FieldLabel:
-                text: 'Hour:'
-            FieldLabel:
-                text: str(root.hour)
-
+            GridLayout:
+                cols: 2
+                FieldLabel:
+                    text: 'Wind Power:'
+                FieldLabel:
+                    text: str(root.windPower) + ' GW' 
+                    color: [0,1,0,1]#r, g, b, a
+                FieldLabel:
+                    text: 'Solar Power:'
+                FieldLabel:
+                    text: str(root.solarPower) + ' GW' 
+                    color: [0,1,0,1] 
+                FieldLabel:                
+                    text: 'Hydroelectric Power:'
+                FieldLabel:
+                    id: hydroPowerValueLabel
+                    text: str(root.hydroPower) + ' GW' 
+            GridLayout:
+                cols: 2
+                FieldLabel:
+                    text: 'City Consumption:'
+                FieldLabel:
+                    text: str(root.consumption) + ' GW'
+                    color: [1, 0, 0, 1]
+                FieldLabel:
+                    text: 'Total Renewable Supply:'
+                FieldLabel:
+                    id: renewableSupplyLabel
+                    text: str(root.renewableSupply) + ' GW' 
+                FieldLabel:
+                    text: 'Renewable Surplus/Shortage:'
+                FieldLabel:
+                    id: surplusValueLabel
+                    text: str(root.renewableSurplus) + ' GW' 
+            GridLayout:
+                cols: 2
+                FieldLabel:
+                    text: 'Battery Energy:'
+                FieldLabel:
+                    text: str(root.batteryEnergy) + ' GWh' 
+                FieldLabel:
+                    text: 'Reservoir Energy:'
+                FieldLabel:
+                    text: str(root.hydroEnergy) + ' GWh'
+            
+            GridLayout:
+                cols: 2
+                FieldLabel:
+                    text: 'Day:'
+                FieldLabel:
+                    text: str(root.day)
+                FieldLabel:
+                    text: 'Hour:'
+                FieldLabel:
+                    text: str(root.hour)
         Button:
             text: 'Stop/Finish'
             on_release: root.stopCycleMode()
         
+<SubstationModeConfigScreen>
+    name: 'substationModeConfig'
+    BoxLayout:
+        orientation: 'vertical'
+        TitleLabel:
+            text: 'Substation Mode Configuration'
+        GridLayout:
+            cols: 2
+            ToggleButton:
+                id: sustainableToggleButton
+                text: 'Sustainable'
+                group: 'sustainable'
+                state: 'down'
+                allow_no_selection: False
+            ToggleButton:
+                text: 'Realistic'
+                group: 'sustainable'
+                allow_no_selection: False       
+        GridLayout:
+            cols: 2
+            Button:
+                text: 'Back'
+                on_release: app.root.current = 'selectMode'
+            Button:
+                text: 'Start'
+                on_release: root.startSubstationMode()
+
+
+<SubstationModeScreen>
+    name: 'substationMode'
+    BoxLayout:
+        orientation: 'vertical'
+        TitleLabel:
+            text: 'Substation Mode'
+
+        GridLayout:
+            cols: 2
+            GridLayout:
+                cols: 2
+                FieldLabel:
+                    text: 'Substation Pi'
+                FieldLabel:
+                    text: root.connectionStatus
+            GridLayout:
+                cols: 2
+                FieldLabel:
+                    text: 'Wind Power:'
+                FieldLabel:
+                    text: str(root.windPower) + ' GW' 
+                    color: [0,1,0,1]#r, g, b, a
+                FieldLabel:
+                    text: 'Solar Power:'
+                FieldLabel:
+                    text: str(root.solarPower) + ' GW' 
+                    color: [0,1,0,1] 
+                FieldLabel:                
+                    text: 'Hydroelectric Power:'
+                FieldLabel:
+                    id: hydroPowerValueLabel
+                    text: str(root.hydroPower) + ' GW' 
+            GridLayout:
+                cols: 2
+                FieldLabel:
+                    text: 'City Consumption:'
+                FieldLabel:
+                    text: str(root.consumption) + ' GW'
+                    color: [1, 0, 0, 1]
+                FieldLabel:
+                    text: 'Total Renewable Supply:'
+                FieldLabel:
+                    id: renewableSupplyLabel
+                    text: str(root.renewableSupply) + ' GW' 
+                FieldLabel:
+                    text: 'Renewable Surplus/Shortage:'
+                FieldLabel:
+                    id: surplusValueLabel
+                    text: str(root.renewableSurplus) + ' GW' 
+            GridLayout:
+                cols: 2
+                FieldLabel:
+                    text: 'Battery Energy:'
+                FieldLabel:
+                    text: str(root.batteryEnergy) + ' GWh' 
+                FieldLabel:
+                    text: 'Reservoir Energy:'
+                FieldLabel:
+                    text: str(root.hydroEnergy) + ' GWh'
+            
+            GridLayout:
+                cols: 2
+                FieldLabel:
+                    text: 'Day:'
+                FieldLabel:
+                    text: str(root.day)
+                FieldLabel:
+                    text: 'Hour:'
+                FieldLabel:
+                    text: str(root.hour)
+
+            GridLayout:
+                cols: 2
+                FieldLabel:
+                    text: 'Switch 1 status'
+                FieldLabel:
+                    text: root.SW1Status
+                FieldLabel:
+                    text: 'Switch 2 status'
+                FieldLabel:
+                    text: root.SW2Status
+                FieldLabel:
+                    text: 'Switch 3 status'
+                FieldLabel:
+                    text: root.SW3Status
+
+        Button:
+            text: 'Stop'
+            on_release: root.stopSubstationMode()
