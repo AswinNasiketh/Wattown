@@ -62,6 +62,15 @@ class PacketSniffer(Thread):
             logging.debug("AttributeError - requestPDU element doesn't exist - Ignore")
 
 
+#testing with scapy and packet spoofing
+
+# from scapy.all import *
+
+# packets = rdpcap('Wattown/packetCaptures/openQB2.pcapng')
+# input()
+# sendp(packets, iface='Realtek USB GbE Family Controller #2')
+
+
 
 # testing with pyshark and capture
 # packets = pyshark.FileCapture('Wattown/packetCaptures/openQB2.pcapng')

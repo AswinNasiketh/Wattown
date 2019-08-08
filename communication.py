@@ -1,4 +1,5 @@
 #module for communication between the wattown pi and the substation pi
+#for use on substation and wattown pis
 
 import requests
 from http.server import BaseHTTPRequestHandler, HTTPServer
