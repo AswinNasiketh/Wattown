@@ -4,24 +4,33 @@ from communication import sendCommand, WATTOWN_SERVER_SOCKET #use sendCommand to
 from threading import Thread, Event
 import logging
 
+logging.basicConfig(level = logging.INFO)
+
+
 class PacketSniffer(Thread):
     commandList = ['openSW1', 'closeSW1']
 
     def __init__(self):
         self.stopEvent = Event()
         self.stopEvent.clear()
-        self.capture = pyshark.LiveCapture(interface='eth0')
-        super().__init__()
+        self.capture = pyshark.LiveCapture(interface='eth0', custom_parameters = {"-C": "tshark-mms"})
+        #self.capture.set_debug()
+        Thread.__init__(self,daemon=True)
 
     def run(self):
         for packet in self.capture.sniff_continuously():
             if self.stopEvent.is_set():
                 break
-
+            #print(packet)
             if self.isMMSPacket(packet):
+                logging.debug("MMS Packet found")
                 commandToSend = self.parseMMSPacket(packet)
                 if commandToSend != -1:
-                    sendCommand(WATTOWN_SERVER_SOCKET, self.commandList[commandToSend])
+                    result = sendCommand(WATTOWN_SERVER_SOCKET, self.commandList[commandToSend])
+                    if result:
+                        logging.info("command sent successfully!")
+                    else:
+                        logging.info("command send failed")
             elif self.isGOOSEPacket(packet):
                 pass
                 # print("GOOSE packet found")
@@ -53,21 +62,30 @@ class PacketSniffer(Thread):
                         closedVal = int(packet.mms.boolean)
                         if closedVal == 1:
                             logging.info("Close switch")
-                            return 0
+                            return 1
                         else:
                             logging.info("Open Switch")
-                            return 1
+                            return 0
             return -1
         except AttributeError:
             logging.debug("AttributeError - requestPDU element doesn't exist - Ignore")
-
+            return -1
 
 #testing with scapy and packet spoofing
-
+#for testing substation mode Pi's reactions, just change pcap file
 # from scapy.all import *
 
-# packets = rdpcap('Wattown/packetCaptures/openQB2.pcapng')
+# packets = rdpcap('openQB2.pcapng')
 # input()
+
+# for packet in packets:
+#     if IP in packet:
+#         packet[IP].dst = '172.19.6.1'
+#         del packet[IP].chksum
+#     if TCP in packet:
+#         del packet[TCP].chksum
+
+
 # sendp(packets, iface='Realtek USB GbE Family Controller #2')
 
 
