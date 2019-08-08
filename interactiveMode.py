@@ -83,13 +83,14 @@ class InteractiveMode():
 
     def animateDistributionLines(self):
         if self.lightBlock1: #signifies some power is flowing
-            self.board.distributionMiddle.startPowerFlow()
-            self.board.distributionRight.startPowerFlow()
+            self.board.distributionMiddle.startPowerFlow()            
         else:
             self.board.distributionMiddle.stopPowerFlow()
+        #right distribution line only comes on when city is fully powered
+        if self.lightBlock3:
+            self.board.distributionRight.startPowerFlow()
+        else:
             self.board.distributionRight.stopPowerFlow()
-
-
     def getWindmillsBlown(self):
         windmillsBlown = self.board.windmills.numWindmillsBlown()
         return windmillsBlown
