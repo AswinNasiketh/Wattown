@@ -50,6 +50,8 @@ class CycleSim():
 
     SUNRISE = 6 #6AM
     SUNSET = 20 #8PM
+    DIST_RIGHT_ON_THRESHOLD = 0.80
+    DIST_MIDDLE_ON_THRESHOLD = 0.20
 
     def __init__(self, board):
         self.board = board
@@ -60,6 +62,7 @@ class CycleSim():
         self.windPower = 0
         self.reservoirPower = 0
         self.totalRenewableSupply = 0
+        self.cityLightsCoefficent = 0
 
         self.dayCount = 0
         self.hourCount = 0
@@ -153,13 +156,16 @@ class CycleSim():
             self.board.wattownSign.turnOff()
 
     def animateDistributionLine(self):
-        self.board.distributionMiddle.startPowerFlow()
-        self.board.distributionRight.startPowerFlow() # will be reset to off when cleanup occurs
-
-        if self.consumptionValues[self.hourCount] == values.MIN_CONSUMPTION:
-            self.board.distributionMiddle.setFrameRate(DistributionLine.SLOW_ANIMATION_FRAME_RATE)
-        else:
-            self.board.distributionMiddle.setFrameRate(DistributionLine.FAST_ANIMATION_FRAME_RATE)
+        if self.consumptionValues[self.hourCount] == values.MIN_CONSUMPTION: #no city blocks lit up
+            self.board.distributionMiddle.stopPowerFlow()
+            self.board.distributionRight.stopPowerFlow() 
+        elif self.cityLightsCoefficent > self.DIST_MIDDLE_ON_THRESHOLD and self.cityLightsCoefficent < self.DIST_RIGHT_ON_THRESHOLD: # up to 2 out of 3 city blocks lit up
+            self.board.distributionMiddle.startPowerFlow()
+            self.board.distributionRight.stopPowerFlow()
+        elif self.cityLightsCoefficent >= self.DIST_RIGHT_ON_THRESHOLD: # all city blocks lit
+            self.board.distributionMiddle.startPowerFlow()
+            self.board.distributionRight.startPowerFlow() 
+        #only show power flow in right distribution line when 3rd city block is lit up
 
     def getUIData(self):
         return [self.solarGenerationValues[self.hourCount], 
@@ -184,8 +190,8 @@ class CycleSim():
 
         consumptionAboveMin = consumption - minConsumption
 
-        cityLightsCoefficent = consumptionAboveMin/maxConsumptionDelta
-        self.board.lightCityBlocks(cityLightsCoefficent, offColourBlack = True)     
+        self.cityLightsCoefficent = consumptionAboveMin/maxConsumptionDelta
+        self.board.lightCityBlocks(self.cityLightsCoefficent, offColourBlack = True)     
 
 
     def setupSolarGenerationValues(self, sustainable = True):

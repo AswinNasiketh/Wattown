@@ -19,33 +19,26 @@ class City():
             offColour = LED_RED_DIM
         
         if blocksToLight == 0:
-            for i in range(City.BLOCK_1_LOWER, City.BLOCK_3_UPPER + 1):
-                self.LEDHandle[i] = offColour
+            self.setBlock1(offColour)
+            self.setBlock2(offColour)
+            self.setBlock3(offColour)
 
         elif blocksToLight == 1:
-            for i in range(City.BLOCK_1_LOWER, City.BLOCK_1_UPPER + 1):
-                if supplyTripped and (i % 2):#if the supply is tripped, set all odd LEDs to red
-                    self.LEDHandle[i] = LED_RED_DIM
-                else:
-                    self.LEDHandle[i] = LED_CITY_LIGHTS_YELLOW
-                
-            for i in range(City.BLOCK_2_LOWER, City.BLOCK_3_UPPER + 1):
-                self.LEDHandle[i] = offColour
+            self.setBlock1(LED_CITY_LIGHTS_YELLOW)
+            self.setBlock2(offColour)
+            self.setBlock3(offColour)
         elif blocksToLight == 2:
-            for i in range(City.BLOCK_1_LOWER, City.BLOCK_2_UPPER + 1):
-                if supplyTripped and (i % 2):
-                    self.LEDHandle[i] = LED_RED_DIM
-                else:
-                    self.LEDHandle[i] = LED_CITY_LIGHTS_YELLOW
-                
-            for i in range(City.BLOCK_3_LOWER, City.BLOCK_3_UPPER + 1):
-                self.LEDHandle[i] = offColour
+            self.setBlock1(LED_CITY_LIGHTS_YELLOW)
+            self.setBlock2(LED_CITY_LIGHTS_YELLOW)
+            self.setBlock3(offColour)
         elif blocksToLight == 3:
-            for i in range(City.BLOCK_1_LOWER, City.BLOCK_3_UPPER + 1):
-                if supplyTripped and (i % 2):
-                    self.LEDHandle[i] = LED_RED_DIM
-                else:
-                    self.LEDHandle[i] = LED_CITY_LIGHTS_YELLOW
+            self.setBlock1(LED_CITY_LIGHTS_YELLOW)
+            self.setBlock2(LED_CITY_LIGHTS_YELLOW)
+            
+            if supplyTripped: # 3rd block is the only block affected by supply tripping
+                self.setBlock3(LED_RED_DIM)
+            else:
+                self.setBlock3(LED_CITY_LIGHTS_YELLOW)
     
     #for more manual control
     def setCityLEDs(self, rangeLower, rangeUpper, colour):
@@ -54,3 +47,18 @@ class City():
 
         for i in range(rangeLower, rangeUpper + 1):
             self.LEDHandle[i] = colour
+            
+    def setBlock1(self, colour):
+        for i in range(City.BLOCK_1_LOWER, City.BLOCK_1_UPPER + 1):
+                self.LEDHandle[i] = colour
+                
+    def setBlock2(self, colour):
+        for i in range(City.BLOCK_2_LOWER, City.BLOCK_2_UPPER + 1):
+                self.LEDHandle[i] = colour
+                
+    def setBlock3(self, colour):
+        for i in range(City.BLOCK_3_LOWER, City.BLOCK_3_UPPER + 1):
+                self.LEDHandle[i] = colour
+                
+        
+        
